@@ -259,26 +259,30 @@ class ToonExporter:
     def _compute_coupling_matrix(
         self, result: AnalysisResult
     ) -> Tuple[Dict[Tuple[str, str], int], Dict[str, Dict[str, int]]]:
-        """Build package-to-package coupling counts from module imports."""
+        """Build package-to-package coupling from cross-module function calls."""
         matrix: Dict[Tuple[str, str], int] = defaultdict(int)
         pkg_fan: Dict[str, Dict[str, int]] = {}
 
-        for mname, mi in result.modules.items():
-            src_pkg = self._package_of_module(mname)
-            for imp in mi.imports:
-                dst_pkg = self._package_of_module(imp)
-                if dst_pkg and dst_pkg != src_pkg:
-                    matrix[(src_pkg, dst_pkg)] += 1
+        # Build module lookup: qualified_func_name -> module_name
+        func_to_module: Dict[str, str] = {}
+        for qname, fi in result.functions.items():
+            func_to_module[qname] = fi.module
 
-        # also use coupling.module_interactions if available
-        interactions = {}
-        if isinstance(result.coupling, dict):
-            interactions = result.coupling.get("module_interactions", {})
-        for src_mod, targets in interactions.items():
+        # Derive coupling from actual cross-module calls
+        for qname, fi in result.functions.items():
+            src_mod = fi.module
             src_pkg = self._package_of_module(src_mod)
-            if isinstance(targets, (list, set)):
-                for tgt in targets:
-                    dst_pkg = self._package_of_module(tgt)
+            for callee in fi.calls:
+                # Resolve callee to a known function
+                callee_mod = func_to_module.get(callee)
+                if not callee_mod:
+                    # Try suffix match
+                    for known_qname, known_mod in func_to_module.items():
+                        if known_qname.endswith(f".{callee}"):
+                            callee_mod = known_mod
+                            break
+                if callee_mod and callee_mod != src_mod:
+                    dst_pkg = self._package_of_module(callee_mod)
                     if dst_pkg and dst_pkg != src_pkg:
                         matrix[(src_pkg, dst_pkg)] += 1
 
