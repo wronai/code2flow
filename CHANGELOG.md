@@ -1,3 +1,46 @@
+## [0.2.3] - 2026-02-28
+
+### Summary
+
+refactor(docs): intelligent code analysis pipeline
+
+### Docs
+
+- docs: update llm_prompt.md
+- docs: update 01_god_function_god_function_normalize_llm_task.md
+- docs: update 02_god_function_god_function_parse_llm_task_text.md
+- docs: update 03_god_function_god_function_main.md
+- docs: update 04_god_function_god_function_validate_mermaid_file.md
+- docs: update 05_god_function_god_function_fix_mermaid_file.md
+- docs: update 06_god_function_god_function_generate_pngs.md
+- docs: update 07_god_function_god_function_generate_single_png.md
+- docs: update 08_god_function_god_function_strip_label_segments.md
+- docs: update 09_god_function_god_function___init__.md
+- ... and 676 more
+
+### Test
+
+- update tests/test_sprint5.py
+
+### Config
+
+- config: update goal.yaml
+
+### Other
+
+- update TICKET
+- config: update analysis.yaml
+- update final_prompts/call_graph.png
+- update final_prompts/calls.mmd
+- update final_prompts/cfg.png
+- update final_prompts/compact_flow.mmd
+- update final_prompts/flow.mmd
+- scripts: update project.sh
+- update project.toon
+- config: update analysis.yaml
+- ... and 5 more
+
+
 ## [0.2.2] - 2026-02-28
 
 ### Summary
