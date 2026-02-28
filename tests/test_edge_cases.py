@@ -4,9 +4,9 @@ import pytest
 import tempfile
 import shutil
 from pathlib import Path
-from code2flow import ProjectAnalyzer, FAST_CONFIG, NLPPipeline, FAST_NLP_CONFIG
+from code2flow import ProjectAnalyzer, FAST_CONFIG, NLPPipeline, FAST_NLP_CONFIG, Config
 from code2flow.core.analyzer import FileCache, FastFileFilter
-from code2flow.core.config import FilterConfig
+from code2flow.core.config import FilterConfig, PerformanceConfig
 
 
 class TestEdgeCases:
@@ -58,7 +58,11 @@ class TestEdgeCases:
             lines = [f"def func_{i}(): pass" for i in range(1000)]
             (tmp_dir / "large.py").write_text('\n'.join(lines))
             
-            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            config = Config(
+                mode="static",
+                filters=FilterConfig(exclude_patterns=[], min_function_lines=1)
+            )
+            analyzer = ProjectAnalyzer(config)
             result = analyzer.analyze_project(str(tmp_dir))
             
             assert result.get_function_count() >= 1000
@@ -72,7 +76,11 @@ class TestEdgeCases:
             # Create file with unicode name
             (tmp_dir / "tëst_файл.py").write_text("def foo(): pass")
             
-            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            config = Config(
+                mode="static",
+                filters=FilterConfig(exclude_patterns=[], min_function_lines=1)
+            )
+            analyzer = ProjectAnalyzer(config)
             result = analyzer.analyze_project(str(tmp_dir))
             
             assert result.get_function_count() >= 1
@@ -116,7 +124,11 @@ def baz(): pass
 '''
             (tmp_dir / "decorated.py").write_text(code)
             
-            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            config = Config(
+                mode="static",
+                filters=FilterConfig(exclude_patterns=[], min_function_lines=1, skip_properties=False)
+            )
+            analyzer = ProjectAnalyzer(config)
             result = analyzer.analyze_project(str(tmp_dir))
             
             assert result.get_function_count() >= 3
@@ -207,6 +219,7 @@ class TestFiltering:
     def test_skip_private_methods(self):
         """Test private method filtering."""
         config = FilterConfig(skip_private=True, min_function_lines=1)
+        filter_obj = FastFileFilter(config)
         
         # Private methods should be skipped
         assert filter_obj.should_skip_function("_private", 5, is_private=True)
@@ -352,7 +365,12 @@ def func_c(): pass
 class ClassX: pass
 ''')
             
-            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            config = Config(
+                mode="static",
+                filters=FilterConfig(exclude_patterns=[], min_function_lines=1),
+                performance=PerformanceConfig(parallel_enabled=False)
+            )
+            analyzer = ProjectAnalyzer(config)
             
             start = time.time()
             result = analyzer.analyze_project(str(tmp_dir))

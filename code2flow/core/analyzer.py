@@ -10,13 +10,20 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
+from radon.complexity import cc_visit, cc_rank
 import fnmatch
+import networkx as nx
+import vulture
 
 from .config import Config, FAST_CONFIG, FilterConfig
 from .models import (
     AnalysisResult, ClassInfo, FlowEdge, FlowNode,
     FunctionInfo, ModuleInfo, Pattern
 )
+from ..analysis.dfg import DFGExtractor
+from ..analysis.call_graph import CallGraphExtractor
+from ..analysis.coupling import CouplingAnalyzer
+from ..analysis.smells import SmellDetector
 
 
 class FileCache:
@@ -156,7 +163,9 @@ class FileAnalyzer:
             except SyntaxError:
                 return {}
         
-        return self._analyze_ast(ast_tree, file_path, module_name, content)
+        result = self._analyze_ast(ast_tree, file_path, module_name, content)
+        self.stats['files_processed'] += 1
+        return result
     
     def _analyze_ast(self, tree: ast.AST, file_path: str, module_name: str, content: str) -> Dict:
         """Analyze AST and extract structure."""
@@ -180,6 +189,42 @@ class FileAnalyzer:
             elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.AsyncFunctionDef):
                 self._process_function(node, file_path, module_name, result, lines, None)
         
+        # Calculate complexity with radon
+        try:
+            complexity_results = cc_visit(content)
+            for entry in complexity_results:
+                # Radon returns a list of objects (Function, Class, Method)
+                # We need to match them to our function/class records
+                full_name = f"{module_name}.{entry.name}"
+                if entry.classname:
+                    full_name = f"{module_name}.{entry.classname}.{entry.name}"
+                
+                if full_name in result['functions']:
+                    result['functions'][full_name].complexity = {
+                        'cyclomatic': entry.complexity,
+                        'rank': cc_rank(entry.complexity)
+                    }
+        except Exception as e:
+            if self.config.verbose:
+                print(f"Error calculating complexity for {file_path}: {e}")
+        
+        # New: Deep Analysis for refactoring
+        try:
+            dfg_ext = DFGExtractor(self.config)
+            dfg_res = dfg_ext.extract(tree, module_name, file_path)
+            result['mutations'] = dfg_res.mutations
+            result['data_flows'] = dfg_res.data_flows
+            
+            # Update function calls from CG extractor which is more robust
+            cg_ext = CallGraphExtractor(self.config)
+            cg_res = cg_ext.extract(tree, module_name, file_path)
+            for func_name, cg_func in cg_res.functions.items():
+                if func_name in result['functions']:
+                    result['functions'][func_name].calls.extend(list(cg_func.calls))
+        except Exception as e:
+            if self.config.verbose:
+                print(f"Error in deep analysis for {file_path}: {e}")
+
         self.stats['files_processed'] += 1
         return result
     
@@ -220,7 +265,7 @@ class FileAnalyzer:
             qualified_name = f"{module_name}.{func_name}"
         
         # Check filtering - use FastFileFilter for function-level filtering
-        line_count = node.end_lineno - node.lineno if node.end_lineno else 1
+        line_count = (node.end_lineno - node.lineno + 1) if node.end_lineno else 1
         is_private = func_name.startswith('_')
         is_property = any(
             isinstance(d, ast.Name) and d.id == 'property' 
@@ -407,6 +452,8 @@ class ProjectAnalyzer:
         start_time = time.time()
         
         project_path = Path(project_path).resolve()
+        if not project_path.exists():
+            raise FileNotFoundError(f"Project path does not exist: {project_path}")
         
         # Collect Python files
         files = self._collect_files(project_path)
@@ -426,9 +473,11 @@ class ProjectAnalyzer:
         # Build call graph
         self._build_call_graph(merged)
         
-        # Detect patterns (if not disabled)
         if not self.config.performance.skip_pattern_detection:
             self._detect_patterns(merged)
+            
+        # New: Refactoring analysis
+        self._perform_refactoring_analysis(merged)
         
         # Calculate stats
         elapsed = time.time() - start_time
@@ -535,6 +584,10 @@ class ProjectAnalyzer:
                 merged.nodes.update(r['nodes'])
             if 'edges' in r:
                 merged.edges.extend(r['edges'])
+            if 'mutations' in r:
+                merged.mutations.extend(r['mutations'])
+            if 'data_flows' in r:
+                merged.data_flows.update(r['data_flows'])
         
         return merged
     
@@ -571,9 +624,9 @@ class ProjectAnalyzer:
         # Detect state machines (simple heuristic)
         for class_name, cls in result.classes.items():
             state_methods = [m for m in cls.methods if any(
-                s in m.lower() for s in ['state', 'transition', 'enter', 'exit']
+                s in m.lower() for s in ['state', 'transition', 'enter', 'exit', 'connect', 'disconnect']
             )]
-            if len(state_methods) >= 3:
+            if len(state_methods) >= 2:
                 cls.is_state_machine = True
                 result.patterns.append(Pattern(
                     name=f"state_machine_{cls.name}",
@@ -582,3 +635,119 @@ class ProjectAnalyzer:
                     functions=cls.methods,
                     entry_points=cls.methods[:1],
                 ))
+
+    def _perform_refactoring_analysis(self, result: AnalysisResult) -> None:
+        """Perform deep analysis and detect code smells."""
+        if self.config.verbose:
+            print("Performing refactoring analysis...")
+            
+        # 1. Calculate metrics (fan-in/fan-out)
+        cg_ext = CallGraphExtractor(self.config)
+        cg_ext.result = result
+        cg_ext._calculate_metrics()
+        
+        # 2. Build networkx graph for project-level analysis
+        G = nx.DiGraph()
+        for func_name, func_info in result.functions.items():
+            G.add_node(func_name)
+            for callee in func_info.calls:
+                G.add_edge(func_name, callee)
+        
+        # 3. Calculate Betweenness Centrality (Bottlenecks)
+        if len(G) > 0:
+            try:
+                centrality = nx.betweenness_centrality(G)
+                for func_name, score in centrality.items():
+                    if func_name in result.functions:
+                        result.functions[func_name].centrality = score
+            except Exception as e:
+                if self.config.verbose:
+                    print(f"Error calculating centrality: {e}")
+            
+            # 4. Detect Circular Dependencies
+            try:
+                cycles = list(nx.simple_cycles(G))
+                if cycles:
+                    result.metrics["project"] = result.metrics.get("project", {})
+                    result.metrics["project"]["circular_dependencies"] = cycles
+            except Exception as e:
+                if self.config.verbose:
+                    print(f"Error detecting cycles: {e}")
+
+            # 5. Community Detection (Module groups)
+            try:
+                from networkx.algorithms import community
+                # Using Louvain if available, otherwise greedy modularity
+                if hasattr(community, 'louvain_communities'):
+                    communities = community.louvain_communities(G.to_undirected())
+                else:
+                    communities = community.greedy_modularity_communities(G.to_undirected())
+                
+                result.coupling["communities"] = [list(c) for c in communities]
+            except Exception as e:
+                if self.config.verbose:
+                    print(f"Error in community detection: {e}")
+        
+        # 6. Analyze coupling
+        coupling_analyzer = CouplingAnalyzer(result)
+        coupling_analyzer.analyze()
+        
+        # 7. Detect code smells
+        smell_detector = SmellDetector(result)
+        smell_detector.detect()
+        
+        # 8. Dead code detection with vulture
+        self._detect_dead_code(result)
+        
+        if self.config.verbose:
+            print(f"  Detected {len(result.smells)} code smells")
+
+    def _detect_dead_code(self, result: AnalysisResult) -> None:
+        """Use vulture to find dead code and update reachability."""
+        if self.config.verbose:
+            print("Detecting dead code with vulture...")
+            
+        try:
+            v = vulture.Vulture(verbose=False)
+            
+            # vulture.scan takes the code content as a string
+            for py_file in Path(result.project_path).rglob("*.py"):
+                if not self.file_filter.should_process(str(py_file)):
+                    continue
+                try:
+                    content = py_file.read_text(encoding='utf-8', errors='ignore')
+                    v.scan(content, filename=str(py_file))
+                except Exception:
+                    continue
+                    
+            dead_code = v.get_unused_code()
+            
+            if self.config.verbose:
+                print(f"  Vulture found {len(dead_code)} unused items")
+            
+            # Map unused code to our functions/classes
+            for item in dead_code:
+                if self.config.verbose:
+                    item_lineno = getattr(item, 'lineno', getattr(item, 'first_lineno', 0))
+                    print(f"  Vulture item: {item.filename}:{item_lineno} ({item.typ})")
+                    
+                # Match by file and line
+                item_path = Path(item.filename).resolve()
+                item_lineno = getattr(item, 'lineno', getattr(item, 'first_lineno', 0))
+                for func_name, func_info in result.functions.items():
+                    func_path = Path(func_info.file).resolve()
+                    if func_path == item_path and func_info.line == item_lineno:
+                        func_info.reachability = "unreachable"
+                        
+                for class_name, class_info in result.classes.items():
+                    if Path(class_info.file).resolve() == Path(item.filename).resolve() and class_info.line == item.lineno:
+                        class_info.reachability = "unreachable" # (if we add reachability to ClassInfo too)
+                        
+            # Mark others as reachable if they are NOT orphans
+            for func_name, func_info in result.functions.items():
+                if func_info.reachability == "unknown":
+                    if func_info.called_by or func_name in result.entry_points:
+                        func_info.reachability = "reachable"
+        except Exception as e:
+            if self.config.verbose:
+                print(f"Error in dead code detection: {e}")

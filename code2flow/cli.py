@@ -137,6 +137,24 @@ Examples:
         help='Export data structure analysis (types, flows, optimization opportunities)'
     )
     
+    parser.add_argument(
+        '--refactor',
+        action='store_true',
+        help='Enable AI-driven refactoring analysis and prompt generation'
+    )
+    
+    parser.add_argument(
+        '--smell',
+        help='Filter refactoring by specific code smell (e.g., god_function, feature_envy)'
+    )
+    
+    parser.add_argument(
+        '--llm-format',
+        choices=['claude', 'gpt', 'markdown'],
+        default='markdown',
+        help='Format for refactoring prompts (default: markdown)'
+    )
+    
     return parser
 
 
@@ -341,6 +359,30 @@ def main():
         exporter.export(result, str(filepath))
         if args.verbose:
             print(f"  - LLM prompt: {filepath}")
+
+        # New: AI-driven refactoring prompts
+        if args.refactor:
+            from .refactor.prompt_engine import PromptEngine
+            prompt_engine = PromptEngine(result)
+            prompts = prompt_engine.generate_prompts()
+            
+            if prompts:
+                prompts_dir = output_dir / 'prompts'
+                prompts_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Filter by smell if requested
+                if args.smell:
+                    prompts = {k: v for k, v in prompts.items() if args.smell in k.lower()}
+                
+                for filename, content in prompts.items():
+                    prompt_path = prompts_dir / filename
+                    prompt_path.write_text(content)
+                
+                if args.verbose:
+                    print(f"  - Refactoring prompts: {prompts_dir}/ ({len(prompts)} files)")
+            else:
+                if args.verbose:
+                    print("  - Refactoring: No code smells detected.")
             
     except Exception as e:
         print(f"Error during export: {e}", file=sys.stderr)

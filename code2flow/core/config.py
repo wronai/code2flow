@@ -41,7 +41,7 @@ class FilterConfig:
         "*_test.py", "test_*.py", "conftest.py"
     ])
     include_patterns: List[str] = field(default_factory=list)
-    min_function_lines: int = 2
+    min_function_lines: int = 1
     skip_private: bool = False
     skip_properties: bool = True
     skip_accessors: bool = True
@@ -126,7 +126,7 @@ FAST_CONFIG = Config(
         skip_private=True,
         skip_properties=True,
         skip_accessors=True,
-        min_function_lines=3,
+        min_function_lines=1,
     ),
     depth=DepthConfig(
         max_cfg_depth=3,

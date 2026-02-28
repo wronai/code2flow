@@ -1,0 +1,358 @@
+# code2flow | 53f 18333L | python:53
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[53]:
+  advanced_data_analyzer.py,1075
+  advanced_yaml_optimizer.py,205
+  benchmarks/benchmark_performance.py,181
+  benchmarks/test_performance.py,154
+  code2flow/__init__.py,37
+  code2flow/__main__.py,4
+  code2flow/cli.py,307
+  code2flow/core/__init__.py,34
+  code2flow/core/analyzer.py,457
+  code2flow/core/config.py,136
+  code2flow/core/models.py,248
+  code2flow/core/streaming_analyzer.py,510
+  code2flow/exporters/__init__.py,0
+  code2flow/exporters/base.py,944
+  code2flow/extractors/__init__.py,0
+  code2flow/extractors/call_graph.py,115
+  code2flow/extractors/cfg_extractor.py,219
+  code2flow/extractors/dfg_extractor.py,136
+  code2flow/llm_flow_generator.py,359
+  code2flow/llm_task_generator.py,215
+  code2flow/mermaid_generator.py,346
+  code2flow/nlp/__init__.py,19
+  code2flow/nlp/config.py,129
+  code2flow/nlp/entity_resolution.py,239
+  code2flow/nlp/intent_matching.py,220
+  code2flow/nlp/normalization.py,87
+  code2flow/nlp/pipeline.py,286
+  code2flow/optimization/advanced_optimizer.py,301
+  code2flow/optimization/implementation.py,641
+  code2flow/optimization/standalone_test.py,331
+  code2flow/optimization/test_optimization.py,317
+  code2flow/patterns/__init__.py,0
+  code2flow/patterns/detector.py,117
+  code2flow/visualizers/__init__.py,0
+  code2flow/visualizers/graph.py,150
+  examples/functional_refactoring_example.py,456
+  fast_analysis.py,176
+  flow.py,793
+  generate_graph_viewer.py,841
+  generate_index_html.py,620
+  hybrid_export.py,199
+  mermaid_to_png.py,221
+  optimize_llm_prompt.py,121
+  optimize_llm_prompt_fixed.py,141
+  performance_optimizations.py,179
+  setup.py,60
+  split_yaml.py,41
+  test_analyzer.py,239
+  test_graph_viewer.py,159
+  tests/test_analyzer.py,156
+  tests/test_edge_cases.py,264
+  tests/test_nlp_pipeline.py,238
+  ultimate_yaml_optimizer.py,177
+D:
+  advanced_data_analyzer.py:
+    i: yaml,json,networkx,collections.{Counter,defaultdict},pathlib.Path,typing.{Any,Dict,List,Tuple}
+    e: HybridDataAnalyzer,main
+    HybridDataAnalyzer: __init__(1),run_all_analyses(0),analyze_data_hubs_and_consolidation(0),extract_redundant_processes(0),cluster_data_types_for_unification(0)  # Advanced analyzer for hybrid export d...
+    main()
+  advanced_yaml_optimizer.py:
+    i: yaml,json,collections.Counter,pathlib.Path
+    e: analyze_yaml_optimization,analyze_main_data,analyze_flow_graph,identify_optimizations,apply_optimizations,save_optimized_files,show_comparison
+    analyze_yaml_optimization()
+    analyze_main_data(data)
+    analyze_flow_graph(data)
+    identify_optimizations(main_data;flow_data)
+    apply_optimizations(main_data;flow_data;opportunities)
+    save_optimized_files(optimized_main;optimized_flow)
+    show_comparison(original_main;original_flow;optimized_main;optimized_flow)
+  benchmarks/benchmark_performance.py:
+    i: time,tempfile,shutil,statistics,sys,code2flow.{FAST_CONFIG,ProjectAnalyzer},code2flow.core.streaming_analyzer.{STRATEGY_QUICK,StreamingAnalyzer},pathlib.Path
+    e: create_test_project,benchmark_original_analyzer,benchmark_streaming_analyzer,benchmark_with_strategies,print_comparison,main
+    create_test_project(size:str='medium')->str
+    benchmark_original_analyzer(project_path:str;runs:int=3)->dict
+    benchmark_streaming_analyzer(project_path:str;runs:int=3)->dict
+    benchmark_with_strategies(project_path:str)->dict
+    print_comparison(original:dict;streaming:dict)
+    main()
+  benchmarks/test_performance.py:
+    i: tempfile,shutil,time,pytest,code2flow.{Config,ProjectAnalyzer},code2flow.core.config.FAST_CONFIG,pathlib.Path,typing.{Dict,List}
+    e: TestPerformanceBenchmarks,TestMemoryBenchmarks
+    TestPerformanceBenchmarks: large_project(0),test_fast_mode_performance(1),test_caching_performance(1),test_parallel_vs_sequential(1),test_scaling_with_project_size(1)  # Performance benchmark tests.
+    TestMemoryBenchmarks: test_memory_usage_stays_bounded(1)  # Memory usage benchmarks.
+  code2flow/cli.py:
+    i: argparse,sys,core.analyzer.ProjectAnalyzer,core.config.{ANALYSIS_MODES,Config},exporters.base.{JSONExporter,LLMPromptExporter,MermaidExporter,YAMLExporter},pathlib.Path
+    e: create_parser,main,generate_llm_context
+    create_parser()->argparse.ArgumentParser
+    main()
+    generate_llm_context(args_list)
+  code2flow/core/analyzer.py:
+    i: ast,hashlib,json,os,pickle,time,concurrent.futures.{ProcessPoolExecutor,as_completed},functools.lru_cache,pathlib.Path
+    e: FileCache,FastFileFilter,FileAnalyzer,ProjectAnalyzer
+    FileCache: __init__(2),_get_cache_key(2),_get_cache_path(1),get(2),put(3)  # Cache for parsed AST files.
+    FastFileFilter: __init__(1),should_process(1),should_skip_function(5)  # Fast file filtering with pattern matc...
+    FileAnalyzer: __init__(2),analyze_file(2),_analyze_ast(4),_process_class(5),_process_function(6)  # Analyzes a single file.
+    ProjectAnalyzer: __init__(1),analyze_project(1),_collect_files(1),_analyze_parallel(1),_analyze_sequential(1)  # Main analyzer with parallel processing.
+    _analyze_single_file(args)
+  code2flow/core/config.py:
+    i: dataclasses.{dataclass,field},enum.Enum,typing.{List,Set}
+    e: AnalysisMode,PerformanceConfig,FilterConfig,DepthConfig,OutputConfig,Config,FAST_CONFIG,ANALYSIS_MODES
+    AnalysisMode:   # Available analysis modes.
+    PerformanceConfig:   # Performance optimization settings.
+    FilterConfig:   # Filtering options to reduce analysis...
+    DepthConfig:   # Depth limiting for control flow analy...
+    OutputConfig:   # Output formatting options.
+  code2flow/core/models.py:
+    i: dataclasses.{dataclass,field},pathlib.Path,typing.{Any,Dict,List,Optional,Set}
+    e: FlowNode,FlowEdge,FunctionInfo,ClassInfo,ModuleInfo,Pattern,AnalysisResult
+    FlowNode: to_dict(1)  # Represents a node in the control flow...
+    FlowEdge: to_dict(1)  # Represents an edge in the control flo...
+    FunctionInfo: to_dict(1)  # Information about a function/method.
+    ClassInfo: to_dict(1)  # Information about a class.
+    ModuleInfo: to_dict(1)  # Information about a module/package.
+  code2flow/core/streaming_analyzer.py:
+    i: ast,hashlib,json,os,time,collections.defaultdict,dataclasses.{dataclass,field},pathlib.Path,typing.Dict
+    e: FilePriority,ScanStrategy,STRATEGY_QUICK,STRATEGY_STANDARD,STRATEGY_DEEP,StreamingFileCache,SmartPrioritizer,StreamingAnalyzer
+    FilePriority:   # Priority scoring for file analysis or...
+    ScanStrategy:   # Scanning methodology configuration.
+    StreamingFileCache: __init__(2),_get_cache_key(2),_evict_if_needed(0),get(2),put(3)  # Memory-efficient cache with LRU evict...
+    SmartPrioritizer: __init__(1),prioritize_files(2),_build_import_graph(2),_check_has_main(1)  # Smart file prioritization for optimal...
+    StreamingAnalyzer: __init__(2),set_progress_callback(1),cancel(0),analyze_streaming(2),_quick_scan_file(1)  # Memory-efficient streaming analyzer w...
+  code2flow/exporters/base.py:
+    i: json,yaml,core.models.AnalysisResult,pathlib.Path,typing.{Any,Dict}
+    e: JSONExporter,YAMLExporter,MermaidExporter,LLMPromptExporter
+    JSONExporter: export(4)  # Export to JSON format.
+    YAMLExporter: export(4),export_grouped(2),export_split(4),export_separated(3),export_data_flow(3)  # Export to YAML format.
+    MermaidExporter: export(2),export_call_graph(2),export_compact(2),_safe_id(1)  # Export call graph to Mermaid format.
+    LLMPromptExporter: export(2),_trace_flow(5),_analyze_call_patterns(1)  # Export LLM-ready analysis summary wit...
+  code2flow/extractors/call_graph.py:
+    i: ast,core.config.Config,core.models.{AnalysisResult,FlowEdge},typing.{Optional,Set}
+    e: CallGraphExtractor
+    CallGraphExtractor: __init__(1),extract(3),visit_Import(1),visit_ImportFrom(1),visit_ClassDef(1)  # Extract call graph from AST.
+  code2flow/extractors/cfg_extractor.py:
+    i: ast,collections.defaultdict,core.config.Config,core.models.{AnalysisResult,FlowEdge,FlowNode,FunctionInfo},typing.Optional
+    e: CFGExtractor
+    CFGExtractor: __init__(1),extract(3),new_node(2),connect(4),visit_FunctionDef(1)  # Extract Control Flow Graph from AST.
+  code2flow/extractors/dfg_extractor.py:
+    i: ast,collections.defaultdict,core.config.Config,core.models.{AnalysisResult,DataFlow,FlowEdge},typing.{Dict,List,Set}
+    e: DFGExtractor
+    DFGExtractor: __init__(1),extract(3),visit_FunctionDef(1),visit_Assign(1),visit_AugAssign(1)  # Extract Data Flow Graph from AST.
+  code2flow/llm_flow_generator.py:
+    i: argparse,re,sys,collections.{Counter,defaultdict,deque},dataclasses.dataclass,pathlib.Path,typing.{Any,Dict}
+    e: _FUNC_LABEL_PREFIX,_CALL_LABEL_PREFIX,FuncSummary,generate_llm_flow,render_llm_flow_md,dump_yaml,create_parser,main
+    FuncSummary: 
+    _strip_bom(text:str)->str
+    _safe_read_yaml(path:Path)->Dict[str, Any]
+    _as_dict(d:Any)->Dict[str, Any]
+    _as_list(v:Any)->List[Any]
+    _shorten(s:str;max_len:int)->str
+    _parse_call_label(label:str)->Optional[str]
+    _parse_func_label(label:str)->Optional[str]
+    _collect_nodes(analysis:Dict[str;Any])->Dict[int, Dict[str, Any]]
+  code2flow/llm_task_generator.py:
+    i: argparse,sys,yaml,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
+    e: normalize_llm_task,_SECTION_KEYS,parse_llm_task_text,load_input,dump_yaml,create_parser,main
+    _strip_bom(text:str)->str
+    _ensure_list(value:Any)->List[Any]
+    _deep_get(d:Dict[str;Any];path:Tuple[str;Ellipsis])->Any
+    normalize_llm_task(data:Dict[str;Any])->Dict[str, Any]
+    _parse_bullets(lines:List[str])->List[str]
+    parse_llm_task_text(text:str)->Dict[str, Any]
+    load_input(path:Path)->Dict[str, Any]
+    dump_yaml(data:Dict[str;Any])->str
+  code2flow/mermaid_generator.py:
+    i: os,sys,subprocess,tempfile,json,pathlib.Path,typing.{List,Optional}
+    e: validate_mermaid_file,fix_mermaid_file,generate_pngs,generate_single_png,generate_with_puppeteer
+    validate_mermaid_file(mmd_path:Path)->List[str]
+    fix_mermaid_file(mmd_path:Path)->bool
+    generate_pngs(input_dir:Path;output_dir:Path;timeout:int=60)->int
+    generate_single_png(mmd_file:Path;output_file:Path;timeout:int=60)->bool
+    generate_with_puppeteer(mmd_file:Path;output_file:Path;timeout:int=60;max_text_size:int=2000000;max_edges:int=20000)->bool
+  code2flow/nlp/config.py:
+    i: yaml,dataclasses.{dataclass,field},pathlib.Path,typing.{Dict,List,Optional}
+    e: NormalizationConfig,IntentMatchingConfig,EntityResolutionConfig,MultilingualConfig,NLPConfig,FAST_NLP_CONFIG,PRECISE_NLP_CONFIG
+    NormalizationConfig:   # Configuration for query normalization.
+    IntentMatchingConfig:   # Configuration for intent matching.
+    EntityResolutionConfig:   # Configuration for entity resolution.
+    MultilingualConfig:   # Configuration for multilingual proces...
+    NLPConfig: from_yaml(1),to_yaml(1)  # Main NLP pipeline configuration.
+  code2flow/nlp/entity_resolution.py:
+    i: re,config.EntityResolutionConfig,dataclasses.{dataclass,field},difflib.SequenceMatcher,typing.{Dict,List,Optional,Set,Tuple}
+    e: Entity,EntityResolutionResult,EntityResolver
+    Entity:   # Resolved entity.
+    EntityResolutionResult: get_by_type(1),get_best_match(0)  # Result of entity resolution.
+    EntityResolver: __init__(2),resolve(3),_extract_candidates(2),_extract_from_patterns(2),_disambiguate(2)  # Resolve entities (functions, classes,...
+  code2flow/nlp/intent_matching.py:
+    i: re,config.IntentMatchingConfig,dataclasses.{dataclass,field},difflib.SequenceMatcher,typing.{Dict,List,Optional,Tuple}
+    e: IntentMatch,IntentMatchingResult,IntentMatcher
+    IntentMatch:   # Single intent match result.
+    IntentMatchingResult: get_best_intent(0),get_confidence(0)  # Result of intent matching.
+    IntentMatcher: __init__(2),match(2),_fuzzy_match(1),_keyword_match(1),_apply_context(3)  # Match queries to intents using fuzzy...
+  code2flow/nlp/normalization.py:
+    i: re,unicodedata,config.NormalizationConfig,dataclasses.{dataclass,field},typing.{Dict,List,Optional}
+    e: NormalizationResult,QueryNormalizer
+    NormalizationResult:   # Result of query normalization.
+    QueryNormalizer: __init__(1),normalize(2),_unicode_normalize(1),_lowercase(1),_remove_punctuation(1)  # Normalize queries for consistent proc...
+  code2flow/nlp/pipeline.py:
+    i: config.{FAST_NLP_CONFIG,NLPConfig},dataclasses.{dataclass,field},normalization.QueryNormalizer,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: PipelineStage,NLPPipelineResult,NLPPipeline
+    PipelineStage:   # Single pipeline stage result.
+    NLPPipelineResult: is_successful(0),get_intent(0),get_entities(0),to_dict(0)  # Complete NLP pipeline result (4b-4e a...
+    NLPPipeline: __init__(1),process(2),_step_normalize(2),_step_match_intent(1),_step_resolve_entities(3)  # Main NLP processing pipeline (4a-4e).
+  code2flow/optimization/advanced_optimizer.py:
+    i: networkx,yaml,itertools,collections.{Counter,defaultdict},typing.{Any,Dict,List,Tuple}
+    e: DataStructureOptimizer
+    DataStructureOptimizer: __init__(1),_build_networkx_graph(0),analyze_communities(0),analyze_centrality(0),analyze_type_patterns(0)  # Advanced optimizer for data structure...
+  code2flow/optimization/implementation.py:
+    i: ast,os,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: OptimizationImplementer
+    OptimizationImplementer: __init__(1),implement_unified_validation_framework(0),implement_generic_filter_map_framework(0),implement_hub_function_splitting(0),generate_optimization_report(0)  # Implements concrete optimizations bas...
+  code2flow/optimization/standalone_test.py:
+    i: sys,time,traceback,pathlib.Path,typing.{Any,Dict,List}
+    e: MockOptimizationTester
+    MockOptimizationTester: __init__(0),run_all_tests(0),test_framework_structure(0),test_code_quality(0),test_performance_simulation(0)  # Mock tester for optimization frameworks.
+  code2flow/optimization/test_optimization.py:
+    i: sys,os,time,traceback,pathlib.Path,typing.{Any,Dict,List}
+    e: OptimizationTester
+    OptimizationTester: __init__(0),run_all_tests(0),test_validation_framework(0),test_processing_framework(0),test_refactored_executor(0)  # Test suite for optimization implement...
+  code2flow/patterns/detector.py:
+    i: collections.defaultdict,core.config.Config,core.models.AnalysisResult,typing.{Dict,List,Set}
+    e: PatternDetector
+    PatternDetector: __init__(1),detect_patterns(1),_detect_recursion(1),_detect_state_machines(1),_detect_factory_pattern(1)  # Detect behavioral patterns in code.
+  code2flow/visualizers/graph.py:
+    i: networkx,core.config.NODE_COLORS,core.models.AnalysisResult,matplotlib.{patches,pyplot},pathlib.Path,typing.Dict
+    e: GraphVisualizer
+    GraphVisualizer: __init__(1),_build_graph(0),visualize_cfg(2),visualize_call_graph(1),_hierarchical_layout(0)  # Visualize analysis results as graphs.
+  examples/functional_refactoring_example.py:
+    i: json,re,abc.{ABC,abstractmethod},dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,Optional,Protocol}
+    e: TemplateGenerator,CommandContext,CommandResult,EntityPreparer,ShellEntityPreparer,DockerEntityPreparer,SQLEntityPreparer,KubernetesEntityPreparer
+    TemplateGenerator: __init__(0),generate(3),_prepare_shell_entities(0),_prepare_docker_entities(0),_prepare_sql_entities(0)  # Original - handles EVERYTHING: loadin...
+    CommandContext:   # Context for command generation.
+    CommandResult:   # Result of command generation.
+    EntityPreparer: supports(1),prepare(3)  # Protocol for domain-specific entity p...
+    ShellEntityPreparer: supports(1),prepare(3),_apply_path_defaults(4),_apply_pattern_defaults(2),_apply_find_flags(3)  # Prepares entities for shell commands.
+    generate(query:str;intent:Optional[str];dry_run:bool;cache_dir:str)
+  fast_analysis.py:
+    i: ast,json,time,sys,collections.{Counter,defaultdict},pathlib.Path
+    e: FastAnalyzer,main
+    FastAnalyzer: __init__(1),analyze_file(1),analyze_directory(1),generate_mermaid(1),generate_report(0)
+    main()
+  flow.py:
+    i: ast,os,json,sys,time,traceback,subprocess,threading,collections.{defaultdict,deque}
+    e: MAX_PATHS_PER_FUNCTION,MAX_DEPTH_ENUMERATION,MAX_DEPTH_INTERPROCEDURAL,MAX_TOTAL_PATHS,MODES,FlowNode,ExecutionTrace,BehavioralPattern
+    FlowNode: __post_init__(0)  # Represents a node in the control flow...
+    ExecutionTrace: __post_init__(0)  # Runtime execution trace for dynamic a...
+    BehavioralPattern:   # Extracted behavioral pattern from cod...
+    EnhancedFlowExtractor: __init__(2),new_node(2),connect(2),fq_name(1),visit_Import(1)  # Enhanced AST visitor with data flow a...
+    DynamicTracer: __init__(0),start_tracing(0),stop_tracing(0),_trace_function(3),get_execution_graph(0)  # Runtime execution tracer for dynamic...
+    main()
+  generate_graph_viewer.py:
+    i: yaml,json,networkx,math,pathlib.Path,typing.{Any,Dict,List,Tuple}
+    e: GraphGenerator,main
+    GraphGenerator: __init__(1),generate_graph_viewer(0),load_hybrid_data(0),load_sample_files(0),build_connections(0)  # Generate interactive graph visualizat...
+    main()
+  generate_index_html.py:
+    i: yaml,json,pathlib.Path
+    e: generate_index_html
+    generate_index_html()
+  hybrid_export.py:
+    i: yaml,os,collections.defaultdict,pathlib.Path
+    e: hybrid_export_strategy,separate_orphans_and_consolidated,split_consolidated,split_orphans,create_hybrid_index,list_files,run_hybrid_export
+    hybrid_export_strategy(result;output_base_path)
+    separate_orphans_and_consolidated(result)
+    split_consolidated(base_path;consolidated_data)
+    split_orphans(base_path;orphans_data)
+    create_hybrid_index(base_path;separated_data)
+    list_files(base_path)
+    run_hybrid_export()
+  mermaid_to_png.py:
+    i: os,sys,argparse,subprocess,tempfile,shutil,pathlib.Path,typing.{List,Optional}
+    e: MermaidRenderer,MermaidCLIRenderer,MermaidInkRenderer,PuppeteerRenderer,MermaidGenerator,main
+    MermaidRenderer: render(2)  # Base class for Mermaid renderers.
+    MermaidCLIRenderer: render(2)  # Render using @mermaid-js/mermaid-cli...
+    MermaidInkRenderer: render(2)  # Render using mmdc (mermaid-cli).
+    PuppeteerRenderer: render(2)  # Render using Puppeteer with HTML temp...
+    MermaidGenerator: __init__(0),generate(2),generate_batch(2)  # Main generator class.
+    main()
+  optimize_llm_prompt.py:
+    i: re,collections.{OrderedDict,defaultdict},typing.{Dict,List,Set,Tuple}
+    e: parse_llm_prompt,build_function_tree,build_class_tree,format_tree,optimize_llm_prompt
+    parse_llm_prompt(file_path:str)->Tuple[Dict, List, List]
+    build_function_tree(function_calls:List[Tuple[str;List[str]]])->Dict
+    build_class_tree(classes:List[Tuple[str;int;str]])->Dict
+    format_tree(tree:Dict;indent:int=0;is_function:bool=False)->List[str]
+    optimize_llm_prompt(input_file:str;output_file:str)
+  optimize_llm_prompt_fixed.py:
+    i: re,collections.{OrderedDict,defaultdict},typing.{Dict,List,Set,Tuple}
+    e: parse_llm_prompt,build_function_tree,build_class_tree,format_function_tree,format_class_tree,optimize_llm_prompt
+    parse_llm_prompt(file_path:str)->Tuple[str, List[Tuple[str, List[str]]], List[Tuple[str, int, str]]]
+    build_function_tree(function_calls:List[Tuple[str;List[str]]])->Dict
+    build_class_tree(classes:List[Tuple[str;int;str]])->Dict
+    format_function_tree(tree:Dict;indent:int=0)->List[str]
+    format_class_tree(tree:Dict;indent:int=0)->List[str]
+    optimize_llm_prompt(input_file:str;output_file:str)
+  performance_optimizations.py:
+    i: os,subprocess,time,pathlib.Path
+    e: run_optimized_analysis,create_performance_script,suggest_alternatives
+    run_optimized_analysis()
+    create_performance_script()
+    suggest_alternatives()
+  setup.py:
+    i: os,setuptools.{find_packages,setup}
+    e: read_readme
+    read_readme()
+  split_yaml.py:
+    i: yaml,pathlib.Path
+    e: split_and_optimize_yaml
+    split_and_optimize_yaml()
+  test_analyzer.py:
+    i: os,sys,tempfile,shutil,flow.{BehavioralPatternExtractor,EnhancedFlowExtractor,ProjectFlowAnalyzer},pathlib.Path
+    e: create_sample_project,test_static_analysis,test_pattern_extraction,test_hybrid_analysis,test_llm_prompt_generation,main
+    create_sample_project()
+    test_static_analysis()
+    test_pattern_extraction()
+    test_hybrid_analysis()
+    test_llm_prompt_generation()
+    main()
+  test_graph_viewer.py:
+    i: json,pathlib.Path
+    e: test_graph_viewer,test_file_structure,main
+    test_graph_viewer()
+    test_file_structure()
+    main()
+  tests/test_analyzer.py:
+    i: pytest,tempfile,shutil,code2flow.{Config,ProjectAnalyzer},code2flow.core.config.FAST_CONFIG,pathlib.Path
+    e: TestProjectAnalyzer,TestConfig,TestExporters
+    TestProjectAnalyzer: sample_project(0),test_analyze_finds_functions(1),test_analyze_finds_classes(1),test_detects_recursion(1),test_detects_state_machine(1)  # Test the main ProjectAnalyzer.
+    TestConfig: test_fast_config_limits_depth(0),test_fast_config_skips_private(0)  # Test configuration.
+    TestExporters: sample_result(0),test_json_export(2),test_mermaid_export(2)  # Test export functionality.
+  tests/test_edge_cases.py:
+    i: pytest,tempfile,shutil,code2flow.{FAST_CONFIG,FAST_NLP_CONFIG,NLPPipeline,ProjectAnalyzer},code2flow.core.analyzer.{FastFileFilter,FileCache},pathlib.Path
+    e: TestEdgeCases,TestFileCache,TestFiltering,TestNLPEdgeCases,TestIntegration,TestBenchmarks
+    TestEdgeCases: test_empty_project(0),test_nonexistent_path(0),test_syntax_error_file(0),test_very_large_file(0),test_unicode_filenames(0)  # Test edge cases and error handling.
+    TestFileCache: test_cache_hit(0),test_cache_ttl_expiration(0),test_cache_clear(0)  # Test caching functionality.
+    TestFiltering: test_exclude_tests(0),test_exclude_patterns(0),test_skip_private_methods(0),test_skip_properties(0)  # Test file and function filtering.
+    TestNLPEdgeCases: test_empty_query(0),test_gibberish_query(0),test_very_long_query(0),test_mixed_languages(0),test_special_characters(0)  # Test NLP pipeline edge cases.
+    TestIntegration: test_codebase_entity_resolution(0),test_nlp_to_analysis_workflow(0)  # Integration tests combining analysis...
+  tests/test_nlp_pipeline.py:
+    i: pytest,code2flow.nlp,code2flow.nlp.intent_matching.IntentMatchingResult,code2flow.nlp.normalization.NormalizationResult
+    e: TestQueryNormalization,TestIntentMatching,TestEntityResolution,TestNLPPipeline,TestNLPConfig,TestMultilingualSupport
+    TestQueryNormalization: test_step_1a_lowercase(0),test_step_1b_remove_punctuation(0),test_step_1c_normalize_whitespace(0),test_step_1d_unicode_normalize(0),test_step_1e_remove_stopwords(0)  # Test Query Normalization steps 1a-1e.
+    TestIntentMatching: test_step_2a_fuzzy_match(0),test_step_2c_keyword_match(0),test_step_2d_context_score(0),test_step_2e_multi_intent_resolution(0),test_polish_intent_matching(0)  # Test Intent Matching steps 2a-2e.
+    TestEntityResolution: mock_entities(0),test_step_3a_extract_entities(1),test_step_3b_name_match_threshold(1),test_step_3c_disambiguation(1),test_step_3d_hierarchical_resolution(1)  # Test Entity Resolution steps 3a-3e.
+    TestNLPPipeline: test_step_4a_orchestration(0),test_step_4c_confidence_scoring(0),test_step_4d_fallback_handling(0),test_step_4e_output_formatting(0),test_polish_query_processing(0)  # Test complete NLP Pipeline integratio...
+    TestNLPConfig: test_config_from_yaml(1),test_config_to_yaml(1)  # Test YAML-driven configuration.
+  ultimate_yaml_optimizer.py:
+    i: yaml,json,gzip,pickle,msgpack,pathlib.Path
+    e: ultimate_yaml_optimization,ultra_compress_main,ultra_compress_flow,create_all_formats,save_all_formats,show_ultimate_comparison,generate_recommendations
+    ultimate_yaml_optimization()
+    ultra_compress_main(data)
+    ultra_compress_flow(data)
+    create_all_formats(main_data;flow_data)
+    save_all_formats(formats)
+    show_ultimate_comparison(original_size;formats)
+    generate_recommendations(formats)

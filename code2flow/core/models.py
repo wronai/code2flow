@@ -100,6 +100,11 @@ class FunctionInfo:
     calls: List[str] = field(default_factory=list)
     called_by: List[str] = field(default_factory=list)
     
+    # Advanced metrics (Sprint 3)
+    complexity: Dict[str, Any] = field(default_factory=dict) # Cyclomatic, Cognitive
+    centrality: float = 0.0 # Betweenness Centrality
+    reachability: str = "unknown" # reachable, unreachable, unknown
+    
     def to_dict(self, compact: bool = True) -> dict:
         """Convert to dictionary."""
         result = {
@@ -141,6 +146,13 @@ class FunctionInfo:
             # Remove duplicates while preserving order
             unique_called_by = list(dict.fromkeys(self.called_by))
             result["called_by"] = unique_called_by
+        
+        if self.complexity:
+            result["complexity"] = self.complexity
+        if self.centrality:
+            result["centrality"] = round(self.centrality, 4)
+        if self.reachability != "unknown":
+            result["reachability"] = self.reachability
         
         return result
 
@@ -236,10 +248,72 @@ class Pattern:
 
 
 @dataclass
+class CodeSmell:
+    """Represents a detected code smell."""
+    name: str
+    type: str  # god_function, feature_envy, etc.
+    file: str
+    line: int
+    severity: float  # 0.0 to 1.0
+    description: str
+    context: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary."""
+        return {
+            "name": self.name,
+            "type": self.type,
+            "file": self.file,
+            "line": self.line,
+            "severity": self.severity,
+            "description": self.description,
+            "context": self.context
+        }
+
+
+@dataclass
+class Mutation:
+    """Represents a mutation of a variable/object."""
+    variable: str
+    file: str
+    line: int
+    type: str  # assign, aug_assign, method_call
+    scope: str
+    context: str
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary."""
+        return {
+            "variable": self.variable,
+            "file": self.file,
+            "line": self.line,
+            "type": self.type,
+            "scope": self.scope,
+            "context": self.context
+        }
+
+
+@dataclass
+class DataFlow:
+    """Represents data flow for a variable."""
+    variable: str
+    dependencies: Set[str] = field(default_factory=set)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary."""
+        return {
+            "variable": self.variable,
+            "dependencies": list(self.dependencies),
+            "metadata": self.metadata
+        }
+
+
+@dataclass
 class AnalysisResult:
     """Complete analysis result for a project."""
-    project_path: str
-    analysis_mode: str
+    project_path: str = ""
+    analysis_mode: str = "static"
     stats: Dict[str, int] = field(default_factory=dict)
     
     # Graph data
@@ -253,8 +327,15 @@ class AnalysisResult:
     
     # Analysis results
     patterns: List[Pattern] = field(default_factory=list)
-    call_graph: Dict[str, List[str]] = field(default_factory=dict)
+    call_graph: Dict[str, List[str]] = field(default_factory=list)
     entry_points: List[str] = field(default_factory=list)
+    data_flows: Dict[str, DataFlow] = field(default_factory=dict)
+    
+    # Refactoring data
+    metrics: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    smells: List[CodeSmell] = field(default_factory=list)
+    coupling: Dict[str, Any] = field(default_factory=dict)
+    mutations: List[Mutation] = field(default_factory=list)
     
     def to_dict(self, compact: bool = True) -> dict:
         """Convert entire result to dictionary."""
@@ -270,6 +351,11 @@ class AnalysisResult:
             "patterns": [p.to_dict(compact) for p in self.patterns] if self.patterns else [],
             "call_graph": self.call_graph,
             "entry_points": self.entry_points,
+            "data_flows": {k: v.to_dict() for k, v in self.data_flows.items()} if self.data_flows else {},
+            "metrics": self.metrics if self.metrics else {},
+            "smells": [s.to_dict() for s in self.smells] if self.smells else [],
+            "coupling": self.coupling if self.coupling else {},
+            "mutations": [m.to_dict() for m in self.mutations] if self.mutations else [],
         }
     
     def get_function_count(self) -> int:
