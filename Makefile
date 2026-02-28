@@ -195,8 +195,8 @@ publish: build
 	$(MAKE) build
 	@echo "📦 Publishing to PyPI..."
 	$(PYTHON) -m venv publish-env
-	publish-env/bin/pip install twine
-	publish-env/bin/python -m twine upload dist/*
+	pip install twine
+	$(PYTHON) -m twine upload dist/*
 	rm -rf publish-env
 	@echo "✓ Published to PyPI"
 
