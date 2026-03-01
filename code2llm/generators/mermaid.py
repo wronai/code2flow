@@ -65,28 +65,33 @@ def _check_bracket_balance(lines: List[str], errors: List[str]) -> None:
             continue
         if _is_balanced_node_line(line):
             continue
-
         check_line = _strip_label_segments(line)
-        for char in check_line:
-            if char == '[':
-                bracket_stack.append((']', line_num))
-            elif char == ']':
-                if not bracket_stack or bracket_stack[-1][0] != ']':
-                    errors.append(f"Line {line_num}: Unmatched ']'")
-                else:
-                    bracket_stack.pop()
-            elif char == '(':
-                paren_stack.append((')', line_num))
-            elif char == ')':
-                if not paren_stack or paren_stack[-1][0] != ')':
-                    errors.append(f"Line {line_num}: Unmatched ')'")
-                else:
-                    paren_stack.pop()
+        _scan_brackets(check_line, line_num, bracket_stack, paren_stack, errors)
 
     for expected, line_num in bracket_stack:
         errors.append(f"Line {line_num}: Unclosed '[' (missing '{expected}')")
     for expected, line_num in paren_stack:
         errors.append(f"Line {line_num}: Unclosed '(' (missing '{expected}')")
+
+
+def _scan_brackets(text: str, line_num: int, bracket_stack: list,
+                   paren_stack: list, errors: List[str]) -> None:
+    """Process bracket/paren chars in a single line."""
+    for char in text:
+        if char == '[':
+            bracket_stack.append((']', line_num))
+        elif char == ']':
+            if not bracket_stack or bracket_stack[-1][0] != ']':
+                errors.append(f"Line {line_num}: Unmatched ']'")
+            else:
+                bracket_stack.pop()
+        elif char == '(':
+            paren_stack.append((')', line_num))
+        elif char == ')':
+            if not paren_stack or paren_stack[-1][0] != ')':
+                errors.append(f"Line {line_num}: Unmatched ')'")
+            else:
+                paren_stack.pop()
 
 
 def _check_node_ids(lines: List[str], errors: List[str]) -> None:
@@ -171,43 +176,53 @@ def _fix_edge_line(line: str) -> str:
     """Fix edge labels and endpoint issues."""
     import re
 
+    if '-->' not in line:
+        return line
+
     # Fix edge labels with pipe issues
-    if '-->' in line and '|' in line:
-        if '-->|' in line:
-            parts = line.split('-->|', 1)
-            if len(parts) == 2:
-                label_and_target = parts[1]
-                if '|' in label_and_target:
-                    parts2 = label_and_target.split('|', 1)
-                    if len(parts2) == 2:
-                        label_content, target = parts2
-                        label_content = label_content.strip('|')
-                        if label_content.endswith('('):
-                            label_content = label_content[:-1]
-                        elif label_content.count('(') > label_content.count(')'):
-                            missing = label_content.count('(') - label_content.count(')')
-                            label_content += ')' * missing
-                        line = f"{parts[0]}-->|{label_content}|{target}"
+    line = _fix_edge_label_pipes(line)
 
     # Fix stray trailing '|' after node IDs
-    if '-->' in line:
-        line = re.sub(r"(\b[A-Za-z]\w*)\|\s*$", r"\1", line)
+    line = re.sub(r"(\b[A-Za-z]\w*)\|\s*$", r"\1", line)
 
     # Sanitize edge label content inside |...|
     def _sanitize_edge_label(m):
         return f"|{_sanitize_label_text(m.group(1))}|"
 
-    if '-->' in line and '|' in line:
+    if '|' in line:
         line = re.sub(r"\|([^|]{1,200})\|", _sanitize_edge_label, line)
 
-    # Sanitize edge endpoints
-    if '-->' in line and '|' not in line:
+    # Sanitize edge endpoints (lines without labels)
+    if '|' not in line:
         m = re.match(r"^(\s*)([^\s-]+)\s*-->\s*([^\s]+)\s*$", line)
         if m:
             indent, src, dst = m.groups()
             line = f"{indent}{_sanitize_node_id(src)} --> {_sanitize_node_id(dst)}"
 
     return line
+
+
+def _fix_edge_label_pipes(line: str) -> str:
+    """Fix edge labels with pipe/parenthesis issues."""
+    if '|' not in line or '-->|' not in line:
+        return line
+    parts = line.split('-->|', 1)
+    if len(parts) != 2:
+        return line
+    label_and_target = parts[1]
+    if '|' not in label_and_target:
+        return line
+    parts2 = label_and_target.split('|', 1)
+    if len(parts2) != 2:
+        return line
+    label_content, target = parts2
+    label_content = label_content.strip('|')
+    if label_content.endswith('('):
+        label_content = label_content[:-1]
+    elif label_content.count('(') > label_content.count(')'):
+        missing = label_content.count('(') - label_content.count(')')
+        label_content += ')' * missing
+    return f"{parts[0]}-->|{label_content}|{target}"
 
 
 def _fix_subgraph_line(line: str) -> str:

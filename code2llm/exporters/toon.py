@@ -31,6 +31,7 @@ EXCLUDE_PATTERNS = {
     'venv', '.venv', 'env', '.env', 'publish-env', 'test-env',
     'site-packages', 'node_modules', '__pycache__', '.git',
     'dist', 'build', 'egg-info', '.tox', '.mypy_cache',
+    'TODO', 'examples',
 }
 
 
@@ -193,13 +194,26 @@ class ToonExporter:
 
     @staticmethod
     def _compute_fan_in(files: Dict, result: AnalysisResult) -> None:
-        """Compute fan-in per file (how many other files import from this file)."""
+        """Compute fan-in per file (how many other files call into this file)."""
         importers: Dict[str, Set[str]] = defaultdict(set)
         for fname, fi in result.functions.items():
+            src_file = fi.file
+            # Forward: who calls me? (called_by)
             for callee in fi.called_by:
                 callee_info = result.functions.get(callee)
-                if callee_info and callee_info.file != fi.file:
-                    importers[fi.file].add(callee_info.file)
+                if callee_info and callee_info.file != src_file:
+                    importers[src_file].add(callee_info.file)
+            # Reverse: who do I call? → target file gets fan-in
+            for callee in fi.calls:
+                callee_info = result.functions.get(callee)
+                if callee_info and callee_info.file != src_file:
+                    importers[callee_info.file].add(src_file)
+                else:
+                    # Suffix match for unqualified names
+                    for qn, ci in result.functions.items():
+                        if qn.endswith(f".{callee}") and ci.file != src_file:
+                            importers[ci.file].add(src_file)
+                            break
         for fpath in files:
             files[fpath]["fan_in"] = len(importers.get(fpath, set()))
 
@@ -940,10 +954,16 @@ class ToonExporter:
         return "."
 
     def _package_of_module(self, module_name: str) -> str:
+        """Return subpackage for coupling analysis.
+
+        For 'code2llm.exporters.toon' returns 'code2llm.exporters'
+        so cross-subpackage coupling is detected.
+        """
         parts = module_name.split(".")
-        if len(parts) >= 2:
+        if len(parts) >= 3:
+            return ".".join(parts[:2])  # e.g. code2llm.exporters
+        if len(parts) == 2:
             return parts[0]
-        # single-part module names are root-level scripts
         return parts[0] if parts else ""
 
     def _traits_from_cfg(self, fi: FunctionInfo, result: AnalysisResult) -> List[str]:
