@@ -12,6 +12,37 @@ feat(rebrand): rename project from code2flow-toon to code2llm with LLM integrati
 - **Setup**: Updated setup.py and pyproject.toml with new name
 - **Makefile**: All targets updated to use `code2llm` commands
 
+## [0.3.3] - 2026-03-01
+
+### Summary
+
+feat(quality): format quality benchmark + rename llm_exporter → context_exporter
+
+### Added
+
+- **Format Quality Benchmark** (`benchmarks/benchmark_format_quality.py`)
+  - Ground-truth project with 8 known problems, 2 pipelines, 2 hub types
+  - Evaluates problem_score, pipeline_score, hub_type_score, structural_score
+  - Gap analysis per format — identifies what each format misses
+  - JSON report saved to `reports/format_quality_*.json`
+  - Results: flow.toon 79%, analysis.toon 66%, context.md 59%, project.map 21%
+
+- **24 format quality tests** (`tests/test_format_quality.py`)
+  - `TestAnalysisToon`: HEALTH, REFACTOR, COUPLING, severity, god_function, fan_out, layers
+  - `TestFlowToon`: PIPELINES, TRANSFORMS, types, ETL stages, side_effects, contracts
+  - `TestProjectMap`: modules, imports, signatures, types
+  - `TestContextMd`: overview, entry_points, markdown
+  - `TestCrossFormat`: uniqueness, complementarity, size difference
+
+### Changed
+
+- **Rename**: `llm_exporter.py` → `context_exporter.py`, `LLMPromptExporter` → `ContextExporter`
+  - Backward-compat shim in `llm_exporter.py` re-exports old name
+  - CLI updated to use `ContextExporter` throughout
+- **Version bump** to 0.3.3
+
+---
+
 ## [0.3.2] - 2026-03-01
 
 ### Summary

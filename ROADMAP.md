@@ -2,7 +2,7 @@
 
 This document outlines planned features, improvements, and milestones for the code2llm project with LLM integration focus.
 
-## Current Status (v0.3.8)
+## Current Status (v0.3.3)
 
 ✅ **Completed:**
 - Core analysis engine with caching and parallel processing
@@ -27,6 +27,10 @@ This document outlines planned features, improvements, and milestones for the co
   - `PipelineDetector` — DiGraph call graph, longest-path detection, cycle-safe
   - Domain classification: NLP, Analysis, Export, Refactor, Core, IO
   - Entry/exit labeling, purity aggregation, bottleneck identification
+- **Format quality benchmark + rename (v0.3.3)**:
+  - `benchmark_format_quality.py` — ground-truth project, 8 problems, 4-axis scoring
+  - 24 format quality tests (`test_format_quality.py`)
+  - `llm_exporter` → `context_exporter` rename with backward compat
 
 ---
 
@@ -316,6 +320,7 @@ pattern:
 | v0.3.0 | Mar 2026 | Format taxonomy (map, toon, flow, context) | ✅ Done |
 | v0.3.1 | Mar 2026 | CONTRACTS + DATA_TYPES enhancement (AST type inference, side-effect detection) | ✅ Done |
 | v0.3.2 | Mar 2026 | networkx pipeline detection, domain grouping, entry/exit labeling | ✅ Done |
+| v0.3.3 | Mar 2026 | Format quality benchmark, llm_exporter → context_exporter rename | ✅ Done |
 | v0.4.0 | Q3 2026 | IDE integration, real-time analysis | 📋 Planned |
 | v0.5.0 | Q4 2026 | JS/TS support | 📋 Planned |
 | v0.6.0 | Q1 2027 | Enterprise features | 📋 Planned |
