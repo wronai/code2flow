@@ -86,12 +86,51 @@
   - [x] Backward-compat shim in `llm_exporter.py`
   - [x] CLI updated to use `ContextExporter`
 
-## 🎯 Sprint 5 — Self-analysis + gap fixes (v0.3.4)
+## ✅ Completed — Bug Fixes + Evolution (v0.5.0)
+
+- [x] **Fix MermaidExporter BUG**: 3 identical files → 3 distinct outputs
+  - [x] `flow.mmd` — full graph with CC-based styling
+  - [x] `calls.mmd` — edges only, no isolated nodes
+  - [x] `compact_flow.mmd` — module-level aggregation with weighted edges
+
+- [x] **Fix SideEffectDetector**: `dict.get()` false positive as IO
+  - [x] HTTP verbs extracted to `HTTP_METHODS` + `HTTP_CALLERS` context
+  - [x] Only `requests.get()`, `session.post()` etc. trigger IO classification
+
+- [x] **Fix Coupling Matrix**: improved callee disambiguation
+  - [x] Candidates-based approach preferring same-package callees
+
+- [x] **Fix Pipeline Detection**: safe ambiguous handling
+  - [x] `_resolve_callee()` returns None for ambiguous matches
+
+- [x] **New EvolutionExporter** → `evolution.toon`
+  - [x] Ranked refactoring queue (CC × fan_out impact scoring)
+  - [x] NEXT[N], RISKS[N], METRICS-TARGET, HISTORY sections
+  - [x] CLI: `--format evolution` or included in `--format all`
+  - [x] Venv/site-packages exclusion
+
+## ✅ Completed — Structural Refactoring (v0.5.1)
+
+- [x] **Split 9 god-functions** guided by `evolution.toon` NEXT list:
+  - [x] `cli.main()` CC=63 → 7 functions
+  - [x] `ToonExporter._render_details` CC=31 → 5 methods
+  - [x] `ToonExporter._compute_file_metrics` CC=21 → 4 methods
+  - [x] `ToonExporter._compute_health` CC=28 → 4 methods
+  - [x] `EvolutionExporter._build_context` CC=31 → 3 methods
+  - [x] `MermaidExporter.export` CC=22 → 4 methods
+  - [x] `MapExporter._render_details` CC=24 → 3 methods
+  - [x] `validate_mermaid_file` CC=42 → 3 functions
+  - [x] `fix_mermaid_file` CC=25 → 3 functions
+- [x] **Metrics**: CC̄ 5.1→4.8, max-CC 63→35 (↓44%), high-CC 27→21 (↓22%)
+- [x] **Auto-benchmark** script (`benchmarks/benchmark_evolution.py`)
+- [x] **Example projects** (Claude Code, shell LLM, LiteLLM)
+
+## 🎯 Sprint 5 — Self-analysis + gap fixes (v0.6.0)
 
 ### High Priority
 
 - [ ] **Self-analysis**
-  - Run code2flow on itself with new flow.toon
+  - Run code2llm on itself with new flow.toon
   - Verify: detect NLP, Analysis, Export, Refactor pipelines
   - Verify: AnalysisResult marked as hub-type
 
@@ -124,7 +163,7 @@
 ## 📝 Notes
 
 - Format taxonomy based on TODO/action_plan_v3.md benchmark results
-- Each format has one purpose: map=structure, toon=health, flow=data-flow, context=LLM
+- Each format has one purpose: map=structure, toon=health, flow=data-flow, context=LLM, evolution=refactoring
 - This TODO list is managed by Goal — use `goal -t` for auto-detection
 
 Last updated: 2026-03-01

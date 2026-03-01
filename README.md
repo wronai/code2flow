@@ -86,17 +86,17 @@ pip install -e ".[dev]"
 
 ```bash
 # Analyze a Python project (default: TOON format)
-code2flow /path/to/project
+code2llm /path/to/project
 
 # With verbose output
-code2flow /path/to/project -v
+code2llm /path/to/project -v
 
 # Generate all formats
-code2flow /path/to/project -f all
+code2llm /path/to/project -f all
 
 # Use different analysis modes
-code2flow /path/to/project -m static    # Fast static analysis only
-code2flow /path/to/project -m hybrid     # Combined analysis (default)
+code2llm /path/to/project -m static    # Fast static analysis only
+code2llm /path/to/project -m hybrid     # Combined analysis (default)
 ```
 
 ## Usage
@@ -105,40 +105,40 @@ code2flow /path/to/project -m hybrid     # Combined analysis (default)
 
 ```bash
 # Default: TOON format only
-code2flow /path/to/project
+code2llm /path/to/project
 
 # All formats (toon,yaml,json,mermaid,png)
-code2flow /path/to/project -f all
+code2llm /path/to/project -f all
 
 # Custom combinations
-code2flow /path/to/project -f toon,yaml
-code2flow /path/to/project -f json,png
-code2flow /path/to/project -f mermaid,png
+code2llm /path/to/project -f toon,yaml
+code2llm /path/to/project -f json,png
+code2llm /path/to/project -f mermaid,png
 ```
 
 ### Analysis Modes
 
 ```bash
 # Static analysis only (fastest)
-code2flow /path/to/project -m static
+code2llm /path/to/project -m static
 
 # Dynamic analysis with tracing
-code2flow /path/to/project -m dynamic
+code2llm /path/to/project -m dynamic
 
 # Hybrid analysis (recommended)
-code2flow /path/to/project -m hybrid
+code2llm /path/to/project -m hybrid
 
 # Behavioral pattern focus
-code2flow /path/to/project -m behavioral
+code2llm /path/to/project -m behavioral
 
 # Reverse engineering ready
-code2flow /path/to/project -m reverse
+code2llm /path/to/project -m reverse
 ```
 
 ### Custom Output
 
 ```bash
-code2flow /path/to/project -o my_analysis
+code2llm /path/to/project -o my_analysis
 ```
 
 ## Output Files
@@ -164,11 +164,11 @@ The TOON v2 format is designed for rapid scanning and actionable insights:
 # CC̄=4.6 | critical:39/406 | dups:0 | cycles:0
 
 HEALTH[20]:
-  🔴 GOD   code2flow/core/analyzer.py = 765L, 4 classes, 30m, max CC=20
+  🔴 GOD   code2llm/core/analyzer.py = 765L, 4 classes, 30m, max CC=20
   🟡 CC    validate_mermaid_file CC=42 (limit:15)
 
 REFACTOR[4]:
-  1. split code2flow/core/analyzer.py  (god module)
+  1. split code2llm/core/analyzer.py  (god module)
   2. split 17 high-CC methods  (CC>15)
 
 COUPLING:
@@ -180,7 +180,7 @@ COUPLING:
   └─────────────┴──────────────────────────────────────┘
 
 LAYERS:
-  code2flow/                      CC̄=5.0    ←in:0  →out:0
+  code2llm/                      CC̄=5.0    ←in:0  →out:0
   │ !! toon                       982L  1C   29m  CC=31
   │ !! analyzer                   765L  4C   30m  CC=20
 
@@ -323,10 +323,10 @@ The analyzer is designed to be extensible. Key areas for enhancement:
 
 | Command | Output | Use Case |
 |---------|--------|----------|
-| `code2flow ./project` | `analysis.toon` | Quick analysis (default) |
-| `code2flow ./project -f all` | All formats | Complete analysis |
-| `code2flow ./project -f toon,yaml` | TOON + YAML | Comparison |
-| `code2flow ./project -m hybrid -v` | TOON + verbose | Detailed analysis |
+| `code2llm ./project` | `analysis.toon` | Quick analysis (default) |
+| `code2llm ./project -f all` | All formats | Complete analysis |
+| `code2llm ./project -f toon,yaml` | TOON + YAML | Comparison |
+| `code2llm ./project -m hybrid -v` | TOON + verbose | Detailed analysis |
 | `python validate_toon.py analysis.toon` | Validation | Quality check |
 
 ## 🔧 Advanced Usage
@@ -335,7 +335,7 @@ The analyzer is designed to be extensible. Key areas for enhancement:
 
 ```bash
 # Deep analysis with all insights
-code2flow ./project \
+code2llm ./project \
     -m hybrid \
     -f toon \
     --max-depth 15 \
@@ -343,14 +343,14 @@ code2flow ./project \
     -v
 
 # Performance-optimized for large projects
-code2flow ./project \
+code2llm ./project \
     -m static \
     -f toon \
     --strategy quick \
     --max-memory 500
 
 # Refactoring-focused analysis
-code2flow ./project \
+code2llm ./project \
     -m behavioral \
     -f toon \
     --refactor \
@@ -363,7 +363,7 @@ code2flow ./project \
 ```bash
 #!/bin/bash
 # Analyze code quality in CI
-code2flow ./src -f toon -o ./analysis
+code2llm ./src -f toon -o ./analysis
 python validate_toon.py ./analysis/analysis.toon
 if [ $? -eq 0 ]; then
     echo "✅ Code analysis passed"
@@ -377,7 +377,7 @@ fi
 ```bash
 #!/bin/sh
 # .git/hooks/pre-commit
-code2flow ./ -f toon -o ./temp_analysis
+code2llm ./ -f toon -o ./temp_analysis
 python validate_toon.py ./temp_analysis/analysis.toon
 rm -rf ./temp_analysis
 ```
@@ -387,21 +387,21 @@ rm -rf ./temp_analysis
 ### Microservice Analysis
 ```bash
 # Analyze microservice complexity
-code2flow ./microservice -f toon -o ./service_analysis
+code2llm ./microservice -f toon -o ./service_analysis
 # Results: 15 critical functions, 3 modules need refactoring
 ```
 
 ### Legacy Code Migration
 ```bash
 # Prepare for legacy system migration
-code2flow ./legacy -f toon,yaml -o ./migration_analysis
+code2llm ./legacy -f toon,yaml -o ./migration_analysis
 # Use TOON for quick overview, YAML for detailed migration planning
 ```
 
 ### Code Review Enhancement
 ```bash
 # Generate insights for code review
-code2flow ./feature-branch -f toon --refactor -o ./review
+code2llm ./feature-branch -f toon --refactor -o ./review
 # Focus on critical functions and code smells
 ```
 
@@ -411,13 +411,13 @@ code2flow ./feature-branch -f toon --refactor -o ./review
 
 **Before:**
 ```bash
-code2flow ./project -f yaml -o ./analysis
+code2llm ./project -f yaml -o ./analysis
 # Output: analysis.yaml (2.5MB)
 ```
 
 **After:**
 ```bash
-code2flow ./project -f toon -o ./analysis
+code2llm ./project -f toon -o ./analysis
 # Output: analysis.toon (204KB)
 ```
 
@@ -431,7 +431,7 @@ code2flow ./project -f toon -o ./analysis
 
 ```bash
 # Still generate YAML if needed
-code2flow ./project -f toon,yaml
+code2llm ./project -f toon,yaml
 # Both formats available for comparison
 ```
 
@@ -482,14 +482,14 @@ ls -la ./output/
 **Issue:** Validation fails
 ```bash
 # Solution: Run with verbose output
-code2flow ./project -f toon -v
+code2llm ./project -f toon -v
 # Check for any errors during analysis
 ```
 
 **Issue:** Large file sizes
 ```bash
 # Solution: Use TOON format instead of YAML
-code2flow ./project -f toon  # 200KB vs 2.5MB
+code2llm ./project -f toon  # 200KB vs 2.5MB
 ```
 
 ### Performance Issues
@@ -497,13 +497,13 @@ code2flow ./project -f toon  # 200KB vs 2.5MB
 **Memory Usage:**
 ```bash
 # Limit memory for large projects
-code2flow ./large-project --max-memory 500 -f toon
+code2llm ./large-project --max-memory 500 -f toon
 ```
 
 **Slow Analysis:**
 ```bash
 # Use fast mode for initial exploration
-code2flow ./project -m static -f toon --strategy quick
+code2llm ./project -m static -f toon --strategy quick
 ```
 
 ## 🤝 Contributing to TOON Format
@@ -520,8 +520,8 @@ The TOON format is designed to be extensible. Areas for contribution:
 
 ```bash
 # Clone and setup development environment
-git clone https://github.com/tom-sapletta/code2flow.git
-cd code2flow
+git clone https://github.com/tom-sapletta/code2llm.git
+cd code2llm
 pip install -e ".[dev]"
 
 # Run tests
@@ -535,15 +535,15 @@ python validate_toon.py output/analysis.toon
 
 - [TOON Format Validation](validate_toon.py) - Built-in validation tool
 - [Project Testing Script](project.sh) - Comprehensive test suite
-- [CLI Reference](code2flow/cli.py) - Complete command-line interface
-- [Exporter Implementation](code2flow/exporters/base.py) - TOON format implementation
+- [CLI Reference](code2llm/cli.py) - Complete command-line interface
+- [Exporter Implementation](code2llm/exporters/base.py) - TOON format implementation
 
 ---
 
 **Ready to analyze your code?** Start with the optimized TOON format:
 
 ```bash
-code2flow ./your-project -f toon
+code2llm ./your-project -f toon
 ```
 
 ## License

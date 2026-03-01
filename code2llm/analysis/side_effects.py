@@ -26,8 +26,14 @@ IO_CALLS = frozenset({
     "dump", "dumps", "load", "loads",
     "save", "savefig",
     "send", "recv", "connect", "listen", "accept",
-    "get", "post", "put", "delete", "patch",  # HTTP
     "execute", "commit", "rollback",  # DB
+})
+
+# HTTP verbs — only IO when called on known HTTP objects (requests.get, session.post)
+HTTP_METHODS = frozenset({"get", "post", "put", "delete", "patch"})
+HTTP_CALLERS = frozenset({
+    "requests", "session", "client", "http", "aiohttp",
+    "httpx", "urllib", "conn", "api", "resp", "response",
 })
 
 IO_ATTRIBUTES = frozenset({
@@ -174,6 +180,11 @@ class SideEffectDetector:
         # IO detection
         if base_name in IO_CALLS:
             info.io_operations.append(base_name)
+        elif base_name in HTTP_METHODS and len(parts) >= 2:
+            # Only classify as IO if caller looks like HTTP client
+            caller = parts[-2].lower()
+            if caller in HTTP_CALLERS:
+                info.io_operations.append(call_name)
         elif base_name in IO_ATTRIBUTES:
             info.io_operations.append(call_name)
 

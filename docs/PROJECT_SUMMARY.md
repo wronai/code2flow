@@ -1,11 +1,11 @@
-# code2flow: Podsumowanie Prac i Analiza nlp2cmd
+# code2llm: Podsumowanie Prac i Analiza nlp2cmd
 
 ## Wykonane Prace
 
 ### 1. Zoptymalizowany System Skanowania ✅
 
 **Implementacja:**
-- `code2flow/core/streaming_analyzer.py` - 610 linii
+- `code2llm/core/streaming_analyzer.py` - 610 linii
 - Trzy strategie: QUICK, STANDARD, DEEP
 - Streaming z progress reporting
 - Incremental analysis z cache
@@ -21,13 +21,13 @@ Przyspieszenie: 37x+ (i działa!)
 ### 2. LLM Context Generator ✅
 
 **Implementacja:**
-- `code2flow llm-context` - nowe polecenie CLI
-- `code2flow/exporters/base.py` - `LLMPromptExporter`
+- `code2llm llm-context` - nowe polecenie CLI
+- `code2llm/exporters/base.py` - `LLMPromptExporter`
 - `docs/LLM_USAGE.md` - dokumentacja użycia
 
 **Porównanie:**
 ```
-Standard code2flow:  13MB YAML, 293,970 linii, 60s
+Standard code2llm:  13MB YAML, 293,970 linii, 60s
 llm-context:       35KB Markdown, 705 linii, 3s
 Różnica:           ~370x mniej, 20x szybciej
 ```
@@ -209,13 +209,13 @@ entities = pipeline.prepare(intent, raw_entities, context)
 ### Test 1: Szybkość Generacji Kontekstu
 
 ```bash
-# Standard code2flow
-time code2flow ../src/nlp2cmd -v -o ./output
+# Standard code2llm
+time code2llm ../src/nlp2cmd -v -o ./output
 # real    0m58.234s
 # Output: 13MB (za duże dla LLM)
 
 # llm-context (nasza implementacja)
-time code2flow llm-context ../src/nlp2cmd -o ./context.md
+time code2llm llm-context ../src/nlp2cmd -o ./context.md
 # real    0m2.891s  
 # Output: 35KB (idealne dla LLM)
 
@@ -254,9 +254,9 @@ for update in analyzer.analyze_streaming(path):
 ## Pliki Wygenerowane w Projekcie
 
 ### Kod:
-1. `code2flow/core/streaming_analyzer.py` - 610 linii
-2. `code2flow/exporters/base.py` - Poprawiony LLMPromptExporter
-3. `code2flow/cli.py` - Dodane `llm-context` polecenie
+1. `code2llm/core/streaming_analyzer.py` - 610 linii
+2. `code2llm/exporters/base.py` - Poprawiony LLMPromptExporter
+3. `code2llm/cli.py` - Dodane `llm-context` polecenie
 
 ### Dokumentacja:
 1. `docs/METHODOLOGY.md` - Metodologia skanowania
@@ -273,13 +273,13 @@ for update in analyzer.analyze_streaming(path):
 
 ---
 
-## Jak Używać code2flow dla nlp2cmd
+## Jak Używać code2llm dla nlp2cmd
 
 ### 1. Szybka Analiza Architektury
 
 ```bash
 cd /home/tom/github/wronai/nlp2cmd/debug
-code2flow llm-context ../src/nlp2cmd -o ./nlp2cmd_context.md
+code2llm llm-context ../src/nlp2cmd -o ./nlp2cmd_context.md
 
 # Zobacz podsumowanie:
 head -30 ./nlp2cmd_context.md
@@ -361,10 +361,10 @@ grep -A 20 "## Public API Surface" ./nlp2cmd_context.md
 
 ```bash
 # Generuj kontekst dla nlp2cmd
-code2flow llm-context ../src/nlp2cmd -o ./context.md -v
+code2llm llm-context ../src/nlp2cmd -o ./context.md -v
 
 # Generuj ze strategią quick (jeszcze szybciej)
-code2flow ../src/nlp2cmd --strategy quick --streaming -o ./output
+code2llm ../src/nlp2cmd --strategy quick --streaming -o ./output
 
 # Benchmark porównawczy
 cd benchmarks && python3 benchmark_performance.py
@@ -375,7 +375,7 @@ cat ./output/llm_context.md | head -50
 
 ---
 
-**Projekt code2flow zakończony sukcesem!** 🚀
+**Projekt code2llm zakończony sukcesem!** 🚀
 
 Wszystkie zadania wykonane:
 - Zoptymalizowany system skanowania

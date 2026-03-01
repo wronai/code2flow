@@ -14,122 +14,130 @@ from typing import List, Optional
 
 def validate_mermaid_file(mmd_path: Path) -> List[str]:
     """Validate Mermaid file and return list of errors."""
-    errors = []
-    
     if not mmd_path.exists():
         return [f"File not found: {mmd_path}"]
-    
+
     try:
         content = mmd_path.read_text(encoding='utf-8')
-        
-        # Basic syntax checks
         lines = content.strip().split('\n')
-        
+        errors = []
+
         # Check for proper graph declaration
         if not lines or not any(line.strip().startswith(('graph', 'flowchart')) for line in lines):
             errors.append("Missing graph declaration (should start with 'graph' or 'flowchart')")
-        
-        def strip_label_segments(s: str) -> str:
-            """Remove label segments that frequently contain Mermaid syntax chars.
 
-            We ignore bracket/paren balancing inside:
-            - edge labels: -->|...|
-            - node labels: N1["..."] or N1[/'...'/] etc.
-            """
-            import re
+        _check_bracket_balance(lines, errors)
+        _check_node_ids(lines, errors)
 
-            # Remove edge labels |...|
-            s = re.sub(r"\|[^|]*\|", "||", s)
+        return errors
 
-            # Remove common node label forms: ["..."], ("..."), {"..."}
-            s = re.sub(r"\[\"[^\"]*\"\]", "[]", s)
-            s = re.sub(r"\(\"[^\"]*\"\)", "()", s)
-            s = re.sub(r"\{\"[^\"]*\"\}", "{}", s)
-
-            # Remove Mermaid special bracket label variants like [/'...'/]
-            s = re.sub(r"\[/[^\]]*?/\]", "[]", s)
-            s = re.sub(r"\(/[^)]*?/\)", "()", s)
-
-            return s
-
-        # Check for unmatched brackets/parentheses (outside label segments)
-        bracket_stack = []
-        paren_stack = []
-        
-        for line_num, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line or line.startswith('%%'):
-                continue
-                
-            # Skip validation for lines that are clearly node definitions with content
-            # Node definitions have the pattern: ID[content] or ID(content) or ID{content}
-            if (('[' in line and ']' in line) or 
-                ('(' in line and ')' in line) or 
-                ('{' in line and '}' in line)):
-                # This looks like a node definition, check if it's properly formed
-                # but don't count parentheses inside the node content
-                continue
-                
-            # Count brackets and parentheses (ignoring those inside label segments)
-            check_line = strip_label_segments(line)
-            for char in check_line:
-                if char == '[':
-                    bracket_stack.append((']', line_num))
-                elif char == ']':
-                    if not bracket_stack or bracket_stack[-1][0] != ']':
-                        errors.append(f"Line {line_num}: Unmatched ']'")
-                    else:
-                        bracket_stack.pop()
-                elif char == '(':
-                    paren_stack.append((')', line_num))
-                elif char == ')':
-                    if not paren_stack or paren_stack[-1][0] != ')':
-                        errors.append(f"Line {line_num}: Unmatched ')'")
-                    else:
-                        paren_stack.pop()
-        
-        # Report unclosed brackets (only for structural ones, not node content)
-        for expected, line_num in bracket_stack:
-            errors.append(f"Line {line_num}: Unclosed '[' (missing '{expected}')")
-        for expected, line_num in paren_stack:
-            errors.append(f"Line {line_num}: Unclosed '(' (missing '{expected}')")
-            
-        # Check for invalid node IDs
-        import re
-        node_pattern = re.compile(r'^\s*([A-Z]\d+|[Ff]\d+_\w+)\s*["\'\[\{]')
-        
-        for line_num, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line or line.startswith('%%'):
-                continue
-            
-            # Skip subgraph lines for node ID validation
-            if line.startswith('subgraph ') or line == 'end':
-                continue
-                
-            # Skip validation for lines that are clearly node definitions with content
-            # Node definitions have the pattern: ID[content] or ID(content) or ID{content}
-            if (('[' in line and ']' in line) or 
-                ('(' in line and ')' in line) or 
-                ('{' in line and '}' in line)):
-                # This looks like a node definition, check if it's properly formed
-                # but don't count parentheses inside the node content
-                continue
-                
-            # Check node definitions
-            if any(char in line for char in ['[', '(', '{']):
-                if not node_pattern.match(line):
-                    # Try to extract node ID
-                    match = re.match(r'^\s*([A-Za-z0-9_]+)', line)
-                    if match:
-                        node_id = match.group(1)
-                        if not re.match(r'^[A-Z]\d+$|^[Ff]\d+_\w+$', node_id):
-                            errors.append(f"Line {line_num}: Invalid node ID '{node_id}' (should be like 'N1' or 'F123_name')")
-        
     except Exception as e:
-        errors.append(f"Error reading file: {e}")
-    
-    return errors
+        return [f"Error reading file: {e}"]
+
+
+def _strip_label_segments(s: str) -> str:
+    """Remove label segments that frequently contain Mermaid syntax chars."""
+    import re
+    s = re.sub(r"\|[^|]*\|", "||", s)
+    s = re.sub(r"\[\"[^\"]*\"\]", "[]", s)
+    s = re.sub(r"\(\"[^\"]*\"\)", "()", s)
+    s = re.sub(r"\{\"[^\"]*\"\}", "{}", s)
+    s = re.sub(r"\[/[^\]]*?/\]", "[]", s)
+    s = re.sub(r"\(/[^)]*?/\)", "()", s)
+    return s
+
+
+def _is_balanced_node_line(line: str) -> bool:
+    """Check if a line has balanced brackets — likely a node definition."""
+    return (('[' in line and ']' in line) or
+            ('(' in line and ')' in line) or
+            ('{' in line and '}' in line))
+
+
+def _check_bracket_balance(lines: List[str], errors: List[str]) -> None:
+    """Check for unmatched brackets/parentheses outside label segments."""
+    bracket_stack = []
+    paren_stack = []
+
+    for line_num, line in enumerate(lines, 1):
+        line = line.strip()
+        if not line or line.startswith('%%'):
+            continue
+        if _is_balanced_node_line(line):
+            continue
+
+        check_line = _strip_label_segments(line)
+        for char in check_line:
+            if char == '[':
+                bracket_stack.append((']', line_num))
+            elif char == ']':
+                if not bracket_stack or bracket_stack[-1][0] != ']':
+                    errors.append(f"Line {line_num}: Unmatched ']'")
+                else:
+                    bracket_stack.pop()
+            elif char == '(':
+                paren_stack.append((')', line_num))
+            elif char == ')':
+                if not paren_stack or paren_stack[-1][0] != ')':
+                    errors.append(f"Line {line_num}: Unmatched ')'")
+                else:
+                    paren_stack.pop()
+
+    for expected, line_num in bracket_stack:
+        errors.append(f"Line {line_num}: Unclosed '[' (missing '{expected}')")
+    for expected, line_num in paren_stack:
+        errors.append(f"Line {line_num}: Unclosed '(' (missing '{expected}')")
+
+
+def _check_node_ids(lines: List[str], errors: List[str]) -> None:
+    """Check for invalid node IDs."""
+    import re
+    node_pattern = re.compile(r'^\s*([A-Z]\d+|[Ff]\d+_\w+)\s*["\'\[\{]')
+
+    for line_num, line in enumerate(lines, 1):
+        line = line.strip()
+        if not line or line.startswith('%%'):
+            continue
+        if line.startswith('subgraph ') or line == 'end':
+            continue
+        if _is_balanced_node_line(line):
+            continue
+
+        if any(char in line for char in ['[', '(', '{']):
+            if not node_pattern.match(line):
+                match = re.match(r'^\s*([A-Za-z0-9_]+)', line)
+                if match:
+                    node_id = match.group(1)
+                    if not re.match(r'^[A-Z]\d+$|^[Ff]\d+_\w+$', node_id):
+                        errors.append(f"Line {line_num}: Invalid node ID '{node_id}' (should be like 'N1' or 'F123_name')")
+
+
+# ------------------------------------------------------------------ #
+# fix_mermaid_file helpers
+# ------------------------------------------------------------------ #
+
+def _sanitize_label_text(txt: str) -> str:
+    """Replace Mermaid syntax chars in labels with HTML entities."""
+    return (
+        txt.replace('&', '&amp;')
+        .replace('"', '&quot;')
+        .replace('[', '&#91;')
+        .replace(']', '&#93;')
+        .replace('(', '&#40;')
+        .replace(')', '&#41;')
+        .replace('{', '&#123;')
+        .replace('}', '&#125;')
+        .replace('|', '&#124;')
+    )
+
+
+def _sanitize_node_id(node_id: str) -> str:
+    """Make a Mermaid-safe node identifier."""
+    import re
+    node_id = (node_id or '').strip()
+    node_id = re.split(r"[\[\]\(\)\{\}\"\|\s]", node_id, maxsplit=1)[0]
+    node_id = re.sub(r"[^A-Za-z0-9_]", "_", node_id)
+    return node_id or "N"
 
 
 def fix_mermaid_file(mmd_path: Path) -> bool:
@@ -139,122 +147,95 @@ def fix_mermaid_file(mmd_path: Path) -> bool:
         lines = content.split('\n')
         fixed_lines = []
 
-        import re
-
-        def sanitize_label_text(txt: str) -> str:
-            # Mermaid labels frequently break parsing when they contain Mermaid syntax chars.
-            # Replace with HTML entities.
-            return (
-                txt.replace('&', '&amp;')
-                .replace('"', '&quot;')
-                .replace('[', '&#91;')
-                .replace(']', '&#93;')
-                .replace('(', '&#40;')
-                .replace(')', '&#41;')
-                .replace('{', '&#123;')
-                .replace('}', '&#125;')
-                .replace('|', '&#124;')
-            )
-
-        def sanitize_node_id(node_id: str) -> str:
-            """Make a Mermaid-safe node identifier.
-
-            Mermaid node IDs should avoid characters like '[', ']', '(', ')', '{', '}', '"', '|'.
-            For call-graph exports, we only need stable-ish identifiers.
-            """
-            node_id = (node_id or '').strip()
-            # Cut off at first clearly dangerous Mermaid syntax char.
-            node_id = re.split(r"[\[\]\(\)\{\}\"\|\s]", node_id, maxsplit=1)[0]
-            # Replace remaining non-word chars just in case.
-            node_id = re.sub(r"[^A-Za-z0-9_]", "_", node_id)
-            return node_id or "N"
-        
         for line in lines:
-            original_line = line
-            
-            # 2. Fix edge labels that might have pipe issues
-            if '-->' in line and '|' in line:
-                # Handle edge labels like: N1 -->|"label"| N2
-                if '-->|' in line:
-                    parts = line.split('-->|', 1)
-                    if len(parts) == 2:
-                        label_and_target = parts[1]
-                        # Find the closing |
-                        if '|' in label_and_target:
-                            parts2 = label_and_target.split('|', 1)
-                            if len(parts2) == 2:
-                                label_content, target = parts2
-                                # Clean up the label content - remove extra pipes if any
-                                label_content = label_content.strip('|')
-                                # Fix incomplete parentheses in edge labels
-                                if label_content.endswith('('):
-                                    label_content = label_content[:-1]  # Remove trailing parenthesis
-                                elif label_content.count('(') > label_content.count(')'):
-                                    # Add missing closing parentheses
-                                    missing_parens = label_content.count('(') - label_content.count(')')
-                                    label_content += ')' * missing_parens
-                                line = f"{parts[0]}-->|{label_content}|{target}"
-            
-            # 2b. Fix stray trailing '|' after node IDs (common breakage: N123|)
-            # Only apply to edge lines to avoid touching other Mermaid constructs.
-            if '-->' in line:
-                line = re.sub(r"(\b[A-Za-z]\w*)\|\s*$", r"\1", line)
+            line = _fix_edge_line(line)
+            line = _fix_subgraph_line(line)
+            result = _fix_class_line(line)
+            if result is not None:
+                fixed_lines.extend(result)
+            else:
+                fixed_lines.append(line)
 
-            # 2c. Sanitize edge label content inside |...|
-            # Example bad line: N1 -->|"char == '('"| N2
-            def _sanitize_edge_label(m: re.Match) -> str:
-                inner = m.group(1)
-                return f"|{sanitize_label_text(inner)}|"
-
-            if '-->' in line and '|' in line:
-                line = re.sub(r"\|([^|]{1,200})\|", _sanitize_edge_label, line)
-
-            # 2d. Sanitize edge endpoints for simple call-graph lines: A --> B
-            # This fixes cases where a node ID contains '[' which Mermaid treats as a label start.
-            if '-->' in line and '|' not in line:
-                m = re.match(r"^(\s*)([^\s-]+)\s*-->\s*([^\s]+)\s*$", line)
-                if m:
-                    indent, src, dst = m.groups()
-                    src_id = sanitize_node_id(src)
-                    dst_id = sanitize_node_id(dst)
-                    line = f"{indent}{src_id} --> {dst_id}"
-            
-            # 3. Fix malformed subgraph IDs
-            if line.strip().startswith('subgraph '):
-                subgraph_part = line.strip()[9:].split('(', 1)
-                if len(subgraph_part) == 2:
-                    subgraph_id, rest = subgraph_part
-                    # Clean subgraph ID
-                    subgraph_id = subgraph_id.replace('.', '_').replace('-', '_').replace(':', '_')
-                    line = f"    subgraph {subgraph_id}({rest}"
-            
-            # 5. Fix class definitions with too many nodes
-            if line.strip().startswith('class ') and ',' in line:
-                # Split long class lines
-                class_parts = line.split(' ', 1)
-                if len(class_parts) == 2:
-                    nodes_and_class = class_parts[1]
-                    nodes, class_name = nodes_and_class.rsplit(' ', 1)
-                    node_list = nodes.split(',')
-                    if len(node_list) > 10:  # Split if too many nodes
-                        # Create multiple lines
-                        for i in range(0, len(node_list), 10):
-                            chunk = ','.join(node_list[i:i+10])
-                            fixed_lines.append(f"    class {chunk} {class_name}")
-                        continue
-            
-            fixed_lines.append(line)
-        
-        # Write back if changed
         fixed_content = '\n'.join(fixed_lines)
         if fixed_content != content:
             mmd_path.write_text(fixed_content, encoding='utf-8')
             return True
-            
+
     except Exception as e:
         print(f"Error fixing {mmd_path}: {e}")
-    
+
     return False
+
+
+def _fix_edge_line(line: str) -> str:
+    """Fix edge labels and endpoint issues."""
+    import re
+
+    # Fix edge labels with pipe issues
+    if '-->' in line and '|' in line:
+        if '-->|' in line:
+            parts = line.split('-->|', 1)
+            if len(parts) == 2:
+                label_and_target = parts[1]
+                if '|' in label_and_target:
+                    parts2 = label_and_target.split('|', 1)
+                    if len(parts2) == 2:
+                        label_content, target = parts2
+                        label_content = label_content.strip('|')
+                        if label_content.endswith('('):
+                            label_content = label_content[:-1]
+                        elif label_content.count('(') > label_content.count(')'):
+                            missing = label_content.count('(') - label_content.count(')')
+                            label_content += ')' * missing
+                        line = f"{parts[0]}-->|{label_content}|{target}"
+
+    # Fix stray trailing '|' after node IDs
+    if '-->' in line:
+        line = re.sub(r"(\b[A-Za-z]\w*)\|\s*$", r"\1", line)
+
+    # Sanitize edge label content inside |...|
+    def _sanitize_edge_label(m):
+        return f"|{_sanitize_label_text(m.group(1))}|"
+
+    if '-->' in line and '|' in line:
+        line = re.sub(r"\|([^|]{1,200})\|", _sanitize_edge_label, line)
+
+    # Sanitize edge endpoints
+    if '-->' in line and '|' not in line:
+        m = re.match(r"^(\s*)([^\s-]+)\s*-->\s*([^\s]+)\s*$", line)
+        if m:
+            indent, src, dst = m.groups()
+            line = f"{indent}{_sanitize_node_id(src)} --> {_sanitize_node_id(dst)}"
+
+    return line
+
+
+def _fix_subgraph_line(line: str) -> str:
+    """Fix malformed subgraph IDs."""
+    if line.strip().startswith('subgraph '):
+        subgraph_part = line.strip()[9:].split('(', 1)
+        if len(subgraph_part) == 2:
+            subgraph_id, rest = subgraph_part
+            subgraph_id = subgraph_id.replace('.', '_').replace('-', '_').replace(':', '_')
+            line = f"    subgraph {subgraph_id}({rest}"
+    return line
+
+
+def _fix_class_line(line: str):
+    """Fix class definitions with too many nodes. Returns list of lines or None."""
+    if line.strip().startswith('class ') and ',' in line:
+        class_parts = line.split(' ', 1)
+        if len(class_parts) == 2:
+            nodes_and_class = class_parts[1]
+            nodes, class_name = nodes_and_class.rsplit(' ', 1)
+            node_list = nodes.split(',')
+            if len(node_list) > 10:
+                result = []
+                for i in range(0, len(node_list), 10):
+                    chunk = ','.join(node_list[i:i+10])
+                    result.append(f"    class {chunk} {class_name}")
+                return result
+    return None
 
 
 def generate_pngs(input_dir: Path, output_dir: Path, timeout: int = 60) -> int:

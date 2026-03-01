@@ -10,9 +10,12 @@ source venv/bin/activate && python -m code2llm ./ -v -o ./project -m hybrid -f t
 python3 validate_toon.py output_toon/analysis.toon
 
 # Test 2: All formats
+rm -rf output_all/
 echo "📊 Test 2: All formats (toon,yaml,json,mermaid,png)"
 source venv/bin/activate && python -m code2llm ./ -v -o ./output_all -m hybrid -f all
 ls -la output_all/
+
+exit
 
 # Test 3: TOON + YAML (for comparison)
 echo "📊 Test 3: TOON + YAML (for validation)"

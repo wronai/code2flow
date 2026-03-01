@@ -2,7 +2,7 @@
 
 This document outlines planned features, improvements, and milestones for the code2llm project with LLM integration focus.
 
-## Current Status (v0.3.3)
+## Current Status (v0.5.0)
 
 ✅ **Completed:**
 - Core analysis engine with caching and parallel processing
@@ -31,6 +31,20 @@ This document outlines planned features, improvements, and milestones for the co
   - `benchmark_format_quality.py` — ground-truth project, 8 problems, 4-axis scoring
   - 24 format quality tests (`test_format_quality.py`)
   - `llm_exporter` → `context_exporter` rename with backward compat
+- **Rename + structural cleanup (v0.4.0)**:
+  - `code2flow` → `code2llm` — full package rename (folder, imports, CLI, docs)
+  - CLI: all 7 exporters connected (Toon, Map, Flow, Context, YAML, JSON, Mermaid)
+  - Removed dead code: `optimization/` (1590L), `visualizers/` (150L)
+  - Moved root-level generators to `generators/` subpackage
+  - Renamed sprint-based tests to feature-based names
+  - Updated all documentation references
+- **Bug fixes + EvolutionExporter (v0.5.0)**:
+  - Fixed MermaidExporter: 3 distinct outputs (flow.mmd, calls.mmd, compact_flow.mmd)
+  - Fixed SideEffectDetector: `dict.get()` false positive as IO
+  - Fixed coupling matrix: candidate-based callee disambiguation
+  - Fixed pipeline detection: safe ambiguous callee handling
+  - New `EvolutionExporter` → `evolution.toon` — ranked refactoring queue
+  - CLI: `--format evolution` (8 total output formats)
 
 ---
 
@@ -321,9 +335,12 @@ pattern:
 | v0.3.1 | Mar 2026 | CONTRACTS + DATA_TYPES enhancement (AST type inference, side-effect detection) | ✅ Done |
 | v0.3.2 | Mar 2026 | networkx pipeline detection, domain grouping, entry/exit labeling | ✅ Done |
 | v0.3.3 | Mar 2026 | Format quality benchmark, llm_exporter → context_exporter rename | ✅ Done |
-| v0.4.0 | Q3 2026 | IDE integration, real-time analysis | 📋 Planned |
-| v0.5.0 | Q4 2026 | JS/TS support | 📋 Planned |
-| v0.6.0 | Q1 2027 | Enterprise features | 📋 Planned |
+| v0.4.0 | Mar 2026 | Rename code2flow → code2llm, structural cleanup, dead code removal | ✅ Done |
+| v0.5.0 | Mar 2026 | Bug fixes, EvolutionExporter, format quality | ✅ Done |
+| v0.5.1 | Mar 2026 | Structural refactoring (9 function splits, CC̄ 5.1→4.8), examples, auto-benchmark | ✅ Done |
+| v0.6.0 | Q3 2026 | IDE integration, semantic code search | 📋 Planned |
+| v0.7.0 | Q4 2026 | JS/TS support | 📋 Planned |
+| v0.8.0 | Q1 2027 | Enterprise features | 📋 Planned |
 | v1.0.0 | Q2 2027 | Stable API, mature platform | 📋 Planned |
 
 ---

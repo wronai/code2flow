@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document describes the optimized scanning methodology for code2flow that addresses performance bottlenecks in large-scale Python codebases. The new approach reduces memory usage by 70% and improves analysis speed by 3-5x through smart prioritization, streaming analysis, and lazy CFG generation.
+This document describes the optimized scanning methodology for code2llm that addresses performance bottlenecks in large-scale Python codebases. The new approach reduces memory usage by 70% and improves analysis speed by 3-5x through smart prioritization, streaming analysis, and lazy CFG generation.
 
 ## Problem Analysis
 
@@ -260,8 +260,8 @@ Build full CFG only for:
 
 | Tool | Time | Memory | Output |
 |------|------|--------|--------|
-| code2flow (orig) | Killed | 2GB | - |
-| code2flow (opt) | 15s | 400MB | Full CFG |
+| code2llm (orig) | Killed | 2GB | - |
+| code2llm (opt) | 15s | 400MB | Full CFG |
 | pyan3 | 8s | 600MB | Call graph only |
 | snakefood | 5s | 200MB | Dependencies only |
 | pydeps | 4s | 150MB | Module graph |
@@ -271,7 +271,7 @@ Build full CFG only for:
 ### Quick Overview
 
 ```python
-from code2flow.core.streaming_analyzer import StreamingAnalyzer, STRATEGY_QUICK
+from code2llm.core.streaming_analyzer import StreamingAnalyzer, STRATEGY_QUICK
 
 analyzer = StreamingAnalyzer(strategy=STRATEGY_QUICK)
 
@@ -301,7 +301,7 @@ for result in analyzer.analyze_streaming("/path/to/project"):
 ### Incremental in CI
 
 ```python
-from code2flow.core.streaming_analyzer import IncrementalAnalyzer
+from code2llm.core.streaming_analyzer import IncrementalAnalyzer
 
 incremental = IncrementalAnalyzer()
 changed, unchanged = incremental.get_changed_files(".")
@@ -326,7 +326,7 @@ else:
 
 ### For CI/CD Integration
 
-1. **Cache analysis state** - Commit `.code2flow_state.json`
+1. **Cache analysis state** - Commit `.code2llm_state.json`
 2. **Use incremental mode** - 10-50x faster on subsequent runs
 3. **Set memory limits** - Prevent OOM kills
 4. **Quick strategy for PR checks** - Fast feedback
@@ -357,7 +357,7 @@ else:
 
 ## Conclusion
 
-The optimized scanning methodology transforms code2flow from a tool that crashes on large projects to one that handles enterprise-scale codebases efficiently. The 4-phase architecture with smart prioritization and memory bounds ensures reliable performance while maintaining output quality.
+The optimized scanning methodology transforms code2llm from a tool that crashes on large projects to one that handles enterprise-scale codebases efficiently. The 4-phase architecture with smart prioritization and memory bounds ensures reliable performance while maintaining output quality.
 
 **Key Takeaways:**
 1. Prioritize important files first (entry points, public API)

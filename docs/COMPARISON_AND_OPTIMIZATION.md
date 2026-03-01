@@ -1,10 +1,10 @@
-# code2flow: Porównanie Podejść i Optymalizacja dla Dużych Projektów
+# code2llm: Porównanie Podejść i Optymalizacja dla Dużych Projektów
 
-## Porównanie: Standard code2flow vs llm-context
+## Porównanie: Standard code2llm vs llm-context
 
 ### Metryki dla nlp2cmd (197 modułów, ~3500 funkcji)
 
-| Aspekt | Standard code2flow | llm-context | Różnica |
+| Aspekt | Standard code2llm | llm-context | Różnica |
 |--------|-------------------|-------------|---------|
 | **Rozmiar** | 13 MB (YAML) | 35 KB (Markdown) | **~370x mniej** |
 | **Liczba linii** | 293,970 | 705 | **~417x mniej** |
@@ -12,7 +12,7 @@
 | **Czytelność** | Maszyna | Człowiek/LLM | Przyjazne LLM |
 | **Struktura** | Strukturalna | Funkcjonalna | Logiczna |
 
-### Co Zawiera Standard code2flow
+### Co Zawiera Standard code2llm
 
 ```yaml
 # analysis.yaml - 13MB, strukturalny
@@ -164,7 +164,7 @@ for update in analyzer.analyze_streaming('/path/to/project'):
 analyzer = StreamingAnalyzer(
     strategy=STRATEGY_QUICK,
     incremental=True,
-    cache_dir='./.code2flow_cache'
+    cache_dir='./.code2llm_cache'
 )
 
 # Pierwszy raz: analizuje wszystko (3s)
@@ -176,7 +176,7 @@ analyzer = StreamingAnalyzer(
 # .github/workflows/analysis.yml
 - name: Generate LLM Context
   run: |
-    code2flow llm-context . -o ./context.md --incremental
+    code2llm llm-context . -o ./context.md --incremental
     # Tylko zmienione pliki - 10-50x szybciej
 ```
 
@@ -330,7 +330,7 @@ class SchemaValidator:
 
 ```bash
 # Generuj kontekst (3s zamiast 60s)
-code2flow llm-context /path/to/project -o ./context.md
+code2llm llm-context /path/to/project -o ./context.md
 
 # Użyj z LLM
 cat ./context.md | llm "What does this project do?"
@@ -346,7 +346,7 @@ cat ./context.md | llm "What does this project do?"
 
 ```bash
 # Generuj kontekst
-code2flow llm-context . -o ./context.md
+code2llm llm-context . -o ./context.md
 
 # Zapytaj o błąd
 cat ./context.md | llm "
@@ -367,7 +367,7 @@ and suggest fixes.
 
 ```bash
 # Porównaj obecny stan z proponowanym
-code2flow llm-context . -o ./current.md
+code2llm llm-context . -o ./current.md
 
 # Zapytaj o refaktoryzację
 cat ./current.md | llam "
@@ -393,7 +393,7 @@ using functional domain separation.
 
 ```bash
 # Generuj kontekst dla nowego developera
-code2flow llm-context . -o ./onboarding.md
+code2llm llm-context . -o ./onboarding.md
 
 # Deweloper może zapytać
 cat ./onboarding.md | llm "
@@ -414,7 +414,7 @@ I'm new to this project. Based on the Key Entry Points and Process Flows:
 
 ```bash
 # Generuj kontekst
-code2flow llm-context . -o ./api_docs.md
+code2llm llm-context . -o ./api_docs.md
 
 # Generuj dokumentację
 cat ./api_docs.md | llm "
@@ -433,15 +433,15 @@ including:
 ### Test 1: Czas Generacji
 
 ```bash
-# Standard code2flow
-time code2flow ../src/nlp2cmd -v -o ./output
+# Standard code2llm
+time code2llm ../src/nlp2cmd -v -o ./output
 # real    0m58.234s
 # user    0m52.891s
 # sys     0m5.112s
 # Output: 13MB
 
 # llm-context
-time code2flow llm-context ../src/nlp2cmd -o ./context.md
+time code2llm llm-context ../src/nlp2cmd -o ./context.md
 # real    0m2.891s
 # user    0m2.543s
 # sys     0m0.312s
@@ -491,7 +491,7 @@ _run_dom_multi_action
 
 ## Podsumowanie i Rekomendacje
 
-### Kiedy Używać Standard code2flow?
+### Kiedy Używać Standard code2llm?
 
 - Potrzebujesz pełnych danych strukturalnych (numery linii, pełne ścieżki)
 - Generujesz diagramy Mermaid dla wszystkich funkcji
@@ -510,7 +510,7 @@ _run_dom_multi_action
 ### Złota Zasada
 
 > **Dla LLM: użyj llm-context (35KB)**
-> **Dla maszyny: użyj standard code2flow (13MB)**
+> **Dla maszyny: użyj standard code2llm (13MB)**
 
 ### Rekomendacja dla nlp2cmd
 

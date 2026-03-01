@@ -1,3 +1,95 @@
+## [0.5.1] - 2026-03-01
+
+### Summary
+
+refactor(quality): structural refactoring — 9 god-functions split, CC̄ 5.1→4.8, max-CC 63→35
+
+### Changed
+
+- **Structural Refactoring** — 9 high-CC functions split into focused helpers:
+  - `cli.main()` CC=63 → 7 functions (`_run_analysis`, `_run_exports`, etc.)
+  - `ToonExporter._render_details` CC=31 → 5 methods
+  - `ToonExporter._compute_file_metrics` CC=21 → 4 methods
+  - `ToonExporter._compute_health` CC=28 → 4 methods
+  - `EvolutionExporter._build_context` CC=31 → 3 methods
+  - `MermaidExporter.export` CC=22 → 4 methods + `_get_cc` helper
+  - `MapExporter._render_details` CC=24 → 3 methods
+  - `validate_mermaid_file` CC=42 → 3 functions + 2 module-level helpers
+  - `fix_mermaid_file` CC=25 → 3 functions + 2 module-level helpers
+- **Metrics before/after**: CC̄ 5.1→4.8, max-CC 63→35 (↓44%), high-CC(≥15) 27→21 (↓22%)
+- **Version bump** to 0.5.1
+
+### Added
+
+- `examples/claude-code/` — code2llm + Claude Code refactoring workflow
+- `examples/shell-llm/` — code2llm + aider / llm / sgpt integration
+- `examples/litellm/` — code2llm + LiteLLM Python automation
+- `benchmarks/benchmark_evolution.py` — auto before/after CC benchmark
+
+---
+
+## [0.5.0] - 2026-03-01
+
+### Summary
+
+fix(exporters): 3 bug fixes + improvement + new EvolutionExporter for ranked refactoring queues
+
+### Added
+
+- **EvolutionExporter** → `evolution.toon` — prioritized refactoring queue:
+  - `NEXT[N]` — ranked actions by impact (CC × fan_out)
+  - `RISKS[N]` — breaking change identification
+  - `METRICS-TARGET` — measurable goals vs current baseline (CC̄, max-CC, god-modules)
+  - `HISTORY` — comparison with previous run
+  - CLI: `--format evolution` or included in `--format all`
+
+### Fixed
+
+- **MermaidExporter**: 3 output files were identical (all calling `export_call_graph`)
+  - `flow.mmd` — full graph with CC-based node shapes and red/yellow styling
+  - `calls.mmd` — edges only, no isolated nodes, LR layout
+  - `compact_flow.mmd` — module-level aggregation with weighted cross-module edges
+  - Human-readable node IDs (e.g. `core__ProjectAnalyzer_analyze`) instead of hashes
+- **SideEffectDetector**: `dict.get()` falsely classified as IO
+  - Extracted HTTP verbs to `HTTP_METHODS` with `HTTP_CALLERS` context check
+  - Only `requests.get()`, `session.post()`, `httpx.put()` etc. trigger IO
+- **COUPLING matrix**: improved callee resolution with candidate disambiguation
+  - Collects all matching candidates, prefers same-package callees
+- **PipelineDetector**: returns `None` for ambiguous callee matches to avoid phantom edges
+
+---
+
+## [0.4.0] - 2026-03-01
+
+### Summary
+
+refactor(rename): code2flow → code2llm rename + structural cleanup + dead code removal
+
+### Changed
+
+- **Package rename**: `code2flow` → `code2llm` — folder, all imports, CLI entry point, documentation
+- **CLI**: all 7 exporters now connected (ToonExporter, MapExporter, FlowExporter, ContextExporter, YAMLExporter, JSONExporter, MermaidExporter)
+- **Generators**: moved root-level `llm_flow_generator.py`, `llm_task_generator.py`, `mermaid_generator.py` into `generators/` subpackage
+- **Tests**: renamed sprint-based to feature-based names:
+  - `test_sprint2_flow.py` → `test_flow_exporter.py`
+  - `test_sprint3_pipelines.py` → `test_pipeline_detector.py`
+  - `test_sprint4.py` → `test_deep_analysis.py`
+  - `test_sprint5.py` → `test_prompt_engine.py`
+- **Documentation**: updated all `.md` files with new project name
+
+### Removed
+
+- **`optimization/`** (1590L dead code) — 4 files, zero external imports
+- **`visualizers/`** (150L dead code) — never imported from CLI or other modules
+
+### Migration
+
+- CLI command: `code2flow` → `code2llm`
+- Python imports: `from code2flow import ...` → `from code2llm import ...`
+- `LLMPromptExporter` still available as backward-compat alias for `ContextExporter`
+
+---
+
 ## [0.3.8] - 2026-03-01
 
 ### Summary

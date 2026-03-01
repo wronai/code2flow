@@ -7,7 +7,7 @@ This guide shows how to use the generated LLM context effectively.
 Generate LLM context for your project:
 
 ```bash
-code2flow llm-context /path/to/project -o ./context.md
+code2llm llm-context /path/to/project -o ./context.md
 ```
 
 ## Example LLM Queries
@@ -172,7 +172,7 @@ Integrate with CI/CD:
 
 ```bash
 # Generate context in CI
-code2flow llm-context . -o ./context.md
+code2llm llm-context . -o ./context.md
 
 # Use with LLM API
 curl -X POST https://api.openai.com/v1/chat/completions \
@@ -234,7 +234,7 @@ What could be causing this?
 If context exceeds LLM limits:
 
 1. Use `--strategy quick` for smaller output
-2. Focus on specific modules: `code2flow llm-context ./specific_module`
+2. Focus on specific modules: `code2llm llm-context ./specific_module`
 3. Manually extract relevant sections
 
 ### Missing Information
@@ -257,7 +257,7 @@ If LLM gives incorrect responses:
 
 ```bash
 # Generate context
-$ code2flow llm-context ../src/nlp2cmd -o context.md -v
+$ code2llm llm-context ../src/nlp2cmd -o context.md -v
 Generating LLM context for: ../src/nlp2cmd
 
 ✓ LLM context generated: ./context.md
@@ -291,14 +291,14 @@ Create a custom command:
   "key": "ctrl+shift+a",
   "command": "workbench.action.terminal.sendSequence",
   "args": {
-    "text": "code2flow llm-context . -o /tmp/context.md && cat /tmp/context.md | pbcopy\u000D"
+    "text": "code2llm llm-context . -o /tmp/context.md && cat /tmp/context.md | pbcopy\u000D"
   }
 }
 ```
 
 ### With ChatGPT Web
 
-1. Generate context: `code2flow llm-context . -o context.md`
+1. Generate context: `code2llm llm-context . -o context.md`
 2. Copy to clipboard: `cat context.md | pbcopy`
 3. Paste into ChatGPT with your query
 
@@ -309,7 +309,7 @@ Create a workflow:
 ```bash
 #!/bin/bash
 # analyze.sh
-CONTEXT=$(code2flow llm-context . -o - 2>/dev/null)
+CONTEXT=$(code2llm llm-context . -o - 2>/dev/null)
 echo "Analyze this codebase and suggest improvements:"
 echo "$CONTEXT" | head -n 100  # Limit for demo
 ```

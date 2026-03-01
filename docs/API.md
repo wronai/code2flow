@@ -15,7 +15,7 @@ pip install code2llm
 ### Code Analysis
 
 ```python
-from code2flow import ProjectAnalyzer, FAST_CONFIG
+from code2llm import ProjectAnalyzer, FAST_CONFIG
 
 # Analyze a Python project
 analyzer = ProjectAnalyzer(FAST_CONFIG)
@@ -29,7 +29,7 @@ print(f"Patterns: {len(result.patterns)}")
 ### NLP Query Processing
 
 ```python
-from code2flow import NLPPipeline, FAST_NLP_CONFIG
+from code2llm import NLPPipeline, FAST_NLP_CONFIG
 
 # Process natural language queries
 pipeline = NLPPipeline(FAST_NLP_CONFIG)
@@ -47,7 +47,7 @@ print(f"Action: {result.action_recommendation}")
 Main analyzer for Python codebases with performance optimizations.
 
 ```python
-from code2flow import ProjectAnalyzer, Config, FAST_CONFIG
+from code2llm import ProjectAnalyzer, Config, FAST_CONFIG
 
 # Fast analysis (recommended for large projects)
 analyzer = ProjectAnalyzer(FAST_CONFIG)
@@ -75,7 +75,7 @@ analyzer = ProjectAnalyzer(config)
 Natural language processing for code queries.
 
 ```python
-from code2flow import NLPPipeline, NLPConfig
+from code2llm import NLPPipeline, NLPConfig
 
 # Custom configuration
 config = NLPConfig(
@@ -104,7 +104,7 @@ pipeline = NLPPipeline(config)
 #### Analysis Configuration
 
 ```python
-from code2flow.core.config import (
+from code2llm.core.config import (
     Config, FAST_CONFIG, PerformanceConfig,
     FilterConfig, DepthConfig
 )
@@ -112,7 +112,7 @@ from code2flow.core.config import (
 # Performance settings
 perf = PerformanceConfig(
     enable_cache=True,
-    cache_dir='.code2flow_cache',
+    cache_dir='.code2llm_cache',
     parallel_workers=8,
     max_nodes_per_file=1000,
     fast_mode=True
@@ -136,7 +136,7 @@ depths = DepthConfig(
 #### NLP Configuration
 
 ```python
-from code2flow.nlp.config import (
+from code2llm.nlp.config import (
     NLPConfig, FAST_NLP_CONFIG, PRECISE_NLP_CONFIG,
     NormalizationConfig, IntentMatchingConfig
 )
@@ -240,19 +240,19 @@ class EntityResolver:
 
 ```bash
 # Basic analysis
-code2flow /path/to/project
+code2llm /path/to/project
 
 # With options
-code2flow /path/to/project \
+code2llm /path/to/project \
     -v \
     -o ./output \
     --format yaml,json,mermaid
 
 # Fast mode
-code2flow /path/to/project --fast
+code2llm /path/to/project --fast
 
 # LLM flow generation
-code2flow llm-flow /path/to/project
+code2llm llm-flow /path/to/project
 ```
 
 ## Multilingual Support
@@ -283,7 +283,7 @@ pipeline.process("pokaż graf wywołań", language="pl")
 
 ```python
 # Use fast config
-from code2flow import FAST_CONFIG
+from code2llm import FAST_CONFIG
 
 FAST_CONFIG.performance.parallel_enabled = False  # If issues
 FAST_CONFIG.filters.skip_private = True
@@ -296,7 +296,7 @@ FAST_CONFIG.depth.max_cfg_depth = 2
 # Enable caching for repeated analysis
 config = Config()
 config.performance.enable_cache = True
-config.performance.cache_dir = '.code2flow_cache'
+config.performance.cache_dir = '.code2llm_cache'
 ```
 
 ### Parallel Processing
@@ -356,7 +356,7 @@ flowchart TD
 The `.toon` format is designed for quick visual scanning of code health. Structure communicates meaning through sorting, indentation, and inline markers.
 
 ```bash
-code2flow -f toon /path/to/project
+code2llm -f toon /path/to/project
 ```
 
 **Format Philosophy:**
@@ -381,7 +381,7 @@ code2flow -f toon /path/to/project
 
 **Example Output:**
 ```
-# code2flow | 39f 9191L | py:39 | 2026-03-01
+# code2llm | 39f 9191L | py:39 | 2026-03-01
 # CC̄=5.0 | critical:36/332 | dups:0 | cycles:0
 
 HEALTH[20]:
@@ -417,7 +417,7 @@ pytest tests/
 pytest tests/test_analyzer.py -v
 
 # Run with coverage
-pytest tests/ --cov=code2flow --cov-report=html
+pytest tests/ --cov=code2llm --cov-report=html
 ```
 
 ## Contributing

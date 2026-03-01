@@ -114,21 +114,8 @@ class ToonExporter:
     def _compute_file_metrics(self, result: AnalysisResult) -> Dict[str, Dict[str, Any]]:
         """Per-file metrics derived from AnalysisResult."""
         files: Dict[str, Dict[str, Any]] = {}
-
-        # read line counts from disk if project_path available
-        line_counts: Dict[str, int] = {}
         project_path = result.project_path
-        if project_path:
-            pp = Path(project_path)
-            if pp.is_dir():
-                for py in pp.rglob("*.py"):
-                    try:
-                        lc = len(py.read_text(encoding="utf-8", errors="ignore").splitlines())
-                        rel = str(py.relative_to(pp))
-                        line_counts[str(py)] = lc
-                        line_counts[rel] = lc
-                    except Exception:
-                        pass
+        line_counts = self._scan_line_counts(project_path)
 
         # aggregate from functions (skip excluded paths)
         for qname, fi in result.functions.items():
@@ -138,12 +125,7 @@ class ToonExporter:
             if fpath not in files:
                 rel = self._rel_path(fpath, project_path)
                 lc = line_counts.get(fpath, line_counts.get(rel, 0))
-                files[fpath] = {
-                    "rel": rel, "lines": lc,
-                    "classes": set(), "methods": 0,
-                    "cc_scores": [], "max_cc": 0.0,
-                    "fan_in": 0,
-                }
+                files[fpath] = self._new_file_record(rel, lc)
             cc = fi.complexity.get("cyclomatic_complexity", 0)
             files[fpath]["cc_scores"].append(cc)
             files[fpath]["max_cc"] = max(files[fpath]["max_cc"], cc)
@@ -159,15 +141,10 @@ class ToonExporter:
             if fpath not in files:
                 rel = self._rel_path(fpath, project_path)
                 lc = line_counts.get(fpath, line_counts.get(rel, 0))
-                files[fpath] = {
-                    "rel": rel, "lines": lc,
-                    "classes": set(), "methods": 0,
-                    "cc_scores": [], "max_cc": 0.0,
-                    "fan_in": 0,
-                }
+                files[fpath] = self._new_file_record(rel, lc)
             files[fpath]["classes"].add(ci.name)
 
-        # modules with no functions/classes (e.g. __init__.py) (skip excluded)
+        # modules with no functions/classes (skip excluded)
         for mname, mi in result.modules.items():
             fpath = mi.file
             if self._is_excluded(fpath):
@@ -175,14 +152,48 @@ class ToonExporter:
             if fpath not in files:
                 rel = self._rel_path(fpath, project_path)
                 lc = line_counts.get(fpath, line_counts.get(rel, 0))
-                files[fpath] = {
-                    "rel": rel, "lines": lc,
-                    "classes": set(), "methods": 0,
-                    "cc_scores": [], "max_cc": 0.0,
-                    "fan_in": 0,
-                }
+                files[fpath] = self._new_file_record(rel, lc)
 
-        # compute fan-in per file (how many other files import from this file)
+        # fan-in + finalize
+        self._compute_fan_in(files, result)
+
+        for fpath in files:
+            files[fpath]["class_count"] = len(files[fpath]["classes"])
+            del files[fpath]["classes"]
+
+        return files
+
+    @staticmethod
+    def _new_file_record(rel: str, line_count: int) -> Dict[str, Any]:
+        """Create a fresh file metrics record."""
+        return {
+            "rel": rel, "lines": line_count,
+            "classes": set(), "methods": 0,
+            "cc_scores": [], "max_cc": 0.0,
+            "fan_in": 0,
+        }
+
+    def _scan_line_counts(self, project_path) -> Dict[str, int]:
+        """Scan project directory for Python file line counts."""
+        line_counts: Dict[str, int] = {}
+        if not project_path:
+            return line_counts
+        pp = Path(project_path)
+        if not pp.is_dir():
+            return line_counts
+        for py in pp.rglob("*.py"):
+            try:
+                lc = len(py.read_text(encoding="utf-8", errors="ignore").splitlines())
+                rel = str(py.relative_to(pp))
+                line_counts[str(py)] = lc
+                line_counts[rel] = lc
+            except Exception:
+                pass
+        return line_counts
+
+    @staticmethod
+    def _compute_fan_in(files: Dict, result: AnalysisResult) -> None:
+        """Compute fan-in per file (how many other files import from this file)."""
         importers: Dict[str, Set[str]] = defaultdict(set)
         for fname, fi in result.functions.items():
             for callee in fi.called_by:
@@ -191,13 +202,6 @@ class ToonExporter:
                     importers[fi.file].add(callee_info.file)
         for fpath in files:
             files[fpath]["fan_in"] = len(importers.get(fpath, set()))
-
-        # convert class sets to counts
-        for fpath in files:
-            files[fpath]["class_count"] = len(files[fpath]["classes"])
-            del files[fpath]["classes"]
-
-        return files
 
     def _compute_package_metrics(
         self, files: Dict[str, Dict], result: AnalysisResult
@@ -311,11 +315,24 @@ class ToonExporter:
                 # Resolve callee to a known function
                 callee_mod = func_to_module.get(callee)
                 if not callee_mod:
-                    # Try suffix match
-                    for known_qname, known_mod in func_to_module.items():
-                        if known_qname.endswith(f".{callee}"):
-                            callee_mod = known_mod
-                            break
+                    # Try suffix match — collect all candidates
+                    candidates = [
+                        (qn, mod) for qn, mod in func_to_module.items()
+                        if qn.endswith(f".{callee}")
+                    ]
+                    if len(candidates) == 1:
+                        callee_mod = candidates[0][1]
+                    elif candidates:
+                        # Prefer callee in same package as caller
+                        same_pkg = [
+                            (qn, mod) for qn, mod in candidates
+                            if self._package_of_module(mod) == src_pkg
+                        ]
+                        if same_pkg:
+                            callee_mod = same_pkg[0][1]
+                        else:
+                            # Pick first cross-package candidate
+                            callee_mod = candidates[0][1]
                 if callee_mod and callee_mod != src_mod:
                     dst_pkg = self._package_of_module(callee_mod)
                     if dst_pkg and dst_pkg != src_pkg:
@@ -379,7 +396,18 @@ class ToonExporter:
         issues: List[Dict[str, Any]] = []
         result: AnalysisResult = ctx["result"]
 
-        # duplicates
+        self._check_duplicates_health(ctx, issues)
+        self._check_god_modules_health(ctx, issues)
+        self._check_smells_health(result, issues)
+        self._check_high_cc_health(ctx, issues)
+
+        # sort: red first, then yellow, limit
+        sev_order = {"red": 0, "yellow": 1, "green": 2}
+        issues.sort(key=lambda x: sev_order.get(x["severity"], 9))
+        return issues[:MAX_HEALTH_ISSUES]
+
+    def _check_duplicates_health(self, ctx, issues):
+        """Check for duplicate classes."""
         ndups = len(ctx["duplicates"])
         if ndups > 0:
             dup_lines = sum(
@@ -393,7 +421,8 @@ class ToonExporter:
                 "impact": f"-{ndups} dup classes",
             })
 
-        # god modules (large files with many classes)
+    def _check_god_modules_health(self, ctx, issues):
+        """Check for god modules (large files with many classes)."""
         for fpath, fm in ctx["files"].items():
             if fm["lines"] >= GOD_MODULE_LINES and fm["class_count"] >= GOD_MODULE_CLASSES:
                 issues.append({
@@ -403,7 +432,8 @@ class ToonExporter:
                     "impact": "split needed",
                 })
 
-        # from existing smells
+    def _check_smells_health(self, result, issues):
+        """Check for code smells: CC, cycles, bottlenecks."""
         for smell in result.smells:
             stype = smell.type
             if stype == "god_function":
@@ -412,27 +442,23 @@ class ToonExporter:
                     fname = smell.context.get("function", smell.name)
                     short = fname.split(".")[-1] if "." in fname else fname
                     issues.append({
-                        "severity": "yellow",
-                        "code": "CC",
+                        "severity": "yellow", "code": "CC",
                         "message": f"{short} CC={cc_val} (limit:{CC_WARNING})",
                         "impact": "split method",
                     })
             elif stype == "circular_dependency":
                 issues.append({
-                    "severity": "red",
-                    "code": "CYCLE",
-                    "message": smell.description,
-                    "impact": "break cycle",
+                    "severity": "red", "code": "CYCLE",
+                    "message": smell.description, "impact": "break cycle",
                 })
             elif stype == "bottleneck":
                 issues.append({
-                    "severity": "yellow",
-                    "code": "BTL",
-                    "message": smell.description,
-                    "impact": "decouple",
+                    "severity": "yellow", "code": "BTL",
+                    "message": smell.description, "impact": "decouple",
                 })
 
-        # high CC functions not caught by smells
+    def _check_high_cc_health(self, ctx, issues):
+        """Check for high CC functions not already caught by smells."""
         high_cc = [f for f in ctx["func_metrics"] if f["cc"] >= CC_WARNING]
         existing_cc_msgs = {i["message"] for i in issues if i["code"] == "CC"}
         for fm in high_cc:
@@ -440,16 +466,9 @@ class ToonExporter:
             msg = f"{short} CC={fm['cc']} (limit:{CC_WARNING})"
             if msg not in existing_cc_msgs:
                 issues.append({
-                    "severity": "yellow",
-                    "code": "CC",
-                    "message": msg,
-                    "impact": "split method",
+                    "severity": "yellow", "code": "CC",
+                    "message": msg, "impact": "split method",
                 })
-
-        # sort: red first, then yellow, limit to MAX_HEALTH_ISSUES
-        sev_order = {"red": 0, "yellow": 1, "green": 2}
-        issues.sort(key=lambda x: sev_order.get(x["severity"], 9))
-        return issues[:MAX_HEALTH_ISSUES]
 
     def _compute_hotspots(self, result: AnalysisResult) -> List[Dict[str, Any]]:
         """Top functions by fan-out."""
@@ -800,10 +819,16 @@ class ToonExporter:
     def _render_details(self, ctx: Dict[str, Any]) -> List[str]:
         """Render D: section — per-module details sorted by max CC desc."""
         result: AnalysisResult = ctx["result"]
-        files = ctx["files"]
         dup_classes = {d["class_name"] for d in ctx["duplicates"]}
+        mod_items = self._rank_modules_by_cc(result)
 
-        # sort modules by max CC desc
+        lines = ["D:"]
+        for mname, mi, max_cc in mod_items:
+            self._render_module_detail(result, mi, dup_classes, lines)
+        return lines
+
+    def _rank_modules_by_cc(self, result: AnalysisResult):
+        """Sort modules by max cyclomatic complexity (desc)."""
         mod_items = []
         for mname, mi in result.modules.items():
             max_cc = 0.0
@@ -814,77 +839,83 @@ class ToonExporter:
                     max_cc = max(max_cc, cc)
             mod_items.append((mname, mi, max_cc))
         mod_items.sort(key=lambda x: x[2], reverse=True)
+        return mod_items
 
-        lines = ["D:"]
-        for mname, mi, max_cc in mod_items:
-            rel = self._rel_path(mi.file, result.project_path)
-            lines.append(f"  {rel}:")
+    def _render_module_detail(self, result, mi, dup_classes, lines):
+        """Render detail for a single module: imports, exports, classes, funcs."""
+        rel = self._rel_path(mi.file, result.project_path)
+        lines.append(f"  {rel}:")
 
-            # imports
-            if mi.imports:
-                imp_str = ",".join(sorted(mi.imports))
-                lines.append(f"    i: {imp_str}")
+        # imports
+        if mi.imports:
+            imp_str = ",".join(sorted(mi.imports))
+            lines.append(f"    i: {imp_str}")
 
-            # exports (classes + top-level functions)
-            exports = []
-            for cq in mi.classes:
-                ci = result.classes.get(cq)
-                if ci:
-                    exports.append(ci.name)
-            for fq in mi.functions:
-                fi = result.functions.get(fq)
-                if fi and not fi.class_name:
-                    exports.append(fi.name)
-            if exports:
-                lines.append(f"    e: {','.join(exports)}")
+        # exports (classes + top-level functions)
+        exports = []
+        for cq in mi.classes:
+            ci = result.classes.get(cq)
+            if ci:
+                exports.append(ci.name)
+        for fq in mi.functions:
+            fi = result.functions.get(fq)
+            if fi and not fi.class_name:
+                exports.append(fi.name)
+        if exports:
+            lines.append(f"    e: {','.join(exports)}")
 
-            # classes with methods - show flow signature
-            for cq in mi.classes:
-                ci = result.classes.get(cq)
-                if not ci:
-                    continue
+        # classes with methods
+        self._render_module_classes(result, mi, dup_classes, lines)
 
-                dup_mark = "  ×DUP" if ci.name in dup_classes else ""
-                doc = ""
-                if ci.docstring:
-                    doc = f"  # {ci.docstring[:60]}..."
-                lines.append(f"    {ci.name}{dup_mark}{doc}")
+        # standalone functions
+        self._render_standalone_funcs(result, mi, lines)
 
-                # flow signature: show call chain for each method
-                method_items = []
-                for mq in ci.methods:
-                    fi = result.functions.get(mq)
-                    if fi:
-                        cc = fi.complexity.get("cyclomatic_complexity", 0)
-                        arity = len(fi.args) - (1 if fi.is_method else 0)
-                        method_items.append((fi, cc, arity))
+    def _render_module_classes(self, result, mi, dup_classes, lines):
+        """Render classes with call chains within a module."""
+        for cq in mi.classes:
+            ci = result.classes.get(cq)
+            if not ci:
+                continue
 
-                # find root method (usually __init__ or first method)
-                root_method = None
-                for fi, cc, arity in method_items:
-                    if fi.name == "__init__":
-                        root_method = fi
-                        break
-                if not root_method and method_items:
-                    root_method = method_items[0][0]
+            dup_mark = "  ×DUP" if ci.name in dup_classes else ""
+            doc = ""
+            if ci.docstring:
+                doc = f"  # {ci.docstring[:60]}..."
+            lines.append(f"    {ci.name}{dup_mark}{doc}")
 
-                # build call chain
-                if root_method:
-                    self._render_call_chain(root_method, method_items, result, lines, "      ")
+            # method items for call chain
+            method_items = []
+            for mq in ci.methods:
+                fi = result.functions.get(mq)
+                if fi:
+                    cc = fi.complexity.get("cyclomatic_complexity", 0)
+                    arity = len(fi.args) - (1 if fi.is_method else 0)
+                    method_items.append((fi, cc, arity))
 
-            # standalone functions
-            for fq in mi.functions:
-                fi = result.functions.get(fq)
-                if fi and not fi.class_name:
-                    args_str = ",".join(
-                        a for a in fi.args if a != "self"
-                    )
-                    ret = ""
-                    if fi.returns:
-                        ret = f"->{fi.returns}"
-                    lines.append(f"    {fi.name}({args_str}){ret}")
+            # find root method
+            root_method = None
+            for fi, cc, arity in method_items:
+                if fi.name == "__init__":
+                    root_method = fi
+                    break
+            if not root_method and method_items:
+                root_method = method_items[0][0]
 
-        return lines
+            if root_method:
+                self._render_call_chain(root_method, method_items, result, lines, "      ")
+
+    def _render_standalone_funcs(self, result, mi, lines):
+        """Render standalone (non-class) functions within a module."""
+        for fq in mi.functions:
+            fi = result.functions.get(fq)
+            if fi and not fi.class_name:
+                args_str = ",".join(
+                    a for a in fi.args if a != "self"
+                )
+                ret = ""
+                if fi.returns:
+                    ret = f"->{fi.returns}"
+                lines.append(f"    {fi.name}({args_str}){ret}")
 
     # ------------------------------------------------------------------
     # utility helpers

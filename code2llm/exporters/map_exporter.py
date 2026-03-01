@@ -78,8 +78,13 @@ class MapExporter(Exporter):
     # ------------------------------------------------------------------
     def _render_details(self, result: AnalysisResult) -> List[str]:
         lines = ["D:"]
+        mod_items = self._rank_modules(result)
+        for mname, mi, max_cc in mod_items:
+            self._render_map_module(result, mi, lines)
+        return lines
 
-        # sort modules by max CC desc
+    def _rank_modules(self, result: AnalysisResult):
+        """Sort modules by max CC desc, excluding excluded paths."""
         mod_items = []
         for mname, mi in result.modules.items():
             if self._is_excluded(mi.file):
@@ -92,67 +97,69 @@ class MapExporter(Exporter):
                     max_cc = max(max_cc, cc)
             mod_items.append((mname, mi, max_cc))
         mod_items.sort(key=lambda x: x[2], reverse=True)
+        return mod_items
 
-        for mname, mi, max_cc in mod_items:
-            rel = self._rel_path(mi.file, result.project_path)
-            lines.append(f"  {rel}:")
+    def _render_map_module(self, result, mi, lines):
+        """Render a single module's detail: imports, exports, classes, funcs."""
+        rel = self._rel_path(mi.file, result.project_path)
+        lines.append(f"  {rel}:")
 
-            # imports
-            if mi.imports:
-                imp_str = ",".join(sorted(mi.imports))
-                lines.append(f"    i: {imp_str}")
+        # imports
+        if mi.imports:
+            imp_str = ",".join(sorted(mi.imports))
+            lines.append(f"    i: {imp_str}")
 
-            # exports (classes + top-level functions)
-            exports = []
-            for cq in mi.classes:
-                ci = result.classes.get(cq)
-                if ci:
-                    exports.append(ci.name)
-            for fq in mi.functions:
-                fi = result.functions.get(fq)
-                if fi and not fi.class_name:
-                    exports.append(fi.name)
-            if exports:
-                lines.append(f"    e: {','.join(exports)}")
+        # exports
+        exports = []
+        for cq in mi.classes:
+            ci = result.classes.get(cq)
+            if ci:
+                exports.append(ci.name)
+        for fq in mi.functions:
+            fi = result.functions.get(fq)
+            if fi and not fi.class_name:
+                exports.append(fi.name)
+        if exports:
+            lines.append(f"    e: {','.join(exports)}")
 
-            # classes with methods and signatures
-            for cq in mi.classes:
-                ci = result.classes.get(cq)
-                if not ci:
-                    continue
+        # classes with method signatures
+        for cq in mi.classes:
+            ci = result.classes.get(cq)
+            if not ci:
+                continue
+            self._render_map_class(result, ci, lines)
 
-                doc = ""
-                if ci.docstring:
-                    doc = f"  # {ci.docstring[:60].rstrip('.')}..."
+        # standalone functions
+        for fq in mi.functions:
+            fi = result.functions.get(fq)
+            if fi and not fi.class_name:
+                sig = self._function_signature(fi)
+                lines.append(f"    {sig}")
 
-                # collect method signatures
-                method_sigs = []
-                for mq in ci.methods:
-                    fi = result.functions.get(mq)
-                    if fi:
-                        arity = len(fi.args) - (1 if fi.is_method else 0)
-                        method_sigs.append(f"{fi.name}({arity})")
+    def _render_map_class(self, result, ci, lines):
+        """Render a single class with its method signatures."""
+        doc = ""
+        if ci.docstring:
+            doc = f"  # {ci.docstring[:60].rstrip('.')}..."
 
-                bases_str = ""
-                if ci.bases:
-                    bases_str = f"({','.join(ci.bases)})"
+        method_sigs = []
+        for mq in ci.methods:
+            fi = result.functions.get(mq)
+            if fi:
+                arity = len(fi.args) - (1 if fi.is_method else 0)
+                method_sigs.append(f"{fi.name}({arity})")
 
-                if method_sigs:
-                    lines.append(
-                        f"    {ci.name}{bases_str}: "
-                        f"{','.join(method_sigs)}{doc}"
-                    )
-                else:
-                    lines.append(f"    {ci.name}{bases_str}:{doc}")
+        bases_str = ""
+        if ci.bases:
+            bases_str = f"({','.join(ci.bases)})"
 
-            # standalone functions with full signatures
-            for fq in mi.functions:
-                fi = result.functions.get(fq)
-                if fi and not fi.class_name:
-                    sig = self._function_signature(fi)
-                    lines.append(f"    {sig}")
-
-        return lines
+        if method_sigs:
+            lines.append(
+                f"    {ci.name}{bases_str}: "
+                f"{','.join(method_sigs)}{doc}"
+            )
+        else:
+            lines.append(f"    {ci.name}{bases_str}:{doc}")
 
     # ------------------------------------------------------------------
     # utility helpers

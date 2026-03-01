@@ -436,10 +436,15 @@ class PipelineDetector:
     def _resolve_callee(
         self, callee: str, funcs: Dict[str, FunctionInfo]
     ) -> Optional[str]:
-        """Resolve callee name to qualified name."""
+        """Resolve callee name to qualified name.
+
+        Returns None for ambiguous matches (multiple candidates)
+        to avoid creating phantom pipeline edges.
+        """
         if callee in funcs:
             return callee
-        for qname in funcs:
-            if qname.endswith(f".{callee}"):
-                return qname
+        candidates = [qn for qn in funcs if qn.endswith(f".{callee}")]
+        if len(candidates) == 1:
+            return candidates[0]
+        # Ambiguous or not found — skip to avoid wrong edges
         return None

@@ -4,6 +4,7 @@ Available exporters:
   - ToonExporter      → analysis.toon  (health diagnostics)
   - MapExporter       → project.map    (structural map)
   - FlowExporter      → flow.toon      (data-flow: pipelines, contracts, types)
+  - EvolutionExporter  → evolution.toon (ranked refactoring queue)
   - ContextExporter   → context.md     (LLM narrative)
   - YAMLExporter      → analysis.yaml
   - JSONExporter      → analysis.json
@@ -21,6 +22,7 @@ from .llm_exporter import LLMPromptExporter  # backward compat
 from .toon import ToonExporter
 from .map_exporter import MapExporter
 from .flow_exporter import FlowExporter
+from .evolution_exporter import EvolutionExporter
 
 __all__ = [
     'Exporter',
@@ -32,4 +34,5 @@ __all__ = [
     'ToonExporter',
     'MapExporter',
     'FlowExporter',
+    'EvolutionExporter',
 ]
