@@ -17,6 +17,130 @@ def load_yaml(filepath):
         print(f"Error loading {filepath}: {e}")
         return None
 
+def load_toon(filepath):
+    """Parse TOON plain-text format into structured data."""
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        return parse_toon_content(content)
+    except Exception as e:
+        print(f"Error loading {filepath}: {e}")
+        return None
+
+def parse_toon_content(content):
+    """Parse TOON v2 plain-text format."""
+    data = {
+        'meta': {},
+        'stats': {},
+        'functions': [],
+        'classes': [],
+        'modules': [],
+        'patterns': [],
+        'call_graph': {},
+        'insights': {},
+        'health': [],
+        'refactor': [],
+        'hotspots': [],
+    }
+    lines = content.split('\n')
+    section = None
+    
+    for line in lines:
+        line_stripped = line.strip()
+        
+        # Parse header
+        if line.startswith('# code2flow'):
+            data['meta']['project'] = 'code2flow'
+            data['meta']['generated'] = line.split('|')[-1].strip() if '|' in line else ''
+            continue
+        
+        # Parse stats from header line 2
+        if line.startswith('# CC'):
+            parts = line[2:].strip().split('|')
+            for part in parts:
+                if 'critical' in part:
+                    data['stats']['critical'] = part.strip()
+                elif 'dups' in part:
+                    data['stats']['duplicates'] = part.strip()
+                elif 'cycles' in part:
+                    data['stats']['cycles'] = part.strip()
+            continue
+        
+        # Detect sections
+        if line.startswith('HEALTH'):
+            section = 'health'
+            continue
+        elif line.startswith('REFACTOR'):
+            section = 'refactor'
+            continue
+        elif line.startswith('COUPLING:'):
+            section = 'coupling'
+            continue
+        elif line.startswith('LAYERS:'):
+            section = 'layers'
+            continue
+        elif line.startswith('DUPLICATES'):
+            section = 'duplicates'
+            continue
+        elif line.startswith('FUNCTIONS'):
+            section = 'functions'
+            continue
+        elif line.startswith('HOTSPOTS:'):
+            section = 'hotspots'
+            continue
+        elif line.startswith('CLASSES:'):
+            section = 'classes'
+            continue
+        elif line.startswith('D:'):
+            section = 'details'
+            continue
+        
+        # Parse section content
+        if section == 'health' and line_stripped:
+            if line_stripped.startswith('🔴') or line_stripped.startswith('🟡'):
+                data['health'].append(line_stripped)
+        elif section == 'functions' and line_stripped:
+            # Parse function lines like: "56.0  main  19n 4exit cond+ret !! split"
+            if line_stripped.startswith('summary:'):
+                continue
+            parts = line_stripped.split()
+            if len(parts) >= 2 and parts[0].replace('.', '').isdigit():
+                func_name = parts[1]
+                data['functions'].append({'name': func_name, 'cc': float(parts[0])})
+        elif section == 'classes' and line_stripped:
+            # Parse class lines like: "ToonExporter  ████████  29m CC̄=9.5 max=31 !!"
+            parts = line_stripped.split()
+            if parts and not parts[0].startswith('█'):
+                class_name = parts[0]
+                data['classes'].append({'name': class_name})
+        elif section == 'hotspots' and line_stripped:
+            # Parse hotspot lines like: "#1  main  fan=45  \"calls 45 functions\""
+            if line_stripped.startswith('#'):
+                parts = line_stripped.split()
+                if len(parts) >= 2:
+                    data['hotspots'].append({'name': parts[1]})
+    
+    return data
+
+def is_toon_file(filepath):
+    """Check if file is TOON format based on extension or content."""
+    path = Path(filepath)
+    if path.suffix == '.toon':
+        return True
+    # Check content for TOON header
+    try:
+        with open(filepath, 'r') as f:
+            first_line = f.readline()
+            return first_line.startswith('# code2flow') or first_line.startswith('# CC')
+    except:
+        return False
+
+def load_file(filepath):
+    """Load file - auto-detect TOON vs YAML format."""
+    if is_toon_file(filepath):
+        return load_toon(filepath)
+    return load_yaml(filepath)
+
 def extract_functions_from_yaml(yaml_data):
     """Extract function list from standard YAML format."""
     functions = set()
@@ -30,19 +154,14 @@ def extract_functions_from_yaml(yaml_data):
     return functions
 
 def extract_functions_from_toon(toon_data):
-    """Extract function list from toon YAML format."""
+    """Extract function list from parsed TOON data."""
     functions = set()
     
     # Extract from functions array
     for func_data in toon_data.get('functions', []):
-        # Reconstruct full function name
         name = func_data.get('name', '')
-        module = func_data.get('module', '')
-        if module and module != 'root':
-            full_name = f"{module}.{name}"
-        else:
-            full_name = name
-        functions.add(full_name)
+        if name:
+            functions.add(name)
     
     return functions
 
@@ -57,18 +176,14 @@ def extract_classes_from_yaml(yaml_data):
     return classes
 
 def extract_classes_from_toon(toon_data):
-    """Extract class list from toon YAML format."""
+    """Extract class list from parsed TOON data."""
     classes = set()
     
-    # Extract from classes array (inferred from function grouping)
-    for class_data in toon_data.get('classes', []):
-        name = class_data.get('name', '')
-        module = class_data.get('module', '')
-        if module and module != 'root':
-            full_name = f"{module}.{name}"
-        else:
-            full_name = name
-        classes.add(full_name)
+    # Extract from classes array
+    for cls_data in toon_data.get('classes', []):
+        name = cls_data.get('name', '')
+        if name:
+            classes.add(name)
     
     return classes
 
@@ -127,13 +242,14 @@ def extract_modules_from_yaml(yaml_data):
     return modules
 
 def extract_modules_from_toon(toon_data):
-    """Extract module list from toon YAML format."""
+    """Extract module list from parsed TOON data."""
+    # TOON v2 doesn't have explicit modules section
+    # Modules are inferred from function/class locations
     modules = set()
-    
-    # Extract from modules array
-    for module_data in toon_data.get('modules', []):
-        modules.add(module_data.get('name', ''))
-    
+    for func in toon_data.get('functions', []):
+        name = func.get('name', '')
+        if '.' in name:
+            modules.add(name.rsplit('.', 1)[0])
     return modules
 
 def compare_basic_stats(yaml_data, toon_data):
@@ -262,50 +378,33 @@ def validate_toon_completeness(toon_data):
     print("\n🔍 TOON Format Structure Validation:")
     print("-" * 50)
     
-    # Check for new format (v2.0) with meta section
-    if 'meta' in toon_data:
-        required_sections = ['meta', 'stats', 'functions', 'classes', 'modules', 'patterns', 'call_graph', 'insights']
-        
-        all_present = True
-        for section in required_sections:
-            present = section in toon_data
-            status = "✅" if present else "❌"
-            print(f"{status} {section}: {'Present' if present else 'Missing'}")
-            if not present:
-                all_present = False
-        
-        # Check meta subsections
-        if 'meta' in toon_data:
-            meta_required = ['project', 'mode', 'generated', 'version']
-            print(f"\n📋 Meta Section:")
-            for subsection in meta_required:
-                present = subsection in toon_data['meta']
-                status = "✅" if present else "❌"
-                print(f"  {status} {subsection}: {'Present' if present else 'Missing'}")
-                if not present:
-                    all_present = False
-    else:
-        # Fallback for old format
-        required_sections = ['project', 'mode', 'stats', 'functions', 'classes', 'modules', 'patterns', 'call_graph']
-        
-        all_present = True
-        for section in required_sections:
-            present = section in toon_data
-            status = "✅" if present else "❌"
-            print(f"{status} {section}: {'Present' if present else 'Missing'}")
-            if not present:
-                all_present = False
+    # Check for TOON v2 format
+    has_functions = bool(toon_data.get('functions'))
+    has_classes = bool(toon_data.get('classes'))
+    has_health = bool(toon_data.get('health'))
+    has_hotspots = bool(toon_data.get('hotspots'))
     
-    # Check function details
+    all_present = True
+    sections = [
+        ('functions', has_functions),
+        ('classes', has_classes),
+        ('health', has_health),
+        ('hotspots', has_hotspots),
+    ]
+    
+    for section, present in sections:
+        status = "✅" if present else "❌"
+        print(f"{status} {section}: {'Present' if present else 'Missing'}")
+        if not present:
+            all_present = False
+    
+    
+    # Show function sample
     functions = toon_data.get('functions', [])
     if functions:
         print(f"\n📋 Function Details Sample (first 3):")
         for i, func in enumerate(functions[:3]):
-            func_type = func.get('tier', func.get('type', 'N/A'))
-            print(f"  {i+1}. {func.get('name', 'N/A')} ({func_type})")
-            print(f"     Module: {func.get('module', 'N/A')}")
-            print(f"     Complexity: {func.get('complexity', 'N/A')}")
-            print(f"     Nodes: {func.get('nodes', 'N/A')}")
+            print(f"  {i+1}. {func.get('name', 'N/A')} (CC={func.get('cc', 'N/A')})")
     
     return all_present
 
@@ -313,36 +412,36 @@ def main():
     """Main validation function."""
     if len(sys.argv) == 2:
         # Single file mode - validate TOON format structure only
-        toon_path = Path(sys.argv[1])
+        file_path = Path(sys.argv[1])
         
-        if not toon_path.exists():
-            print(f"Error: {toon_path} not found")
+        if not file_path.exists():
+            print(f"Error: {file_path} not found")
             sys.exit(1)
         
-        print(f"🔍 Validating TOON format: {toon_path.name}")
+        print(f"🔍 Validating TOON format: {file_path.name}")
         print("=" * 60)
         
-        # Load TOON file
-        toon_data = load_yaml(toon_path)
+        # Load file (auto-detect format)
+        data = load_file(file_path)
         
-        if not toon_data:
-            print("Error: Could not load TOON file")
+        if not data:
+            print("Error: Could not load file")
             sys.exit(1)
         
-        # Validate TOON structure
-        toon_valid = validate_toon_completeness(toon_data)
+        # Validate structure
+        is_valid = validate_toon_completeness(data)
         
         # Final summary
         print("\n" + "=" * 60)
         print("📋 TOON FORMAT VALIDATION SUMMARY:")
         print("=" * 60)
         
-        status = "✅ PASS" if toon_valid else "❌ FAIL"
+        status = "✅ PASS" if is_valid else "❌ FAIL"
         print(f"{status} TOON Structure")
         
-        print("\n" + ("🎉 TOON FORMAT VALID!" if toon_valid else "⚠️  TOON FORMAT ISSUES!"))
+        print("\n" + ("🎉 TOON FORMAT VALID!" if is_valid else "⚠️  TOON FORMAT ISSUES!"))
         
-        return 0 if toon_valid else 1
+        return 0 if is_valid else 1
     
     elif len(sys.argv) == 3:
         # Comparison mode - compare YAML vs TOON
@@ -362,7 +461,7 @@ def main():
         
         # Load both files
         yaml_data = load_yaml(yaml_path)
-        toon_data = load_yaml(toon_path)
+        toon_data = load_file(toon_path)  # Auto-detect TOON format
         
         if not yaml_data or not toon_data:
             print("Error: Could not load one or both files")
@@ -401,8 +500,8 @@ def main():
     
     else:
         print("Usage:")
-        print("  python validate_toon.py <analysis.toon.yaml>                    # Validate TOON only")
-        print("  python validate_toon.py <analysis.yaml> <analysis.toon.yaml>  # Compare both formats")
+        print("  python validate_toon.py <analysis.toon>                      # Validate TOON only")
+        print("  python validate_toon.py <analysis.yaml> <analysis.toon>      # Compare both formats")
         sys.exit(1)
 
 if __name__ == '__main__':

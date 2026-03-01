@@ -2,40 +2,50 @@
 
 ## Podsumowanie Zmian
 
-Refaktoryzacja monolitycznego `flow.py` (1145 linii) w modularną paczkę Python.
+Refaktoryzacja monolitycznego `flow.py` (1145 linii) w modularną paczkę Python,
+a następnie wprowadzenie **taksonomii 4 formatów** (v0.3.0).
 
-## Nowa Struktura
+## Nowa Struktura (v0.3.0)
 
 ```
-debug/
+code2flow/
 ├── code2flow/                  # Główna paczka
-│   ├── __init__.py            # Eksportuje publiczne API
+│   ├── __init__.py            # Eksportuje publiczne API (v0.3.0)
 │   ├── __main__.py            # Entry point: python -m code2flow
-│   ├── cli.py                 # CLI: code2flow komenda
+│   ├── cli.py                 # CLI: code2flow komenda (map,toon,flow,context,all)
 │   ├── core/                  # Klasy bazowe i konfiguracja
 │   │   ├── __init__.py
 │   │   ├── config.py          # Config, ANALYSIS_MODES, NODE_COLORS
 │   │   ├── models.py          # FlowNode, FlowEdge, DataFlow, AnalysisResult
-│   │   └── analyzer.py        # ProjectAnalyzer - główny orchestrator
-│   ├── extractors/            # Ekstraktory AST
+│   │   ├── analyzer.py        # ProjectAnalyzer - główny orchestrator
+│   │   └── streaming_analyzer.py  # StreamingAnalyzer z priorytetyzacją
+│   ├── analysis/              # Moduły analizy
+│   │   ├── call_graph.py      # CallGraphExtractor
+│   │   ├── cfg.py             # CFGExtractor - Control Flow Graph
+│   │   ├── coupling.py        # CouplingAnalyzer
+│   │   ├── data_analysis.py   # DataAnalyzer
+│   │   ├── dfg.py             # DFGExtractor - Data Flow Graph
+│   │   └── smells.py          # SmellDetector
+│   ├── exporters/             # Eksport do formatów (4 główne + dodatkowe)
 │   │   ├── __init__.py
-│   │   ├── cfg_extractor.py   # CFGExtractor - Control Flow Graph
-│   │   ├── dfg_extractor.py   # DFGExtractor - Data Flow Graph
-│   │   └── call_graph.py      # CallGraphExtractor
-│   ├── exporters/             # Eksport do formatów
-│   │   ├── __init__.py
-│   │   └── base.py            # YAMLExporter, JSONExporter, MermaidExporter, LLMPromptExporter
+│   │   ├── base.py            # Exporter ABC
+│   │   ├── toon.py            # ToonExporter → analysis.toon (diagnostyka)
+│   │   ├── map_exporter.py    # MapExporter → project.map (struktura) ⭐ NEW
+│   │   ├── flow_exporter.py   # FlowExporter → flow.toon (data-flow) ⭐ NEW
+│   │   ├── llm_exporter.py    # LLMPromptExporter → context.md (LLM)
+│   │   ├── yaml_exporter.py   # YAMLExporter → analysis.yaml
+│   │   ├── json_exporter.py   # JSONExporter → analysis.json
+│   │   └── mermaid_exporter.py # MermaidExporter → *.mmd
+│   ├── nlp/                   # NLP pipeline
+│   ├── optimization/          # Optymalizacje
 │   ├── visualizers/           # Wizualizacja
-│   │   ├── __init__.py
-│   │   └── graph.py           # GraphVisualizer (NetworkX + matplotlib)
-│   └── patterns/              # Detekcja wzorców
-│       ├── __init__.py
-│       └── detector.py        # PatternDetector (rekurencja, singleton, factory, state machine, strategy)
-├── setup.py                   # Setup konfiguracja
-├── pyproject.toml            # Nowoczesna konfiguracja pyproject
-├── Makefile                  # Zaktualizowany Makefile
-├── requirements.txt          # Zależności (networkx, matplotlib, pyyaml, numpy)
-└── README.md                 # Zaktualizowana dokumentacja
+│   ├── patterns/              # Detekcja wzorców
+│   └── refactor/              # Silnik refaktoryzacji
+├── setup.py
+├── pyproject.toml
+├── Makefile
+├── requirements.txt
+└── README.md
 ```
 
 ## Kluczowe Decyzje Architektoniczne

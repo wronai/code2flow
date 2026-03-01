@@ -1,3 +1,52 @@
+## [0.3.0] - 2026-03-01
+
+### Summary
+
+refactor(exporters): format taxonomy — 4 files, 4 purposes (map, toon, flow, context)
+
+### Added
+
+- **MapExporter** (`project.map`) — structural map format
+  - Modules, imports, signatures, type information
+  - Formerly `project.toon` — renamed for clarity
+  - Purpose: "what exists and how it's connected"
+
+- **FlowExporter** (`flow.toon`) — **NEW** data-flow format
+  - PIPELINES: auto-detected call chains with purity scoring
+  - TRANSFORMS: high fan-out functions sorted by fan-out
+  - CONTRACTS: per-pipeline input→output with CC and purity
+  - DATA_TYPES: consumed/produced counts, hub-type detection
+  - SIDE_EFFECTS: IO/Cache/Mutation/Pure classification
+  - Purpose: "how data flows through the system"
+
+- **New CLI format options**
+  - `--format map` — generate project.map (structural map)
+  - `--format flow` — generate flow.toon (data-flow analysis)
+  - `--format context` — generate context.md (LLM narrative)
+  - `--format all` — now generates all 8 formats (toon, map, flow, context, yaml, json, mermaid, png)
+
+### Changed
+
+- **Renamed `llm_prompt.md` → `context.md`** — LLM narrative context
+  - LLMPromptExporter now outputs `context.md` by default
+  - Purpose: "understand the system to rebuild it"
+
+- **Format taxonomy** based on benchmark analysis (TODO/action_plan_v3.md)
+  - `project.map` — structure (modules, imports, signatures)
+  - `analysis.toon` — health diagnostics (CC, coupling, smells)
+  - `flow.toon` — data flow (pipelines, contracts, hub-types)
+  - `context.md` — LLM narrative (architecture, patterns, API)
+
+- **Version bump** to 0.3.0
+
+### Docs
+
+- Updated README.md with new format taxonomy and examples
+- Updated TODO.md with Sprint 2-4 roadmap from action_plan_v3
+- Updated CHANGELOG.md, ROADMAP.md, REFACTORING_PLAN.md
+
+---
+
 ## [0.2.5] - 2026-03-01
 
 ### Summary

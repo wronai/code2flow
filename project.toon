@@ -1,4 +1,4 @@
-# code2flow | 54f 13451L | python:54
+# code2flow | 54f 13550L | python:54
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[54]:
   benchmarks/benchmark_performance.py,181
@@ -54,7 +54,7 @@ M[54]:
   tests/test_sprint4.py,60
   tests/test_sprint5.py,62
   tests/test_toon_v2.py,228
-  validate_toon.py,291
+  validate_toon.py,376
 D:
   benchmarks/benchmark_performance.py:
     i: time,tempfile,shutil,statistics,sys,code2flow.{FAST_CONFIG,ProjectAnalyzer},code2flow.core.streaming_analyzer.{STRATEGY_QUICK,StreamingAnalyzer},pathlib.Path
@@ -312,12 +312,12 @@ D:
     sample_result()
   validate_toon.py:
     i: yaml,sys,collections.defaultdict,pathlib.Path
-    e: load_yaml,extract_functions_from_yaml,extract_functions_from_toon,extract_classes_from_yaml,extract_classes_from_toon,analyze_class_differences,extract_modules_from_yaml,extract_modules_from_toon
+    e: load_yaml,load_toon,parse_toon_content,is_toon_file,load_file,extract_functions_from_yaml,extract_functions_from_toon,extract_classes_from_yaml
     load_yaml(filepath)
+    load_toon(filepath)
+    parse_toon_content(content)
+    is_toon_file(filepath)
+    load_file(filepath)
     extract_functions_from_yaml(yaml_data)
     extract_functions_from_toon(toon_data)
     extract_classes_from_yaml(yaml_data)
-    extract_classes_from_toon(toon_data)
-    analyze_class_differences(yaml_data;toon_data)
-    extract_modules_from_yaml(yaml_data)
-    extract_modules_from_toon(toon_data)

@@ -1,31 +1,59 @@
 # code2flow
 
-**Python Code Flow Analysis Tool** - Static analysis for control flow graphs (CFG), data flow graphs (DFG), and call graph extraction with optimized TOON format.
+**Python Code Flow Analysis Tool** — Static analysis for control flow graphs (CFG), data flow graphs (DFG), and call graph extraction with 4 purpose-built output formats.
 
 ![img.png](img.png)
 
-## 🚀 New: TOON Format v2
+## 🚀 New in v0.3.0: Format Taxonomy
 
-**TOON v2** is the default output format - scannable, severity-sorted, prompt-ready:
+**4 files, 4 purposes** — each format answers a different question:
 
-- **🎯 Health-first design** - issues sorted by severity (🔴/🟡)
-- **📊 Coupling matrix** - fan-in/fan-out analysis
-- **🔍 Duplicate detection** - find identical classes
-- **📈 Layered architecture** - package-level metrics
-- **⚡ Inline markers** - `!!` (CC≥15), `!` (CC≥10), `×DUP`
-- **🚫 Smart filtering** - excludes venv, site-packages
-- **📋 Actionable REFACTOR** - concrete steps, not just problems
+| Format | File | Purpose | Answers |
+|--------|------|---------|---------|
+| **Map** | `project.map` | Structure | "What exists and how it's connected?" |
+| **Toon** | `analysis.toon` | Health diagnostics | "What's broken and how to fix it?" |
+| **Flow** | `flow.toon` | Data flow | "How do data flow through the system?" |
+| **Context** | `context.md` | LLM narrative | "Understand the system to rebuild it" |
 
 ```bash
-# Default: TOON format only
+# Default: health diagnostics only
 code2flow /path/to/project
 
-# Generate all formats
+# Generate all 4 core formats
+code2flow /path/to/project -f toon,map,flow,context
+
+# Generate everything (all 8 formats)
 code2flow /path/to/project -f all
 
-# TOON + YAML (for comparison)
-code2flow /path/to/project -f toon,yaml
+# Just the structural map
+code2flow /path/to/project -f map
 ```
+
+### When to Use Which Format
+
+```
+"What's in the project?"              → project.map
+"What's broken?"                      → analysis.toon (HEALTH)
+"How to fix it?"                      → analysis.toon (REFACTOR)
+"How do data flow through the system?"→ flow.toon (PIPELINES)
+"Where to split a type?"              → flow.toon (DATA_TYPES)
+"Is the pipeline pure?"               → flow.toon (CONTRACTS)
+"How to rebuild in another language?" → context.md
+"What depends on this module?"        → analysis.toon (COUPLING)
+"What type does a function return?"   → project.map (signatures)
+```
+
+## 🎯 TOON v2 — Health Diagnostics
+
+**TOON v2** (`analysis.toon`) is the default output — scannable, severity-sorted, prompt-ready:
+
+- **🎯 Health-first design** — issues sorted by severity (🔴/🟡)
+- **📊 Coupling matrix** — fan-in/fan-out analysis
+- **🔍 Duplicate detection** — find identical classes
+- **📈 Layered architecture** — package-level metrics
+- **⚡ Inline markers** — `!!` (CC≥15), `!` (CC≥10), `×DUP`
+- **🚫 Smart filtering** — excludes venv, site-packages
+- **📋 Actionable REFACTOR** — concrete steps, not just problems
 
 ## Performance Optimization
 
@@ -143,17 +171,26 @@ code2flow /path/to/project -o my_analysis
 
 ## Output Files
 
+### Core Formats (4 purpose-built files)
+
+| File | Format | Purpose | Size |
+|------|--------|---------|------|
+| `analysis.toon` | **Toon** | Health diagnostics (HEALTH, REFACTOR, COUPLING) | ~25KB |
+| `project.map` | **Map** | Structural map (modules, imports, signatures) | ~23KB |
+| `flow.toon` | **Flow** | Data-flow analysis (PIPELINES, CONTRACTS, DATA_TYPES) | ~10KB |
+| `context.md` | **Context** | LLM narrative (architecture, patterns, API) | ~30KB |
+
+### Additional Formats
+
 | File | Description | Size |
 |------|-------------|------|
-| `analysis.toon` | **🎯 Optimized TOON format** (default) | ~200KB |
 | `analysis.yaml` | Complete structured analysis data | ~2.5MB |
 | `analysis.json` | JSON format for programmatic use | ~2.6MB |
 | `flow.mmd` | Full Mermaid flowchart (all nodes) | ~9KB |
-| `compact_flow.mmd` | Compact flowchart - deduplicated nodes | ~9KB |
+| `compact_flow.mmd` | Compact flowchart — deduplicated nodes | ~9KB |
 | `calls.mmd` | Function call graph | ~9KB |
 | `cfg.png` | Control flow visualization | ~7MB |
 | `call_graph.png` | Call graph visualization | ~3.7MB |
-| `llm_prompt.md` | LLM-ready analysis summary | ~35KB |
 
 ## 🎯 TOON v2 Format Structure
 
@@ -323,9 +360,12 @@ The analyzer is designed to be extensible. Key areas for enhancement:
 
 | Command | Output | Use Case |
 |---------|--------|----------|
-| `code2flow ./project` | `analysis.toon` | Quick analysis (default) |
-| `code2flow ./project -f all` | All formats | Complete analysis |
-| `code2flow ./project -f toon,yaml` | TOON + YAML | Comparison |
+| `code2flow ./project` | `analysis.toon` | Quick health diagnostics (default) |
+| `code2flow ./project -f all` | All 8 formats | Complete analysis |
+| `code2flow ./project -f toon,map,flow,context` | 4 core formats | Full taxonomy |
+| `code2flow ./project -f map` | `project.map` | Structural map |
+| `code2flow ./project -f flow` | `flow.toon` | Data-flow analysis |
+| `code2flow ./project -f context` | `context.md` | LLM narrative |
 | `code2flow ./project -m hybrid -v` | TOON + verbose | Detailed analysis |
 | `python validate_toon.py analysis.toon` | Validation | Quality check |
 

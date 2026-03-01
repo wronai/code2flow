@@ -2,7 +2,7 @@
 
 This document outlines planned features, improvements, and milestones for the code2flow project.
 
-## Current Status (v0.2.0)
+## Current Status (v0.3.0)
 
 ✅ **Completed:**
 - Core analysis engine with caching and parallel processing
@@ -11,6 +11,13 @@ This document outlines planned features, improvements, and milestones for the co
 - Comprehensive test suite
 - CLI with multiple output formats
 - PyPI publication ready
+- **TOON v2 Format** — health-first diagnostics (`analysis.toon`)
+- **Format Taxonomy (v0.3.0)** — 4 purpose-built output formats:
+  - `project.map` — structural map (modules, imports, signatures, types)
+  - `analysis.toon` — health diagnostics (HEALTH, REFACTOR, COUPLING, LAYERS)
+  - `flow.toon` — **NEW** data-flow analysis (PIPELINES, TRANSFORMS, CONTRACTS, DATA_TYPES)
+  - `context.md` — LLM narrative (architecture, patterns, API surface)
+  - CLI: `--format map,toon,flow,context,all`
 
 ---
 
@@ -294,14 +301,15 @@ pattern:
 
 ## Release Schedule
 
-| Version | Target Date | Focus |
-|---------|-------------|-------|
-| v0.2.0 | Feb 2025 | Initial release with NLP pipeline |
-| v0.3.0 | Mar 2025 | Semantic search, patterns, web UI |
-| v0.4.0 | Apr 2025 | IDE integration, real-time analysis |
-| v0.5.0 | May 2025 | JS/TS support |
-| v0.6.0 | Jun 2025 | Enterprise features |
-| v1.0.0 | Q4 2025 | Stable API, mature platform |
+| Version | Target Date | Focus | Status |
+|---------|-------------|-------|--------|
+| v0.2.5 | Mar 2026 | TOON v2 format implementation | ✅ Done |
+| v0.3.0 | Mar 2026 | Format taxonomy (map, toon, flow, context) | ✅ Done |
+| v0.3.1 | Q2 2026 | CONTRACTS + DATA_TYPES enhancement | 📋 Planned |
+| v0.4.0 | Q3 2026 | IDE integration, real-time analysis | 📋 Planned |
+| v0.5.0 | Q4 2026 | JS/TS support | 📋 Planned |
+| v0.6.0 | Q1 2027 | Enterprise features | 📋 Planned |
+| v1.0.0 | Q2 2027 | Stable API, mature platform | 📋 Planned |
 
 ---
 

@@ -11,7 +11,10 @@ from pathlib import Path
 
 from .core.config import Config, ANALYSIS_MODES
 from .core.analyzer import ProjectAnalyzer
-from .exporters import YAMLExporter, JSONExporter, MermaidExporter, LLMPromptExporter, ToonExporter
+from .exporters import (
+    YAMLExporter, JSONExporter, MermaidExporter, LLMPromptExporter,
+    ToonExporter, MapExporter, FlowExporter,
+)
 from .visualizers.graph import GraphVisualizer
 
 
@@ -25,13 +28,16 @@ def create_parser() -> argparse.ArgumentParser:
 Examples:
   code2flow /path/to/project                    # Default: TOON format only
   code2flow /path/to/project -f all             # Generate all formats
-  code2flow /path/to/project -f toon,yaml      # TOON + YAML
-  code2flow /path/to/project -f json,png       # JSON + PNG
+  code2flow /path/to/project -f toon,map,flow   # Diagnostics + structure + data-flow
+  code2flow /path/to/project -f context         # LLM narrative context
   code2flow /path/to/project -m static -o ./analysis
   code2flow llm-flow                             # Generate LLM flow summary
 
 Format Options:
-  toon    - Optimized compact format (default)
+  toon    - Health diagnostics (analysis.toon) — default
+  map     - Structural map (project.map) — modules, imports, signatures
+  flow    - Data-flow analysis (flow.toon) — pipelines, contracts, types
+  context - LLM narrative (context.md) — architecture summary
   yaml    - Standard YAML format
   json    - Machine-readable JSON
   mermaid - Flowchart diagrams
@@ -63,7 +69,7 @@ Format Options:
     parser.add_argument(
         '-f', '--format',
         default='toon',
-        help='Output formats: toon,yaml,json,mermaid,png,all (default: toon)'
+        help='Output formats: toon,map,flow,context,yaml,json,mermaid,png,all (default: toon)'
     )
     
     parser.add_argument(
@@ -286,7 +292,7 @@ def main():
     
     # Handle 'all' format
     if 'all' in formats:
-        formats = ['toon', 'yaml', 'json', 'mermaid', 'png']
+        formats = ['toon', 'map', 'flow', 'context', 'yaml', 'json', 'mermaid', 'png']
     
     try:
         if 'toon' in formats:
@@ -294,7 +300,28 @@ def main():
             filepath = output_dir / 'analysis.toon'
             exporter.export(result, str(filepath))
             if args.verbose:
-                print(f"  - TOON: {filepath}")
+                print(f"  - TOON (diagnostics): {filepath}")
+
+        if 'map' in formats:
+            exporter = MapExporter()
+            filepath = output_dir / 'project.map'
+            exporter.export(result, str(filepath))
+            if args.verbose:
+                print(f"  - MAP (structure): {filepath}")
+
+        if 'flow' in formats:
+            exporter = FlowExporter()
+            filepath = output_dir / 'flow.toon'
+            exporter.export(result, str(filepath))
+            if args.verbose:
+                print(f"  - FLOW (data-flow): {filepath}")
+
+        if 'context' in formats:
+            exporter = LLMPromptExporter()
+            filepath = output_dir / 'context.md'
+            exporter.export(result, str(filepath))
+            if args.verbose:
+                print(f"  - CONTEXT (LLM narrative): {filepath}")
         
         if 'yaml' in formats:
             exporter = YAMLExporter()
@@ -375,12 +402,13 @@ def main():
             if args.verbose:
                 print(f"  - Data structures: {struct_path}")
                 
-        # Always generate LLM prompt
-        exporter = LLMPromptExporter()
-        filepath = output_dir / 'llm_prompt.md'
-        exporter.export(result, str(filepath))
-        if args.verbose:
-            print(f"  - LLM prompt: {filepath}")
+        # Generate LLM context (backward compat: also as llm_prompt.md)
+        if 'context' not in formats:
+            exporter = LLMPromptExporter()
+            filepath = output_dir / 'context.md'
+            exporter.export(result, str(filepath))
+            if args.verbose:
+                print(f"  - CONTEXT (LLM narrative): {filepath}")
 
         # New: AI-driven refactoring prompts
         if args.refactor:
