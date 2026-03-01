@@ -125,19 +125,52 @@
 - [x] **Auto-benchmark** script (`benchmarks/benchmark_evolution.py`)
 - [x] **Example projects** (Claude Code, shell LLM, LiteLLM)
 
-## 🎯 Sprint 5 — Self-analysis + gap fixes (v0.6.0)
+## ✅ Completed — Sprint 5 (v0.6.0)
+
+- [x] **Structural splits** (Phase 1-3)
+  - [x] `exporters/toon.py` → `exporters/toon/` package (renderer, metrics, helpers, module_detail)
+  - [x] `core/analyzer.py` → `core/core/` subpackage (file_analyzer, file_filter, refactoring, cache)
+  - [x] `core/streaming_analyzer.py` → `core/streaming/` subpackage (scanner, prioritizer, incremental)
+
+- [x] **Split high-CC functions** (Phase 4)
+  - [x] `render_coupling` CC=28 → 6 sub-methods
+  - [x] `render_layers` CC=21 → 4 sub-methods
+  - [x] `render_functions` CC=18 → 2 sub-methods
+  - [x] `parse_toon_content` CC=35 → dispatch dict + 4 parsers
+  - [x] `_annotation_to_str` CC=18 → dispatch dict + 6 handlers
+
+- [x] **Bug fixes** (Phase 5)
+  - [x] `PipelineDetector._resolve_callee` — method→method edges (self.X resolution)
+  - [x] `MermaidExporter._module_of` — subpackage-level grouping in compact_flow.mmd
+  - [x] Cleanup: removed `analyzer_old.py`, `streaming_analyzer_old.py`, `TODO/`
+
+- [x] **Test fixes** — 8 broken tests fixed, 159/159 passing
+  - [x] `test_advanced_analysis.py` — updated imports for RefactoringAnalyzer, fixed complexity key
+  - [x] `test_edge_cases.py` — fixed should_skip_function signature, nested classes assertion
+  - [x] `test_prompt_engine.py` — updated assertions to match Jinja2 template output
+  - [x] `test_refactoring_engine.py` — fixed god_function detection threshold
+
+- [x] **Self-analysis benchmark**
+  - [x] CC̄=4.7 (was 5.1), max-CC=19 (was 35), 0 god modules
+  - [x] 12 pipelines detected (Analysis:8, Export:4)
+  - [x] compact_flow.mmd: 5 subpackage nodes with weighted edges
+
+## 🎯 Sprint 6 — Remaining improvements (v0.7.0)
 
 ### High Priority
 
-- [ ] **Self-analysis**
-  - Run code2llm on itself with new flow.toon
-  - Verify: detect NLP, Analysis, Export, Refactor pipelines
-  - Verify: AnalysisResult marked as hub-type
+- [ ] **Fix 9 remaining CC>15 functions** (CC̄ 4.7 → target ≤3.5)
+  - [ ] `parse_llm_task_text` CC=19
+  - [ ] `_resolve_callee` CC=18
+  - [ ] `_infer_from_name` CC=17
+  - [ ] `_find_data_pipelines` CC=17
+  - [ ] `_compute_god_modules` CC=16
+  - [ ] `_run_exports` CC=15
+  - [ ] `_analyze_data_types` CC=15
+  - [ ] `_trace_flow` CC=15
+  - [ ] `_collect_entrypoints` CC=15
 
-- [ ] **Fix benchmark gaps**
-  - god_function detection in flow.toon (CC≥15 marker)
-  - missing_types detection across formats
-  - Purity info in structural features
+- [ ] **Streaming analysis** — accumulate results properly (remove double-analysis TODO in cli.py:305)
 
 ### Medium Priority
 
@@ -162,8 +195,6 @@
 
 ## 📝 Notes
 
-- Format taxonomy based on TODO/action_plan_v3.md benchmark results
 - Each format has one purpose: map=structure, toon=health, flow=data-flow, context=LLM, evolution=refactoring
-- This TODO list is managed by Goal — use `goal -t` for auto-detection
 
 Last updated: 2026-03-01

@@ -2,7 +2,7 @@
 
 pip install -e .
 pip install code2llm --upgrade
-code2llm ./ --streaming --strategy deep -o ./project
+#code2llm ./ --streaming --strategy deep -o ./project
 code2llm ./ -f toon -o ./
 
 echo "🚀 Testing different output formats..."
