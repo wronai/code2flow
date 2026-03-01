@@ -339,56 +339,70 @@ def _run_streaming_analysis(args, config, source_path: Path):
     return analyzer.analyze_project(str(source_path))
 
 
+def _export_evolution(args, result, output_dir: Path):
+    """Export evolution.toon format."""
+    if 'evolution' not in [f.strip() for f in args.format.split(',')] and 'all' not in [f.strip() for f in args.format.split(',')]:
+        return
+    exporter = EvolutionExporter()
+    filepath = output_dir / 'evolution.toon'
+    exporter.export(result, str(filepath))
+    if args.verbose:
+        print(f"  - EVOLUTION (refactoring queue): {filepath}")
+
+
+def _export_data_structures(args, result, output_dir: Path):
+    """Export data structures YAML."""
+    if not args.data_structures:
+        return
+    exporter = YAMLExporter()
+    struct_path = output_dir / 'data_structures.yaml'
+    exporter.export_data_structures(result, str(struct_path), compact=True)
+    if args.verbose:
+        print(f"  - Data structures: {struct_path}")
+
+
+def _export_context_fallback(args, result, output_dir: Path, formats: list):
+    """Export context.md if not in formats."""
+    if 'context' in formats or 'all' in formats:
+        return
+    exporter = ContextExporter()
+    filepath = output_dir / 'context.md'
+    exporter.export(result, str(filepath))
+    if args.verbose:
+        print(f"  - CONTEXT (LLM narrative): {filepath}")
+
+
+def _export_readme(args, result, output_dir: Path):
+    """Export README.md documentation."""
+    if not args.readme or args.no_readme:
+        return
+    exporter = READMEExporter()
+    filepath = output_dir / 'README.md'
+    exporter.export(result, str(filepath))
+    if args.verbose:
+        print(f"  - README (documentation): {filepath}")
+
+
 def _run_exports(args, result, output_dir: Path):
     """Export analysis results in requested formats."""
     formats = [f.strip() for f in args.format.split(',')]
-
     if 'all' in formats:
         formats = ['toon', 'map', 'flow', 'context', 'yaml', 'json', 'mermaid', 'evolution']
 
     try:
-        # Simple format exports
         _export_simple_formats(args, result, output_dir, formats)
-
-        # Mermaid (complex — 3 files + PNG)
+        
         if 'mermaid' in formats:
             _export_mermaid(args, result, output_dir)
-
-        # Evolution
-        if 'evolution' in formats:
-            exporter = EvolutionExporter()
-            filepath = output_dir / 'evolution.toon'
-            exporter.export(result, str(filepath))
-            if args.verbose:
-                print(f"  - EVOLUTION (refactoring queue): {filepath}")
-
-        # Data structures (optional flag)
-        if args.data_structures:
-            exporter = YAMLExporter()
-            struct_path = output_dir / 'data_structures.yaml'
-            exporter.export_data_structures(result, str(struct_path), compact=True)
-            if args.verbose:
-                print(f"  - Data structures: {struct_path}")
-
-        # Backward compat: always generate context.md
-        if 'context' not in formats:
-            exporter = ContextExporter()
-            filepath = output_dir / 'context.md'
-            exporter.export(result, str(filepath))
-            if args.verbose:
-                print(f"  - CONTEXT (LLM narrative): {filepath}")
-
-        # AI-driven refactoring prompts
+        
+        _export_evolution(args, result, output_dir)
+        _export_data_structures(args, result, output_dir)
+        _export_context_fallback(args, result, output_dir, formats)
+        
         if args.refactor:
             _export_refactor_prompts(args, result, output_dir)
-
-        # README documentation (default enabled)
-        if args.readme and not args.no_readme:
-            exporter = READMEExporter()
-            filepath = output_dir / 'README.md'
-            exporter.export(result, str(filepath))
-            if args.verbose:
-                print(f"  - README (documentation): {filepath}")
+        
+        _export_readme(args, result, output_dir)
 
     except Exception as e:
         print(f"Error during export: {e}", file=sys.stderr)

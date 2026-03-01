@@ -4,10 +4,10 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Analysis Mode**: static
-- **Total Functions**: 678
+- **Total Functions**: 688
 - **Total Classes**: 97
 - **Modules**: 82
-- **Entry Points**: 549
+- **Entry Points**: 551
 
 ## Architecture by Module
 
@@ -25,6 +25,11 @@
 - **Functions**: 25
 - **File**: `validate_toon.py`
 
+### code2llm.generators.llm_flow
+- **Functions**: 24
+- **Classes**: 1
+- **File**: `llm_flow.py`
+
 ### code2llm.exporters.toon.renderer
 - **Functions**: 21
 - **Classes**: 1
@@ -35,15 +40,14 @@
 - **Classes**: 3
 - **File**: `pipeline.py`
 
-### code2llm.generators.llm_flow
-- **Functions**: 20
-- **Classes**: 1
-- **File**: `llm_flow.py`
-
 ### code2llm.analysis.type_inference
 - **Functions**: 18
 - **Classes**: 1
 - **File**: `type_inference.py`
+
+### code2llm.cli
+- **Functions**: 17
+- **File**: `cli.py`
 
 ### code2llm.analysis.side_effects
 - **Functions**: 17
@@ -93,19 +97,15 @@
 - **Classes**: 3
 - **File**: `pipeline_detector.py`
 
+### code2llm.exporters.context_exporter
+- **Functions**: 14
+- **Classes**: 1
+- **File**: `context_exporter.py`
+
 ### code2llm.exporters.flow_exporter
 - **Functions**: 14
 - **Classes**: 1
 - **File**: `flow_exporter.py`
-
-### code2llm.cli
-- **Functions**: 13
-- **File**: `cli.py`
-
-### code2llm.nlp.normalization
-- **Functions**: 13
-- **Classes**: 2
-- **File**: `normalization.py`
 
 ## Key Entry Points
 
@@ -218,10 +218,6 @@ Strategy:
 ### code2llm.generators.llm_flow.main
 - **Calls**: None.parse_args, Path, code2llm.generators.llm_flow._safe_read_yaml, code2llm.generators.llm_flow.generate_llm_flow, Path, output_path.parent.mkdir, output_path.write_text, input_path.exists
 
-### code2llm.exporters.context_exporter.ContextExporter._trace_flow
-> Trace execution flow from a function with cycle detection.
-- **Calls**: visited.add, sorted, None.join, set, func_name.split, None.append, calls_by_module.items, func_name.split
-
 ### examples.litellm.run.main
 - **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.parse_args, examples.litellm.run.run_analysis, print, examples.litellm.run.get_refactoring_advice, print
 
@@ -232,6 +228,10 @@ Strategy:
 ### examples.functional_refactoring_example.generate
 > Generate command from natural language query.
 - **Calls**: click.command, click.argument, click.option, click.option, click.option, EvolutionaryCache, CommandGenerator, CommandContext
+
+### code2llm.exporters.map_exporter.MapExporter._render_map_module
+> Render a single module's detail: imports, exports, classes, funcs.
+- **Calls**: self._rel_path, lines.append, None.join, lines.append, result.classes.get, result.functions.get, lines.append, result.classes.get
 
 ## Process Flows
 
@@ -350,6 +350,14 @@ Scans function bodies for IO operations,
 - **Methods**: 14
 - **Key Methods**: code2llm.nlp.entity_resolution.EntityResolver.__init__, code2llm.nlp.entity_resolution.EntityResolver.resolve, code2llm.nlp.entity_resolution.EntityResolver._extract_candidates, code2llm.nlp.entity_resolution.EntityResolver._extract_from_patterns, code2llm.nlp.entity_resolution.EntityResolver._disambiguate, code2llm.nlp.entity_resolution.EntityResolver._resolve_hierarchical, code2llm.nlp.entity_resolution.EntityResolver._resolve_aliases, code2llm.nlp.entity_resolution.EntityResolver._name_similarity, code2llm.nlp.entity_resolution.EntityResolver.load_from_analysis, code2llm.nlp.entity_resolution.EntityResolver.step_3a_extract_entities
 
+### code2llm.exporters.context_exporter.ContextExporter
+> Export LLM-ready analysis summary with architecture and flows.
+
+Output: context.md — architecture na
+- **Methods**: 14
+- **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns, code2llm.exporters.context_exporter.ContextExporter._get_api_surface
+- **Inherits**: Exporter
+
 ### code2llm.exporters.flow_exporter.FlowExporter
 > Export to flow.toon — data-flow focused format.
 
@@ -365,6 +373,12 @@ Builds a call graph as a DiGraph, fin
 - **Methods**: 13
 - **Key Methods**: code2llm.analysis.pipeline_detector.PipelineDetector.__init__, code2llm.analysis.pipeline_detector.PipelineDetector.detect, code2llm.analysis.pipeline_detector.PipelineDetector._build_graph, code2llm.analysis.pipeline_detector.PipelineDetector._find_pipeline_paths, code2llm.analysis.pipeline_detector.PipelineDetector._longest_path_from, code2llm.analysis.pipeline_detector.PipelineDetector._longest_path_in_dag, code2llm.analysis.pipeline_detector.PipelineDetector._build_pipelines, code2llm.analysis.pipeline_detector.PipelineDetector._build_stages, code2llm.analysis.pipeline_detector.PipelineDetector._classify_domain, code2llm.analysis.pipeline_detector.PipelineDetector._derive_pipeline_name
 
+### code2llm.analysis.call_graph.CallGraphExtractor
+> Extract call graph from AST.
+- **Methods**: 13
+- **Key Methods**: code2llm.analysis.call_graph.CallGraphExtractor.__init__, code2llm.analysis.call_graph.CallGraphExtractor.extract, code2llm.analysis.call_graph.CallGraphExtractor._calculate_metrics, code2llm.analysis.call_graph.CallGraphExtractor.visit_Import, code2llm.analysis.call_graph.CallGraphExtractor.visit_ImportFrom, code2llm.analysis.call_graph.CallGraphExtractor.visit_ClassDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_FunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_AsyncFunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_Call, code2llm.analysis.call_graph.CallGraphExtractor._qualified_name
+- **Inherits**: ast.NodeVisitor
+
 ### code2llm.nlp.intent_matching.IntentMatcher
 > Match queries to intents using fuzzy and keyword matching.
 - **Methods**: 13
@@ -374,12 +388,6 @@ Builds a call graph as a DiGraph, fin
 > Normalize queries for consistent processing.
 - **Methods**: 13
 - **Key Methods**: code2llm.nlp.normalization.QueryNormalizer.__init__, code2llm.nlp.normalization.QueryNormalizer.normalize, code2llm.nlp.normalization.QueryNormalizer._unicode_normalize, code2llm.nlp.normalization.QueryNormalizer._lowercase, code2llm.nlp.normalization.QueryNormalizer._remove_punctuation, code2llm.nlp.normalization.QueryNormalizer._normalize_whitespace, code2llm.nlp.normalization.QueryNormalizer._remove_stopwords, code2llm.nlp.normalization.QueryNormalizer._tokenize, code2llm.nlp.normalization.QueryNormalizer.step_1a_lowercase, code2llm.nlp.normalization.QueryNormalizer.step_1b_remove_punctuation
-
-### code2llm.analysis.call_graph.CallGraphExtractor
-> Extract call graph from AST.
-- **Methods**: 13
-- **Key Methods**: code2llm.analysis.call_graph.CallGraphExtractor.__init__, code2llm.analysis.call_graph.CallGraphExtractor.extract, code2llm.analysis.call_graph.CallGraphExtractor._calculate_metrics, code2llm.analysis.call_graph.CallGraphExtractor.visit_Import, code2llm.analysis.call_graph.CallGraphExtractor.visit_ImportFrom, code2llm.analysis.call_graph.CallGraphExtractor.visit_ClassDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_FunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_AsyncFunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_Call, code2llm.analysis.call_graph.CallGraphExtractor._qualified_name
-- **Inherits**: ast.NodeVisitor
 
 ### code2llm.exporters.map_exporter.MapExporter
 > Export to map.toon — structural map with modules, imports, signatures.
@@ -404,14 +412,6 @@ Keys: M=modules, D=details,
 > Export call graph to Mermaid format.
 - **Methods**: 12
 - **Key Methods**: code2llm.exporters.mermaid_exporter.MermaidExporter.export, code2llm.exporters.mermaid_exporter.MermaidExporter._render_subgraphs, code2llm.exporters.mermaid_exporter.MermaidExporter._render_edges, code2llm.exporters.mermaid_exporter.MermaidExporter._render_cc_styles, code2llm.exporters.mermaid_exporter.MermaidExporter._get_cc, code2llm.exporters.mermaid_exporter.MermaidExporter.export_call_graph, code2llm.exporters.mermaid_exporter.MermaidExporter.export_compact, code2llm.exporters.mermaid_exporter.MermaidExporter._readable_id, code2llm.exporters.mermaid_exporter.MermaidExporter._safe_module, code2llm.exporters.mermaid_exporter.MermaidExporter._module_of
-- **Inherits**: Exporter
-
-### code2llm.exporters.context_exporter.ContextExporter
-> Export LLM-ready analysis summary with architecture and flows.
-
-Output: context.md — architecture na
-- **Methods**: 12
-- **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns, code2llm.exporters.context_exporter.ContextExporter._get_api_surface
 - **Inherits**: Exporter
 
 ## Data Transformation Functions
@@ -484,6 +484,13 @@ Key functions that process and transform data:
 ### demo_langs.valid.sample.UserService.process_users
 - **Output to**: print
 
+### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
+- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
+
+### benchmarks.benchmark_format_quality._generate_format_outputs
+> Generate all format outputs and evaluate them.
+- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
+
 ### code2llm.cli.create_parser
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
@@ -495,13 +502,6 @@ Key functions that process and transform data:
 ### code2llm.cli._export_simple_formats
 > Export toon, map, flow, context, yaml, json formats.
 - **Output to**: format_map.items, code2llm.cli._export_yaml, JSONExporter, exporter.export, exporter_cls
-
-### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
-- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
-### benchmarks.benchmark_format_quality._generate_format_outputs
-> Generate all format outputs and evaluate them.
-- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).

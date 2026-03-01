@@ -1,3 +1,29 @@
+## [0.5.7] - 2026-03-01
+
+### Summary
+
+refactor(goal): code analysis engine
+
+### Docs
+
+- docs: update README
+- docs: update context.md
+
+### Config
+
+- config: update goal.yaml
+
+### Other
+
+- update .gitignore
+- update code2llm/cli.py
+- update code2llm/exporters/context_exporter.py
+- update code2llm/generators/llm_flow.py
+- update project/analysis.toon
+- update project/evolution.toon
+- update project/project.toon
+
+
 ## [0.5.1] - 2026-03-01
 
 ### Summary

@@ -1,17 +1,14 @@
-# code2llm | 73f 13494L | py:73 | 2026-03-01
-# CC̄=4.4 | critical:41/678 | dups:0 | cycles:0
+# code2llm | 73f 13546L | py:73 | 2026-03-01
+# CC̄=4.4 | critical:39/688 | dups:0 | cycles:0
 
-HEALTH[7]:
+HEALTH[4]:
   🟡 CC    main CC=17 (limit:15)
-  🟡 CC    _run_exports CC=15 (limit:15)
   🟡 CC    _find_data_pipelines CC=17 (limit:15)
-  🟡 CC    _infer_from_name CC=17 (limit:15)
   🟡 CC    _resolve_callee CC=18 (limit:15)
-  🟡 CC    _trace_flow CC=15 (limit:15)
-  🟡 CC    _collect_entrypoints CC=15 (limit:15)
+  🟡 CC    _infer_from_name CC=17 (limit:15)
 
 REFACTOR[1]:
-  1. split 7 high-CC methods  (CC>15)
+  1. split 4 high-CC methods  (CC>15)
 
 COUPLING:
                                   code2llm  code2llm.generators           benchmarks              scripts
@@ -22,12 +19,12 @@ COUPLING:
   CYCLES: none
 
 LAYERS:
-  code2llm/                       CC̄=4.6    ←in:2  →out:1
-  │ !! cli                        548L  0C   13m  CC=15     ←2
+  code2llm/                       CC̄=4.5    ←in:2  →out:1
+  │ !! cli                        562L  0C   17m  CC=12     ←2
   │ !! metrics                    501L  1C   27m  CC=12     ←0
   │ !! pipeline_detector          486L  3C   14m  CC=18     ←0
   │ !  mermaid                    477L  0C   16m  CC=13     ←1
-  │ !! llm_flow                   451L  1C   20m  CC=15     ←0
+  │ !  llm_flow                   472L  1C   24m  CC=14     ←0
   │ !  readme_exporter            404L  1C    3m  CC=13     ←0
   │ !  flow_exporter              391L  1C   14m  CC=10     ←0
   │ !  pipeline                   388L  3C   20m  CC=10     ←0
@@ -45,8 +42,8 @@ LAYERS:
   │ analyzer                   232L  1C    8m  CC=8      ←0
   │ !  map_exporter               225L  1C   13m  CC=13     ←3
   │ dfg                        224L  1C   12m  CC=7      ←0
+  │ !  context_exporter           224L  1C   14m  CC=10     ←0
   │ call_graph                 210L  1C   13m  CC=9      ←0
-  │ !! context_exporter           207L  1C   12m  CC=15     ←0
   │ !  scanner                    201L  1C    6m  CC=14     ←0
   │ models                     194L  11C    6m  CC=8      ←0
   │ smells                     192L  1C    9m  CC=7      ←0
@@ -113,14 +110,11 @@ LAYERS:
 
 DUPLICATES[0]: none
 
-FUNCTIONS (CC≥10, 41 of 574):
+FUNCTIONS (CC≥10, 39 of 584):
    18.0  PipelineDetector._resolve_callee           21n   6exit  cond+ret  !! split
    17.0  main                                       21n   3exit  loops+cond+ret  !! split
    17.0  DataAnalyzer._find_data_pipelines          14n   2exit  loops+cond+ret  !! split
    17.0  TypeInferenceEngine._infer_from_name       13n   2exit  loops+cond+ret  !! split
-   15.0  _run_exports                                4n   1exit  cond  !! split
-   15.0  ContextExporter._trace_flow                17n   3exit  loops+cond+ret  !! split
-   15.0  _collect_entrypoints                       13n   2exit  loops+cond+ret  !! split
    14.0  DataAnalyzer._find_event_flows              9n   2exit  loops+cond+ret
    14.0  DataAnalyzer._get_function_data_types      19n   2exit  cond+ret
    14.0  DataAnalyzer._analyze_optimization_opportunities   15n   2exit  loops+cond+ret
@@ -139,8 +133,8 @@ FUNCTIONS (CC≥10, 41 of 574):
    13.0  MermaidExporter.export_call_graph          16n   1exit  loops+cond
    13.0  MermaidExporter.export_compact             14n   1exit  loops+cond
    13.0  generate_single_png                         2n   1exit  
-   12.0  _export_mermaid                             8n   1exit  cond
    12.0  DataAnalyzer._find_state_patterns           9n   2exit  loops+cond+ret
+   12.0  _export_mermaid                             8n   1exit  cond
    12.0  StreamingAnalyzer.analyze_streaming        16n   1exit  loops+cond
    12.0  PromptEngine._build_context_for_smell       5n   2exit  cond+ret
    12.0  _check_node_ids                            15n   1exit  loops+cond
@@ -148,16 +142,17 @@ FUNCTIONS (CC≥10, 41 of 574):
    12.0  FileAnalyzer._process_function             14n   2exit  loops+cond+ret
    11.0  ToonRenderer.render_refactor               14n   3exit  loops+cond+ret
    10.0  NLPPipeline._format_action                 29n  10exit  cond+ret
-   10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
    10.0  EvolutionExporter._build_context            3n   2exit  ret
    10.0  EvolutionExporter._render_next             16n   3exit  loops+cond+ret
+   10.0  ContextExporter._trace_flow                14n   3exit  loops+cond+ret
+   10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
    10.0  FlowExporter._infer_invariant              21n   8exit  cond+ret
-   10.0  _scan_brackets                             11n   1exit  loops+cond
    10.0  render_llm_flow_md                         16n   2exit  loops+cond+ret
+   10.0  _scan_brackets                             11n   1exit  loops+cond
    10.0  ToonRenderer.render_classes                11n   3exit  loops+cond+ret
 
   summary:
-    critical(≥10): 41 | high(5-10): 195 | medium(2-5): 215 | low(<2): 123
+    critical(≥10): 39 | high(5-10): 200 | medium(2-5): 222 | low(<2): 123
     7% CC≥10  41% CC≥5
 
 HOTSPOTS:
@@ -165,8 +160,8 @@ HOTSPOTS:
   #2  run_benchmark                        fan=18   "calls 18 functions"
   #3  ProjectAnalyzer.analyze_project      fan=18   "analysis pipeline, 18 stages"
   #4  ToonExporter.export                  fan=18   "export with 18 outputs"
-  #5  NLPPipeline.process                  fan=17   "analysis pipeline, 17 stages"
-  #6  MermaidExporter.export_call_graph    fan=17   "export with 17 outputs"
+  #5  MermaidExporter.export_call_graph    fan=17   "export with 17 outputs"
+  #6  NLPPipeline.process                  fan=17   "analysis pipeline, 17 stages"
   #7  run_benchmark                        fan=16   "calls 16 functions"
   #8  evaluate_format                      fan=16   "16-way dispatch"
   #9  StreamingAnalyzer.analyze_streaming  fan=16   "analysis pipeline, 16 stages"
@@ -183,15 +178,15 @@ CLASSES:
   EvolutionExporter              █████████████             15m  CC̄=4.7   max=10  
   FileAnalyzer                   █████████████             15m  CC̄=4.5   max=12  
   EntityResolver                 ████████████              14m  CC̄=3.7   max=13  
+  ContextExporter                ████████████              14m  CC̄=4.8   max=10  
   FlowExporter                   ████████████              14m  CC̄=5.6   max=10  
   PipelineDetector               ███████████               13m  CC̄=6.9   max=18    !!
+  CallGraphExtractor             ███████████               13m  CC̄=4.2   max=9   
   IntentMatcher                  ███████████               13m  CC̄=3.5   max=7   
   QueryNormalizer                ███████████               13m  CC̄=1.8   max=6   
-  CallGraphExtractor             ███████████               13m  CC̄=4.2   max=9   
   MapExporter                    ███████████               13m  CC̄=4.8   max=13  
   DFGExtractor                   ██████████                12m  CC̄=3.6   max=7   
   MermaidExporter                ██████████                12m  CC̄=5.3   max=13  
-  ContextExporter                ██████████                12m  CC̄=5.3   max=15    !!
   RefactoringAnalyzer            █████████                 11m  CC̄=4.2   max=9   
   SmellDetector                  ████████                   9m  CC̄=4.4   max=7   
   ModuleDetailRenderer           ████████                   9m  CC̄=4.4   max=7   
@@ -244,8 +239,8 @@ CLASSES:
   EntityResolutionConfig                                    0m  CC̄=0.0   max=0.0 
   MultilingualConfig                                        0m  CC̄=0.0   max=0.0 
   IntentMatch                                               0m  CC̄=0.0   max=0.0 
-  Entity                                                    0m  CC̄=0.0   max=0.0 
   NormalizationResult                                       0m  CC̄=0.0   max=0.0 
+  Entity                                                    0m  CC̄=0.0   max=0.0 
   PipelineStage                                             0m  CC̄=0.0   max=0.0 
   FuncSummary                                               0m  CC̄=0.0   max=0.0 
   ScanStrategy                                              0m  CC̄=0.0   max=0.0 
@@ -298,59 +293,6 @@ D:
     e: TypeInferenceEngine
     TypeInferenceEngine  # Extract and infer type information from Python source files....
       __init__(0)  CC=1.0
-  code2llm/cli.py:
-    e: create_parser,_handle_special_commands,_validate_and_setup,_print_start_info,main,_run_analysis,_run_streaming_analysis,_run_exports,_export_simple_formats,_export_yaml,_export_mermaid,_export_refactor_prompts,generate_llm_context
-    create_parser()
-    _handle_special_commands()
-    _validate_and_setup(args)
-    _print_start_info(args,source_path,output_dir)
-    main()
-    _run_analysis(args,source_path,output_dir)
-    _run_streaming_analysis(args,config,source_path)
-    _run_exports(args,result,output_dir)
-    _export_simple_formats(args,result,output_dir,formats)
-    _export_yaml(args,result,output_dir)
-    _export_mermaid(args,result,output_dir)
-    _export_refactor_prompts(args,result,output_dir)
-    generate_llm_context(args_list)
-  code2llm/exporters/context_exporter.py:
-    e: ContextExporter
-    ContextExporter  # Export LLM-ready analysis summary with architecture and flow...
-      export(2)  CC=1.0
-        → _get_important_entries(1)  CC=3.0
-        → _get_overview(1)  CC=1.0
-        → _get_architecture_by_module(1)  CC=7.0
-        → _get_key_entry_points(1)  CC=4.0
-        → _get_process_flows(2)  CC=6.0
-        → _trace_flow(5)  CC=15.0  !
-        → _get_key_classes(1)  CC=6.0
-        → _get_data_transformations(1)  CC=7.0
-        → _get_behavioral_patterns(1)  CC=4.0
-        → _get_api_surface(1)  CC=5.0
-        → _get_system_interactions(1)  CC=5.0
-  code2llm/generators/llm_flow.py:
-    e: FuncSummary,_strip_bom,_safe_read_yaml,_as_dict,_as_list,_shorten,_parse_call_label,_parse_func_label,_collect_nodes,_collect_entrypoints,_collect_functions,_node_counts_by_function,_pick_relevant_functions,_summarize_functions,_build_call_graph,_reachable,generate_llm_flow,render_llm_flow_md,dump_yaml,create_parser,main
-    FuncSummary
-    _strip_bom(text)
-    _safe_read_yaml(path)
-    _as_dict(d)
-    _as_list(v)
-    _shorten(s,max_len)
-    _parse_call_label(label)
-    _parse_func_label(label)
-    _collect_nodes(analysis)
-    _collect_entrypoints(nodes)
-    _collect_functions(nodes)
-    _node_counts_by_function(nodes)
-    _pick_relevant_functions()
-    _summarize_functions(nodes,limit_decisions,limit_calls)
-    _build_call_graph(func_summaries,known_functions)
-    _reachable(g,roots,max_nodes)
-    generate_llm_flow(analysis,max_functions,limit_decisions,limit_calls)
-    render_llm_flow_md(flow)
-    dump_yaml(data)
-    create_parser()
-    main(argv)
   code2llm/analysis/side_effects.py:
     e: SideEffectInfo,SideEffectDetector
     SideEffectInfo  # Side-effect analysis result for a single function....
@@ -377,6 +319,33 @@ S...
     _parse_acceptance_tests(sections)
     parse_llm_task_text(text)
     load_input(path)
+    dump_yaml(data)
+    create_parser()
+    main(argv)
+  code2llm/generators/llm_flow.py:
+    e: FuncSummary,_strip_bom,_safe_read_yaml,_as_dict,_as_list,_shorten,_parse_call_label,_parse_func_label,_collect_nodes,_group_nodes_by_file,_is_entrypoint_file,_extract_entrypoint_info,_deduplicate_entrypoints,_collect_entrypoints,_collect_functions,_node_counts_by_function,_pick_relevant_functions,_summarize_functions,_build_call_graph,_reachable,generate_llm_flow,render_llm_flow_md,dump_yaml,create_parser,main
+    FuncSummary
+    _strip_bom(text)
+    _safe_read_yaml(path)
+    _as_dict(d)
+    _as_list(v)
+    _shorten(s,max_len)
+    _parse_call_label(label)
+    _parse_func_label(label)
+    _collect_nodes(analysis)
+    _group_nodes_by_file(nodes)
+    _is_entrypoint_file(filepath)
+    _extract_entrypoint_info(node,filepath)
+    _deduplicate_entrypoints(entrypoints)
+    _collect_entrypoints(nodes)
+    _collect_functions(nodes)
+    _node_counts_by_function(nodes)
+    _pick_relevant_functions()
+    _summarize_functions(nodes,limit_decisions,limit_calls)
+    _build_call_graph(func_summaries,known_functions)
+    _reachable(g,roots,max_nodes)
+    generate_llm_flow(analysis,max_functions,limit_decisions,limit_calls)
+    render_llm_flow_md(flow)
     dump_yaml(data)
     create_parser()
     main(argv)
@@ -461,6 +430,25 @@ S...
     generate_pngs(input_dir,output_dir,timeout)
     generate_single_png(mmd_file,output_file,timeout)
     generate_with_puppeteer(mmd_file,output_file,timeout,max_text_size,max_edges)
+  code2llm/cli.py:
+    e: create_parser,_handle_special_commands,_validate_and_setup,_print_start_info,main,_run_analysis,_run_streaming_analysis,_export_evolution,_export_data_structures,_export_context_fallback,_export_readme,_run_exports,_export_simple_formats,_export_yaml,_export_mermaid,_export_refactor_prompts,generate_llm_context
+    create_parser()
+    _handle_special_commands()
+    _validate_and_setup(args)
+    _print_start_info(args,source_path,output_dir)
+    main()
+    _run_analysis(args,source_path,output_dir)
+    _run_streaming_analysis(args,config,source_path)
+    _export_evolution(args,result,output_dir)
+    _export_data_structures(args,result,output_dir)
+    _export_context_fallback(args,result,output_dir,formats)
+    _export_readme(args,result,output_dir)
+    _run_exports(args,result,output_dir)
+    _export_simple_formats(args,result,output_dir,formats)
+    _export_yaml(args,result,output_dir)
+    _export_mermaid(args,result,output_dir)
+    _export_refactor_prompts(args,result,output_dir)
+    generate_llm_context(args_list)
   code2llm/core/streaming_analyzer.py:
     e: StreamingAnalyzer
     StreamingAnalyzer  # Memory-efficient streaming analyzer with progress tracking....
@@ -493,6 +481,23 @@ S...
     e: EvolutionExporter
     EvolutionExporter  # Export evolution.toon — prioritized refactoring queue....
       _is_excluded(1)  CC=5.0
+  code2llm/exporters/context_exporter.py:
+    e: ContextExporter
+    ContextExporter  # Export LLM-ready analysis summary with architecture and flow...
+      export(2)  CC=1.0
+        → _get_important_entries(1)  CC=3.0
+        → _get_overview(1)  CC=1.0
+        → _get_architecture_by_module(1)  CC=7.0
+        → _get_key_entry_points(1)  CC=4.0
+        → _get_process_flows(2)  CC=6.0
+        → _trace_flow(5)  CC=10.0
+        → _group_calls_by_module(2)  CC=5.0
+        → _format_sub_flow(3)  CC=3.0
+        → _get_key_classes(1)  CC=6.0
+        → _get_data_transformations(1)  CC=7.0
+        → _get_behavioral_patterns(1)  CC=4.0
+        → _get_api_surface(1)  CC=5.0
+        → _get_system_interactions(1)  CC=5.0
   code2llm/exporters/flow_exporter.py:
     e: FlowExporter
     FlowExporter  # Export to flow.toon — data-flow focused format.
@@ -691,6 +696,11 @@ Unlike simple L...
     DatabaseConnection  # Simple database connection simulator....
       __init__(1)  CC=2.0
         → _load_data(0)  CC=3.0
+  badges/server.py:
+    e: index,generate_badges,get_badges
+    index()
+    generate_badges()
+    get_badges()
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()
@@ -700,11 +710,6 @@ Unlike simple L...
     update_pyproject_toml(new_version)
     update_version_file(new_version)
     main()
-  badges/server.py:
-    e: index,generate_badges,get_badges
-    index()
-    generate_badges()
-    get_badges()
   benchmarks/benchmark_format_quality.py:
     e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
     _print_benchmark_header()

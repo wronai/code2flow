@@ -90,36 +90,57 @@ def _collect_nodes(analysis: Dict[str, Any]) -> Dict[int, Dict[str, Any]]:
     return parsed
 
 
-def _collect_entrypoints(nodes: Dict[int, Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _group_nodes_by_file(nodes: Dict[int, Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    """Group nodes by their source file."""
     by_file: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     for n in nodes.values():
         f = n.get("file")
         if isinstance(f, str):
             by_file[f].append(n)
+    return by_file
 
-    entrypoints: List[Dict[str, Any]] = []
-    for f, ns in by_file.items():
-        if not (f.endswith("__main__.py") or f.endswith("cli.py")):
-            continue
 
-        main_funcs = [n for n in ns if n.get("type") == "FUNC" and isinstance(n.get("function"), str)]
-        for n in main_funcs:
-            entrypoints.append(
-                {
-                    "kind": "cli" if f.endswith("cli.py") else "module_main",
-                    "file": f,
-                    "function": n.get("function"),
-                    "line": n.get("line"),
-                }
-            )
+def _is_entrypoint_file(filepath: str) -> bool:
+    """Check if file is a potential entrypoint (main or CLI)."""
+    return filepath.endswith("__main__.py") or filepath.endswith("cli.py")
 
+
+def _extract_entrypoint_info(node: Dict[str, Any], filepath: str) -> Optional[Dict[str, Any]]:
+    """Extract entrypoint info from a node if it's a function."""
+    if node.get("type") != "FUNC" or not isinstance(node.get("function"), str):
+        return None
+    return {
+        "kind": "cli" if filepath.endswith("cli.py") else "module_main",
+        "file": filepath,
+        "function": node.get("function"),
+        "line": node.get("line"),
+    }
+
+
+def _deduplicate_entrypoints(entrypoints: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Remove duplicate entrypoints by function name."""
     uniq: Dict[str, Dict[str, Any]] = {}
     for ep in entrypoints:
         key = str(ep.get("function") or "")
         if key and key not in uniq:
             uniq[key] = ep
-
     return list(uniq.values())
+
+
+def _collect_entrypoints(nodes: Dict[int, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Find entrypoint functions (main, CLI handlers)."""
+    by_file = _group_nodes_by_file(nodes)
+    
+    entrypoints: List[Dict[str, Any]] = []
+    for f, ns in by_file.items():
+        if not _is_entrypoint_file(f):
+            continue
+        for n in ns:
+            ep_info = _extract_entrypoint_info(n, f)
+            if ep_info:
+                entrypoints.append(ep_info)
+    
+    return _deduplicate_entrypoints(entrypoints)
 
 
 def _collect_functions(nodes: Dict[int, Dict[str, Any]]) -> Set[str]:

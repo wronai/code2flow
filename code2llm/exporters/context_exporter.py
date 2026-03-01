@@ -177,31 +177,48 @@ class ContextExporter(Exporter):
         lines.extend(["```", ""])
         return lines
 
+    def _group_calls_by_module(self, calls: list, func_name: str) -> dict:
+        """Group function calls by their module."""
+        module = func_name.rsplit('.', 1)[0] if '.' in func_name else 'root'
+        calls_by_module = {}
+        for called in calls[:5]:
+            mod = called.rsplit('.', 1)[0] if '.' in called else 'root'
+            if mod not in calls_by_module:
+                calls_by_module[mod] = []
+            calls_by_module[mod].append(called)
+        return calls_by_module, module
+
+    def _format_sub_flow(self, sub_flow: str, called: str, is_cross_module: bool) -> list:
+        """Format sub-flow lines with proper indentation."""
+        lines = []
+        cross = " →" if is_cross_module else ""
+        lines.append(f"  └─{cross}> {called.split('.')[-1]}")
+        for sub in sub_flow.split('\n')[1:][:3]:
+            lines.append("    " + sub)
+        return lines
+
     def _trace_flow(self, func_name: str, func, result: AnalysisResult, depth: int, visited: set = None) -> str:
         """Trace execution flow from a function with cycle detection."""
-        if visited is None: visited = set()
-        if func_name in visited or depth <= 0: return func_name.split('.')[-1]
+        if visited is None:
+            visited = set()
+        if func_name in visited or depth <= 0:
+            return func_name.split('.')[-1]
         
         visited.add(func_name)
         short_name = func_name.split('.')[-1]
         module = func_name.rsplit('.', 1)[0] if '.' in func_name else 'root'
         lines = [f"{short_name} [{module}]"]
         
-        calls_by_module = {}
-        for called in func.calls[:5]:
-            mod = called.rsplit('.', 1)[0] if '.' in called else 'root'
-            if mod not in calls_by_module: calls_by_module[mod] = []
-            calls_by_module[mod].append(called)
+        calls_by_module, func_module = self._group_calls_by_module(func.calls, func_name)
         
         shown = 0
-        for mod, calls in sorted(calls_by_module.items(), key=lambda x: x[0] != module):
+        for mod, calls in sorted(calls_by_module.items(), key=lambda x: x[0] != func_module):
             for called in calls[:2]:
-                if shown >= 3: break
+                if shown >= 3:
+                    break
                 called_func = result.functions.get(called)
                 if called_func and called not in visited:
                     sub_flow = self._trace_flow(called, called_func, result, depth - 1, visited.copy())
-                    cross = " →" if mod != module else ""
-                    lines.append(f"  └─{cross}> {called.split('.')[-1]}")
-                    for sub in sub_flow.split('\n')[1:][:3]: lines.append("    " + sub)
+                    lines.extend(self._format_sub_flow(sub_flow, called, mod != func_module))
                     shown += 1
         return '\n'.join(lines)
