@@ -45,7 +45,8 @@ code2llm ./ -f all
 # LLM-ready context only
 code2llm ./ -f context
 ```
-Przykład z projektu toonic:
+
+Przykład z projektu toonic, z użyciem modelu Kimi K2.5 w VScode Windsurf:
 ![img_1.png](img_1.png)
 ```bash
 code2llm ./ -f toon,evolution -o ./project
