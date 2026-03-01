@@ -178,6 +178,21 @@ reports/
 *.json.bak
 env-report.json
 
+# code2llm output artifacts
+.code2llm_cache/
+.code2llm_metrics.json
+code2llm_output/
+output_all/
+output_comparison/
+output_modes/
+test_default/
+test_no_readme/
+optimized_analysis/
+toon_v5/
+publish-test-env/
+project/
+TODO/
+
 # Secrets
 .env.local
 .env.*.local

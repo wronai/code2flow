@@ -28,24 +28,37 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  code2llm /path/to/project                    # Default: TOON format + README
-  code2llm /path/to/project -f all             # Generate all formats + README
-  code2llm /path/to/project -f toon,map,flow   # Diagnostics + structure + data-flow + README
-  code2llm /path/to/project -f context         # LLM narrative + README
-  code2llm /path/to/project -m static -o ./analysis
-  code2llm /path/to/project --no-readme        # Disable README generation
-  code2llm llm-flow                             # Generate LLM flow summary
+  code2llm ./                                       # Default: TOON diagnostics + README
+  code2llm ./ -f all -o ./docs                      # All formats to ./docs/
+  code2llm ./ -f toon,map,flow                      # Diagnostics + structure + data-flow
+  code2llm ./ -f context                            # LLM narrative (context.md)
+  code2llm ./ --streaming --strategy deep -f all    # Deep streaming analysis, all outputs
+  code2llm ./ --strategy quick -f toon              # Fast overview
+  code2llm ./ --refactor                            # AI refactoring prompts
+  code2llm ./ --refactor --smell god_function       # Filter by smell type
+  code2llm ./ -f yaml --split-output                # Split YAML into multiple files
+  code2llm ./ -f yaml --separate-orphans            # Separate orphaned functions
+  code2llm ./ -f mermaid --no-png                   # Mermaid diagrams without PNG
+  code2llm ./ -m static -v -o ./analysis            # Static mode, verbose
+  code2llm ./ --no-readme                           # Disable README generation
+  code2llm llm-flow                                 # Generate LLM flow summary
+  code2llm llm-context ./                           # Generate LLM context only
 
-Format Options:
-  toon    - Health diagnostics (analysis.toon) — default
-  map     - Structural map (map.toon) — modules, imports, signatures
-  flow    - Data-flow analysis (flow.toon) — pipelines, contracts, types
-  context - LLM narrative (context.md) — architecture summary
-  yaml    - Standard YAML format
-  json    - Machine-readable JSON
-  mermaid - Flowchart diagrams
-  evolution - Refactoring queue (evolution.toon)
-  all     - Generate all formats
+Format Options (-f):
+  toon      — Health diagnostics (analysis.toon) [default]
+  map       — Structural map (map.toon) — modules, imports, signatures
+  flow      — Data-flow analysis (flow.toon) — pipelines, contracts, types
+  context   — LLM narrative (context.md) — architecture summary
+  yaml      — Standard YAML format
+  json      — Machine-readable JSON
+  mermaid   — Flowchart diagrams (flow.mmd, calls.mmd, compact_flow.mmd)
+  evolution — Refactoring queue (evolution.toon)
+  all       — Generate all formats
+
+Strategy Options (--strategy):
+  quick     — Fast overview, fewer files analyzed
+  standard  — Balanced analysis [default]
+  deep      — Complete analysis, all files
         '''
     )
     
