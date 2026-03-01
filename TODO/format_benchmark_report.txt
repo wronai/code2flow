@@ -1,0 +1,363 @@
+==========================================================================================
+BENCHMARK: Format Comparison for Data-Flow Oriented Refactoring
+==========================================================================================
+
+Question: Which code2flow output format best enables refactoring
+          driven by DATA FLOW ANALYSIS rather than code structure?
+
+──────────────────────────────────────────────────────────────────────────────────────────
+FORMAT PROFILES
+──────────────────────────────────────────────────────────────────────────────────────────
+
+Format                   Size  Lines   Call  Types  Verbs  Funcs
+──────────────────── ──────── ────── ────── ────── ────── ──────
+project.toon          22,783    323      0    118     66    279
+analysis.toon         25,537    476     58      0     55    127
+llm_prompt.md         30,187    577      1     51    108      0
+
+Feature                    project.toon  analysis.toon  llm_prompt.md 
+───────────────────────── ────────────── ────────────── ──────────────
+Call chains (→)                  ✗              ✓              ✓      
+Data types                       ✓              ✗              ✗      
+Fan-in/out                       ✗              ✓              ✗      
+Coupling matrix                  ✓              ✓              ✓      
+Entry/exit points                ✓              ✓              ✓      
+Function signatures              ✓              ✗              ✗      
+Import graph                     ✓              ✗              ✗      
+CC metrics                       ✓              ✓              ✗      
+Health section                   ✗              ✓              ✗      
+Refactor steps                   ✓              ✓              ✓      
+Duplicates                       ✗              ✓              ✓      
+Mermaid diagram                  ✗              ✗              ✓      
+Data flow info                   ✓              ✓              ✓      
+State machines                   ✓              ✗              ✓      
+Behavioral patterns              ✓              ✓              ✓      
+Inline severity                  ✗              ✓              ✗      
+API surface                      ✓              ✓              ✓      
+  → project.toon: 11/17 features
+  → analysis.toon: 12/17 features
+  → llm_prompt.md: 10/17 features
+
+──────────────────────────────────────────────────────────────────────────────────────────
+DETAILED SCORING (0-10 scale)
+──────────────────────────────────────────────────────────────────────────────────────────
+
+  ══ DATA FLOW ══
+
+  A1: Call Chain Visibility (weight: 3.0)
+  Can you trace how data flows through function call chains?
+
+    🥇 analysis.toon        ████████░░  8.0
+       D: section shows call chains with → arrows (58 edges visible). Each class shows method→method flow with CC. HOTSPOTS show fan-out chains.
+
+    🥈 llm_prompt.md        ███████░░░  7.0
+       'Key Entry Points' shows call targets per function. Mermaid diagram shows connections. But flat list, not hierarchical chain.
+
+    🥉 project.toon         ███░░░░░░░  3.0
+       Signatures show input→output types but NO call chains. 118 type mentions, but connections between functions invisible.
+
+
+  A2: Data Type Awareness (weight: 3.0)
+  Can you see what types of data flow between functions?
+
+    🥇 project.toon         █████████░  9.0
+       Full type signatures: func(arg:type)->return_type. 118 type references. ONLY format with return types visible.
+
+    🥈 llm_prompt.md        ██░░░░░░░░  2.0
+       Call targets listed but no parameter types. 'Calls: result.functions.items' — shows object access but not types.
+
+    🥉 analysis.toon        █░░░░░░░░░  1.0
+       Zero type information. Only CC numbers and node counts. Cannot tell what data a function consumes or produces.
+
+
+  A3: Transform Verb Density (weight: 2.0)
+  Does the format describe what happens to data (parse, convert, extract, merge)?
+
+    🥇 llm_prompt.md        ████████░░  8.0
+       108 transform verbs in 577 lines (18.7/100 lines). Docstrings preserved ('Trace execution flow', 'Normalize queries').
+
+    🥈 analysis.toon        ███████░░░  7.0
+       55 transform verbs in 476 lines (11.6/100 lines). HOTSPOT descriptions add context ('analysis pipeline, 18 stages').
+
+    🥉 project.toon         ██████░░░░  6.0
+       66 transform verbs in 323 lines (20.4/100 lines). Function names carry semantic meaning (parse_llm_task_text, extract, normalize).
+
+
+  A4: Dependency Graph Visibility (weight: 2.0)
+  Can you see which modules depend on which, showing data flow paths between components?
+
+    🥇 project.toon         █████████░  9.0
+       Full import list per module (i: ast,astroid,core.config.Config,...). Can reconstruct entire dependency graph. ONLY format with complete import data.
+
+    🥈 analysis.toon        ███████░░░  7.0
+       COUPLING matrix shows package-level dependencies with fan-in/fan-out. Aggregated view (not per-file imports) but immediately scannable.
+
+    🥉 llm_prompt.md        ████░░░░░░  4.0
+       Mermaid diagram shows some connections. 'System Interactions' section. But incomplete — only top entry points, not full graph.
+
+
+  A5: Pipeline Detection (weight: 3.0)
+  Can you identify multi-step data processing pipelines (A→B→C→D)?
+
+    🥇 llm_prompt.md        ███████░░░  7.0
+       'Process Flows' section explicitly shows pipelines. 'Flow 1: main → create_parser'. But most flows are truncated to 1-2 steps.
+
+    🥈 analysis.toon        ██████░░░░  6.0
+       D: section shows call chains (export→_build_context→_compute_*→_render_*). HOTSPOTS show fan-out. But pipelines not explicitly labeled.
+
+    🥉 project.toon         ██░░░░░░░░  2.0
+       No pipeline info. Can infer from function names (normalize→match→resolve→format) but requires human interpretation.
+
+
+  ══ REFACTORING ══
+
+  B1: Problem Identification (weight: 2.0)
+  Does the format explicitly identify problems to fix?
+
+    🥇 analysis.toon        ██████████ 10.0
+       HEALTH[20] with 🔴/🟡 severity. REFACTOR[3] with numbered steps. !! inline markers. 'split', 'god module' labels. Best problem identification.
+
+    🥈 llm_prompt.md        ███░░░░░░░  3.0
+       No explicit problem section. Mentions 'Reverse Engineering Guidelines' but these are generic, not specific to THIS codebase's problems.
+
+    🥉 project.toon         ██░░░░░░░░  2.0
+       No problem identification. Raw data only. Human must infer that 1240-line file is a problem.
+
+
+  B2: Refactoring Steps (weight: 2.0)
+  Does the format provide concrete steps for refactoring?
+
+    🥇 analysis.toon        █████████░  9.0
+       REFACTOR[3]: '1. split core/streaming_analyzer.py (god module)' '2. split 18 high-CC methods'. Numbered, actionable.
+
+    🥈 llm_prompt.md        ██░░░░░░░░  2.0
+       Generic guidelines: 'Preserving call graph structure', 'Implementing identified patterns'. Not specific to actual problems.
+
+    🥉 project.toon         ░░░░░░░░░░  0.0
+       Zero refactoring guidance. Pure structural data.
+
+
+  B3: Impact Estimation (weight: 2.0)
+  Can you estimate the impact of a refactoring change?
+
+    🥇 analysis.toon        ████████░░  8.0
+       CC values show complexity reduction potential. Fan-in/out shows blast radius. COUPLING matrix shows which packages are affected.
+
+    🥈 project.toon         █████░░░░░  5.0
+       Line counts per module let you estimate file sizes after split. Import lists show what would break. But no metrics.
+
+    🥉 llm_prompt.md        ████░░░░░░  4.0
+       Call counts per function show usage frequency. But no complexity metrics. Can't estimate how much simpler the code would become.
+
+
+  ══ DENSITY ══
+
+  C1: Signal-to-Noise Ratio (weight: 1.5)
+  How much useful information per byte?
+
+    🥇 project.toon         ████████░░  8.0
+       11 features in 22 KB = 0.49 features/KB. Compact, no repetition, every line carries unique info.
+
+    🥈 analysis.toon        ███████░░░  7.0
+       12 features in 25 KB = 0.48 features/KB. Rich features but CLASSES section lists 20+ zero-method dataclasses.
+
+    🥉 llm_prompt.md        ████░░░░░░  4.0
+       9 features in 29 KB = 0.31 features/KB. Verbose markdown. Architecture section repeats function/class counts redundantly.
+
+
+  C2: Scanability (weight: 1.5)
+  Can you visually scan the format and find critical information in seconds?
+
+    🥇 analysis.toon        █████████░  9.0
+       HEALTH section at top with 🔴/🟡. !! markers on left edge. Bar charts ████ for classes. Sorted by severity. Designed for scanning.
+
+    🥈 project.toon         ██████░░░░  6.0
+       Compact and structured with clear keys (M:, D:, i:, e:). But no severity markers — all modules look equally important.
+
+    🥉 llm_prompt.md        ███░░░░░░░  3.0
+       Markdown headers help but content is narrative. Must READ, not scan. No visual severity markers. Alphabetical-ish ordering.
+
+
+  ══ LLM ══
+
+  D1: LLM Data-Flow Comprehension (weight: 2.5)
+  Can an LLM reconstruct the system as a data transformation pipeline from this format?
+
+    🥇 llm_prompt.md        ████████░░  8.0
+       Designed for LLM consumption. Process Flows, System Interactions mermaid, behavioral patterns. Natural language descriptions help LLM reason about intent.
+
+    🥈 analysis.toon        ███████░░░  7.0
+       Call chains in D: section are explicit. HOTSPOTS show convergence points. But MISSING: what data types flow through these chains.
+
+    🥉 project.toon         █████░░░░░  5.0
+       Types + imports enable LLM to INFER data flow. But LLM must do significant work: match function signatures, trace imports, reconstruct chains.
+
+
+  D2: LLM Refactoring Generation (weight: 2.5)
+  Can an LLM generate refactoring proposals focused on data-flow optimization (not just code cleanup)?
+
+    🥇 analysis.toon        ████████░░  8.0
+       HEALTH+REFACTOR tell LLM what to fix. CC+fan-out tell WHERE data flow is tangled. Call chains in D: show HOW to untangle. Almost complete.
+
+    🥈 llm_prompt.md        ██████░░░░  6.0
+       LLM understands architecture well enough to suggest changes. But no metrics for prioritization. Generic guidelines, not specific refactoring targets.
+
+    🥉 project.toon         ████░░░░░░  4.0
+       LLM sees signatures and imports — can propose interface changes. But no metrics to prioritize or measure improvement.
+
+
+──────────────────────────────────────────────────────────────────────────────────────────
+CATEGORY SUMMARIES (weighted average 0-10)
+──────────────────────────────────────────────────────────────────────────────────────────
+
+  DATA FLOW:
+    analysis.toon        █████░░░░░ 5.6
+    project.toon         █████░░░░░ 5.5
+    llm_prompt.md        █████░░░░░ 5.5
+
+  REFACTORING:
+    analysis.toon        █████████░ 9.0
+    llm_prompt.md        ███░░░░░░░ 3.0
+    project.toon         ██░░░░░░░░ 2.3
+
+  DENSITY:
+    analysis.toon        ████████░░ 8.0
+    project.toon         ███████░░░ 7.0
+    llm_prompt.md        ███░░░░░░░ 3.5
+
+  LLM:
+    analysis.toon        ███████░░░ 7.5
+    llm_prompt.md        ███████░░░ 7.0
+    project.toon         ████░░░░░░ 4.5
+
+══════════════════════════════════════════════════════════════════════════════════════════
+FINAL RANKING — Data-Flow Refactoring Effectiveness
+══════════════════════════════════════════════════════════════════════════════════════════
+
+  🥇 analysis.toon        █████████████░░░░░░░ 7.0/10
+  🥈 llm_prompt.md        ██████████░░░░░░░░░░ 5.0/10
+  🥉 project.toon         █████████░░░░░░░░░░░ 4.8/10
+
+──────────────────────────────────────────────────────────────────────────────────────────
+GAP ANALYSIS — What's Missing for Ideal Data-Flow Format
+──────────────────────────────────────────────────────────────────────────────────────────
+
+  project.toon:
+    ❌ NO call chains — functions listed in isolation, no → between them
+    ❌ NO complexity metrics — can't prioritize what to fix
+    ❌ NO problem identification — doesn't say what's wrong
+    ❌ NO pipeline detection — NLP pipeline stages (normalize→match→resolve→format) invisible
+    ✓  HAS type signatures — ONLY format with input/output types
+    ✓  HAS full import graph — ONLY format with complete dependency data
+
+  analysis.toon:
+    ❌ NO type information — CC=45 tells you it's complex but not WHAT data it processes
+    ❌ NO function signatures — can't see input→output contract
+    ❌ NO import-level dependencies — COUPLING is package-level only
+    ❌ CLASSES section 40% noise — 22 dataclasses with CC̄=0.0 listed
+    ✓  HAS call chains — D: section shows method→method flow
+    ✓  HAS health diagnostics — HEALTH + REFACTOR are the strongest sections of any format
+    ✓  HAS severity markers — !! 🔴 🟡 enable instant visual scanning
+
+  llm_prompt.md:
+    ❌ NO metrics — can't quantify problems or improvements
+    ❌ NO severity — all functions treated equally, no prioritization
+    ❌ Process Flows truncated — most flows show only 1-2 steps, not full pipelines
+    ❌ Verbose — 30 KB for less information than analysis.toon's 25 KB
+    ✓  HAS natural language descriptions — LLM-native format
+    ✓  HAS behavioral patterns — state machines, factories detected
+    ✓  HAS API surface — public interface visibility
+
+──────────────────────────────────────────────────────────────────────────────────────────
+NAMING PROBLEM — Current vs. Actual Purpose
+──────────────────────────────────────────────────────────────────────────────────────────
+
+  Current names are misleading:
+
+  ┌─────────────────┬────────────────────────────────┬─────────────────────────────────┐
+  │ Current Name    │ What It Actually Is             │ Proposed Name                   │
+  ├─────────────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ project.toon    │ Structure map (modules,        │ .map  (architecture map)        │
+  │                 │ imports, signatures)            │ or .struct                      │
+  ├─────────────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ analysis.toon   │ Health diagnostics report      │ .health / .diag / .toon         │
+  │                 │ (CC, coupling, refactor steps)  │ (keep .toon for THIS one)       │
+  ├─────────────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ llm_prompt.md   │ Narrative architecture summary  │ .arch.md / .context.md          │
+  │                 │ (flows, patterns, API surface)  │                                 │
+  └─────────────────┴────────────────────────────────┴─────────────────────────────────┘
+
+  Problem: Both files use .toon extension but are completely different formats:
+    project.toon  = key:value compact notation (M:, D:, i:, e:)
+    analysis.toon = diagnostic sections (HEALTH, COUPLING, LAYERS, FUNCTIONS)
+
+  They share ZERO structural similarity. Using the same extension is like
+  calling both CSV and JSON files '.data'.
+
+══════════════════════════════════════════════════════════════════════════════════════════
+RECOMMENDATION — Unified Format for Data-Flow Refactoring
+══════════════════════════════════════════════════════════════════════════════════════════
+
+  None of the 3 formats alone is sufficient for data-flow refactoring.
+  Each has critical gaps that the others fill:
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  IDEAL FORMAT = merge of strengths from all three:                 │
+  │                                                                     │
+  │  From project.toon:   Type signatures, import graph                │
+  │  From analysis.toon:  HEALTH, REFACTOR, call chains, CC metrics    │
+  │  From llm_prompt.md:  Behavioral patterns, docstrings, API surface │
+  │                                                                     │
+  │  Plus NEW (missing from all):                                       │
+  │    • DATA_FLOW section: explicit pipeline stages                   │
+  │    • TRANSFORMS: what each function does to data                   │
+  │    • CONTRACT: input type → output type per function               │
+  │    • PIPELINES: automatically detected A→B→C chains               │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Proposed naming and file structure:
+
+    output/
+    ├── analysis.toon      ← KEEP: the health/diagnostic format (renamed from 'toon v2')
+    ├── project.map        ← RENAME: structural map (was project.toon)
+    ├── context.md         ← RENAME: LLM narrative (was llm_prompt.md)
+    └── flow.toon          ← NEW: data-flow-focused format (proposed below)
+
+  The NEW flow.toon format should focus on DATA FLOW:
+
+  ```
+  # code2flow/flow | 335 functions | 12 pipelines | 2026-03-01
+
+  PIPELINES[4]:
+    NLP: raw_query → normalize(str→str) → match_intent(str→IntentMatch)
+         → resolve_entities(IntentMatch→Entity[]) → format_action(Entity[]→str)
+    Analysis: path → collect_files(Path→Path[]) → analyze_file(Path→AnalysisResult)
+              → merge_results(AnalysisResult[]→AnalysisResult) → build_call_graph
+    Export: AnalysisResult → compute_metrics → render_sections(ctx→str[]) → write(str)
+    Refactoring: AnalysisResult → detect_smells → build_context → render_prompt(→str)
+
+  TRANSFORMS (sorted by fan-out):
+    main(args:list) → {Config,Path,AnalysisResult}  fan=45  !! God Function
+    _compute_file_metrics(result:AR) → Dict[str,FileMetrics]  fan=22
+    analyze_project(path:Path) → AnalysisResult  fan=18  PIPELINE:Analysis.entry
+    process(query:str) → NLPPipelineResult  fan=18  PIPELINE:NLP.entry
+
+  CONTRACTS (input→output per function, grouped by pipeline):
+    Pipeline: NLP
+      normalize(query:str, lang:str) → str           CC=6   pure
+      match_intent(normalized:str) → IntentMatch      CC=7   pure
+      resolve(match:IntentMatch) → Entity[]           CC=13  side-effect:cache
+      format_action(entities:Entity[]) → str          CC=10  10 branches
+
+  DATA_TYPES (ranked by usage across functions):
+    AnalysisResult    consumed:18  produced:4   hub-type
+    str               consumed:45  produced:30  ubiquitous
+    Path              consumed:12  produced:3   input-heavy
+    FunctionInfo      consumed:8   produced:2   read-mostly
+  ```
+
+  This format enables refactoring by DATA FLOW:
+  - 'AnalysisResult consumed:18' → too many dependents, split the type
+  - 'Pipeline NLP is pure' → safe to parallelize
+  - 'main() → 45 outputs' → not a function, it's a script in disguise
+  - 'resolve() has side-effect:cache' → mark as impure in pipeline

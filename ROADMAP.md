@@ -2,7 +2,7 @@
 
 This document outlines planned features, improvements, and milestones for the code2flow project.
 
-## Current Status (v0.3.0)
+## Current Status (v0.3.1)
 
 ✅ **Completed:**
 - Core analysis engine with caching and parallel processing
@@ -15,9 +15,14 @@ This document outlines planned features, improvements, and milestones for the co
 - **Format Taxonomy (v0.3.0)** — 4 purpose-built output formats:
   - `project.map` — structural map (modules, imports, signatures, types)
   - `analysis.toon` — health diagnostics (HEALTH, REFACTOR, COUPLING, LAYERS)
-  - `flow.toon` — **NEW** data-flow analysis (PIPELINES, TRANSFORMS, CONTRACTS, DATA_TYPES)
+  - `flow.toon` — data-flow analysis (PIPELINES, TRANSFORMS, CONTRACTS, DATA_TYPES)
   - `context.md` — LLM narrative (architecture, patterns, API surface)
   - CLI: `--format map,toon,flow,context,all`
+- **AST-based type inference + side-effect detection (v0.3.1)**:
+  - `TypeInferenceEngine` — parses return annotations, argument types, name-based fallback
+  - `SideEffectDetector` — AST scan for IO, cache, mutation, pure classification
+  - Enhanced CONTRACTS: IN/OUT types, SIDE-EFFECT, INVARIANT, SMELL markers
+  - Enhanced DATA_TYPES: source counts, hub-type split recommendations
 
 ---
 
@@ -305,7 +310,7 @@ pattern:
 |---------|-------------|-------|--------|
 | v0.2.5 | Mar 2026 | TOON v2 format implementation | ✅ Done |
 | v0.3.0 | Mar 2026 | Format taxonomy (map, toon, flow, context) | ✅ Done |
-| v0.3.1 | Q2 2026 | CONTRACTS + DATA_TYPES enhancement | 📋 Planned |
+| v0.3.1 | Mar 2026 | CONTRACTS + DATA_TYPES enhancement (AST type inference, side-effect detection) | ✅ Done |
 | v0.4.0 | Q3 2026 | IDE integration, real-time analysis | 📋 Planned |
 | v0.5.0 | Q4 2026 | JS/TS support | 📋 Planned |
 | v0.6.0 | Q1 2027 | Enterprise features | 📋 Planned |

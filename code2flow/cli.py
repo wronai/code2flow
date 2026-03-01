@@ -35,7 +35,7 @@ Examples:
 
 Format Options:
   toon    - Health diagnostics (analysis.toon) — default
-  map     - Structural map (project.map) — modules, imports, signatures
+  map     - Structural map (map.toon) — modules, imports, signatures
   flow    - Data-flow analysis (flow.toon) — pipelines, contracts, types
   context - LLM narrative (context.md) — architecture summary
   yaml    - Standard YAML format
@@ -304,7 +304,7 @@ def main():
 
         if 'map' in formats:
             exporter = MapExporter()
-            filepath = output_dir / 'project.map'
+            filepath = output_dir / 'map.toon'
             exporter.export(result, str(filepath))
             if args.verbose:
                 print(f"  - MAP (structure): {filepath}")

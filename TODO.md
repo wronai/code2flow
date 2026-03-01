@@ -9,24 +9,33 @@
   - [x] Update CLI: `--format map,toon,flow,context,all`
   - [x] 4 files, 4 purposes: map (structure), toon (health), flow (data-flow), context (LLM)
 
-## 🎯 Sprint 2 — CONTRACTS + DATA_TYPES (v0.3.1)
+## ✅ Completed — Sprint 2 (v0.3.1)
 
-### High Priority
+- [x] **Type inference from AST** (`analysis/type_inference.py`)
+  - [x] Parse `->` return annotations
+  - [x] Parse arguments with type hints
+  - [x] Fallback: infer from names (`parse_*` → str input, `to_dict` → dict output)
+  - [x] Batch mode: `extract_all_types()` for all project functions
 
-- [ ] **Type inference from AST**
-  - Parse `->` return annotations
-  - Parse arguments with type hints
-  - Fallback: infer from names (`parse_*` → str input, `to_dict` → dict output)
+- [x] **CONTRACTS section enhancement**
+  - [x] Per-pipeline: IN types, OUT type for each stage
+  - [x] Side-effect detection via AST: `self.`, `.write`, `open()`, `global`, `cache`
+  - [x] Purity scoring: pure / IO / cache / mutation
+  - [x] INVARIANT inference (normalize → `len(output) <= len(input)`)
+  - [x] SMELL markers for CC ≥ 15
 
-- [ ] **CONTRACTS section enhancement**
-  - Per-pipeline: input→output for each stage
-  - Side-effect detection: `self.`, `.write`, `.save`, `cache`
-  - Purity scoring: pure / IO / cache / mutation
+- [x] **DATA_TYPES section enhancement**
+  - [x] Count consumed/produced per type (AST-based)
+  - [x] Auto-detect hub-types (consumed ≥ 10)
+  - [x] Hub-type split recommendations with named sub-interfaces
+  - [x] Source counts: `[N annotated, M inferred / T functions]`
 
-- [ ] **DATA_TYPES section enhancement**
-  - Count consumed/produced per type
-  - Auto-detect hub-types (consumed ≥ 10)
-  - Recommend split for hub-types
+- [x] **SideEffectDetector** (`analysis/side_effects.py`)
+  - [x] AST scan: `open()`, `write()`, `self.x = ...`, `global`, `del`
+  - [x] Classification: IO / Cache / Mutation / Pure
+  - [x] Heuristic fallback when source unavailable
+
+- [x] **26 new tests** (`tests/test_sprint2_flow.py`)
 
 ## 🎯 Sprint 3 — PIPELINES auto-detection + SIDE_EFFECTS (v0.3.2)
 

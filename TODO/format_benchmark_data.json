@@ -1,0 +1,177 @@
+{
+  "profiles": {
+    "project.toon": {
+      "size_bytes": 22783,
+      "lines": 323,
+      "call_edges": 0,
+      "type_mentions": 118,
+      "transform_verbs": 66,
+      "functions_mentioned": 279
+    },
+    "analysis.toon": {
+      "size_bytes": 25537,
+      "lines": 476,
+      "call_edges": 58,
+      "type_mentions": 0,
+      "transform_verbs": 55,
+      "functions_mentioned": 127
+    },
+    "llm_prompt.md": {
+      "size_bytes": 30187,
+      "lines": 577,
+      "call_edges": 1,
+      "type_mentions": 51,
+      "transform_verbs": 108,
+      "functions_mentioned": 0
+    }
+  },
+  "criteria": [
+    {
+      "name": "A1: Call Chain Visibility",
+      "category": "Data Flow",
+      "weight": 3.0,
+      "scores": {
+        "project.toon": 3.0,
+        "analysis.toon": 8.0,
+        "llm_prompt.md": 7.0
+      }
+    },
+    {
+      "name": "A2: Data Type Awareness",
+      "category": "Data Flow",
+      "weight": 3.0,
+      "scores": {
+        "project.toon": 9.0,
+        "analysis.toon": 1.0,
+        "llm_prompt.md": 2.0
+      }
+    },
+    {
+      "name": "A3: Transform Verb Density",
+      "category": "Data Flow",
+      "weight": 2.0,
+      "scores": {
+        "project.toon": 6.0,
+        "analysis.toon": 7.0,
+        "llm_prompt.md": 8.0
+      }
+    },
+    {
+      "name": "A4: Dependency Graph Visibility",
+      "category": "Data Flow",
+      "weight": 2.0,
+      "scores": {
+        "project.toon": 9.0,
+        "analysis.toon": 7.0,
+        "llm_prompt.md": 4.0
+      }
+    },
+    {
+      "name": "A5: Pipeline Detection",
+      "category": "Data Flow",
+      "weight": 3.0,
+      "scores": {
+        "project.toon": 2.0,
+        "analysis.toon": 6.0,
+        "llm_prompt.md": 7.0
+      }
+    },
+    {
+      "name": "B1: Problem Identification",
+      "category": "Refactoring",
+      "weight": 2.0,
+      "scores": {
+        "project.toon": 2.0,
+        "analysis.toon": 10.0,
+        "llm_prompt.md": 3.0
+      }
+    },
+    {
+      "name": "B2: Refactoring Steps",
+      "category": "Refactoring",
+      "weight": 2.0,
+      "scores": {
+        "project.toon": 0.0,
+        "analysis.toon": 9.0,
+        "llm_prompt.md": 2.0
+      }
+    },
+    {
+      "name": "B3: Impact Estimation",
+      "category": "Refactoring",
+      "weight": 2.0,
+      "scores": {
+        "project.toon": 5.0,
+        "analysis.toon": 8.0,
+        "llm_prompt.md": 4.0
+      }
+    },
+    {
+      "name": "C1: Signal-to-Noise Ratio",
+      "category": "Density",
+      "weight": 1.5,
+      "scores": {
+        "project.toon": 8.0,
+        "analysis.toon": 7.0,
+        "llm_prompt.md": 4.0
+      }
+    },
+    {
+      "name": "C2: Scanability",
+      "category": "Density",
+      "weight": 1.5,
+      "scores": {
+        "project.toon": 6.0,
+        "analysis.toon": 9.0,
+        "llm_prompt.md": 3.0
+      }
+    },
+    {
+      "name": "D1: LLM Data-Flow Comprehension",
+      "category": "LLM",
+      "weight": 2.5,
+      "scores": {
+        "project.toon": 5.0,
+        "analysis.toon": 7.0,
+        "llm_prompt.md": 8.0
+      }
+    },
+    {
+      "name": "D2: LLM Refactoring Generation",
+      "category": "LLM",
+      "weight": 2.5,
+      "scores": {
+        "project.toon": 4.0,
+        "analysis.toon": 8.0,
+        "llm_prompt.md": 6.0
+      }
+    }
+  ],
+  "final_ranking": {
+    "analysis.toon": 6.981481481481482,
+    "llm_prompt.md": 5.018518518518518,
+    "project.toon": 4.796296296296297
+  },
+  "category_scores": {
+    "Data Flow": {
+      "project.toon": 5.538461538461538,
+      "analysis.toon": 5.615384615384615,
+      "llm_prompt.md": 5.538461538461538
+    },
+    "Refactoring": {
+      "project.toon": 2.3333333333333335,
+      "analysis.toon": 9.0,
+      "llm_prompt.md": 3.0
+    },
+    "Density": {
+      "project.toon": 7.0,
+      "analysis.toon": 8.0,
+      "llm_prompt.md": 3.5
+    },
+    "LLM": {
+      "project.toon": 4.5,
+      "analysis.toon": 7.5,
+      "llm_prompt.md": 7.0
+    }
+  }
+}

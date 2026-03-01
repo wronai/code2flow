@@ -1,4 +1,4 @@
-"""Map Exporter — generates project.map (structural map).
+"""Map Exporter — generates map.toon (structural map).
 
 Produces a compact key:value format showing modules, imports, signatures,
 and type information. Formerly the project.toon format.
@@ -24,7 +24,7 @@ EXCLUDE_PATTERNS = {
 
 
 class MapExporter(Exporter):
-    """Export to project.map — structural map with modules, imports, signatures.
+    """Export to map.toon — structural map with modules, imports, signatures.
 
     Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
     """

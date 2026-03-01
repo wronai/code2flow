@@ -1,3 +1,48 @@
+## [0.3.1] - 2026-03-01
+
+### Summary
+
+feat(flow): AST-based type inference + side-effect detection for enhanced CONTRACTS and DATA_TYPES
+
+### Added
+
+- **TypeInferenceEngine** (`analysis/type_inference.py`)
+  - Parses `->` return annotations from source AST
+  - Extracts argument type hints (`arg: Type`)
+  - Fallback: infers types from function name patterns (`parse_*` → str→dict)
+  - Batch mode: `extract_all_types()` for all project functions
+
+- **SideEffectDetector** (`analysis/side_effects.py`)
+  - AST scan: detects `open()`, `write()`, `self.x = ...`, `global`, `del`
+  - Classification: IO / Cache / Mutation / Pure
+  - `SideEffectInfo` with detailed breakdown and summary
+  - Heuristic fallback when source files unavailable
+
+- **26 new tests** (`tests/test_sprint2_flow.py`)
+  - TypeInferenceEngine: annotation extraction, defaults, signatures, batch
+  - SideEffectDetector: IO, pure, mutation, summary, batch, heuristic
+  - FlowExporter integration: contracts IN/OUT, data types, edge cases
+
+### Changed
+
+- **Enhanced CONTRACTS section** in `flow.toon`
+  - Per-stage: IN types, OUT type, SIDE-EFFECT summary
+  - INVARIANT inference (normalize → `len(output) <= len(input)`)
+  - SMELL markers for CC ≥ 15
+
+- **Enhanced DATA_TYPES section** in `flow.toon`
+  - Source counts: `[N annotated, M inferred / T functions]`
+  - Hub-type split recommendations with named sub-interfaces
+  - e.g. `AnalysisResult → split into: StructureResult, MetricsResult, FlowResult`
+
+- **FlowExporter** now uses `TypeInferenceEngine` and `SideEffectDetector`
+  - Typed signatures from AST (not just arg names)
+  - Purity scoring from AST body scan (not just name heuristics)
+
+- **Version bump** to 0.3.1
+
+---
+
 ## [0.3.0] - 2026-03-01
 
 ### Summary

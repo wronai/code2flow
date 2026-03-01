@@ -5,6 +5,9 @@ DATA_TYPES, and SIDE_EFFECTS sections.
 
 Purpose: "how data flows through the system"
 Format: pipeline stages, transform fan-out, contracts, hub-type detection
+
+Sprint 2 (v0.3.1): Enhanced with AST-based type inference and side-effect
+detection for richer CONTRACTS and DATA_TYPES sections.
 """
 
 import ast
@@ -17,6 +20,8 @@ from .base import Exporter
 from ..core.models import (
     AnalysisResult, FunctionInfo, ClassInfo, ModuleInfo, FlowNode
 )
+from ..analysis.type_inference import TypeInferenceEngine
+from ..analysis.side_effects import SideEffectDetector, SideEffectInfo
 
 # Thresholds
 CC_HIGH = 15
@@ -31,11 +36,30 @@ EXCLUDE_PATTERNS = {
 }
 
 
+# Hub-type split recommendations: type -> suggested sub-interfaces
+HUB_SPLIT_RECOMMENDATIONS: Dict[str, List[str]] = {
+    "AnalysisResult": ["StructureResult (modules, classes, functions)",
+                       "MetricsResult (complexity, coupling)",
+                       "FlowResult (call_graph, cfg, dfg)"],
+    "dict": ["replace with typed alternatives (dataclass/TypedDict)"],
+    "str": [],  # primitive, expected to be ubiquitous
+    "list": [],
+    "Any": [],
+}
+
+
 class FlowExporter(Exporter):
     """Export to flow.toon — data-flow focused format.
 
     Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TYPES, SIDE_EFFECTS
+
+    Sprint 2: Uses TypeInferenceEngine for AST-based type extraction and
+    SideEffectDetector for AST-based purity scoring.
     """
+
+    def __init__(self):
+        self._type_engine = TypeInferenceEngine()
+        self._side_effect_detector = SideEffectDetector()
 
     def export(self, result: AnalysisResult, output_path: str, **kwargs) -> None:
         """Export analysis result to flow.toon format."""
@@ -73,20 +97,28 @@ class FlowExporter(Exporter):
         }
         ctx["funcs"] = funcs
 
+        # AST-based type inference (Sprint 2)
+        ctx["type_info"] = self._type_engine.extract_all_types(funcs)
+
+        # AST-based side-effect detection (Sprint 2)
+        ctx["se_info"] = self._side_effect_detector.analyze_all(funcs)
+
         # Detect pipelines from call chains
-        ctx["pipelines"] = self._detect_pipelines(funcs, result)
+        ctx["pipelines"] = self._detect_pipelines(funcs, result, ctx["se_info"])
 
         # Compute transforms (high fan-out functions)
         ctx["transforms"] = self._compute_transforms(funcs)
 
-        # Compute type usage across functions
-        ctx["type_usage"] = self._compute_type_usage(funcs)
+        # Compute type usage across functions (now AST-based)
+        ctx["type_usage"] = self._compute_type_usage(funcs, ctx["type_info"])
 
-        # Classify side effects
-        ctx["side_effects"] = self._classify_side_effects(funcs, result)
+        # Classify side effects (now AST-based)
+        ctx["side_effects"] = self._classify_side_effects(funcs, ctx["se_info"])
 
-        # Compute contracts per pipeline
-        ctx["contracts"] = self._compute_contracts(ctx["pipelines"], funcs)
+        # Compute contracts per pipeline (now with IN/OUT/SIDE-EFFECT)
+        ctx["contracts"] = self._compute_contracts(
+            ctx["pipelines"], funcs, ctx["type_info"], ctx["se_info"]
+        )
 
         return ctx
 
@@ -94,7 +126,8 @@ class FlowExporter(Exporter):
     # pipeline detection
     # ------------------------------------------------------------------
     def _detect_pipelines(
-        self, funcs: Dict[str, FunctionInfo], result: AnalysisResult
+        self, funcs: Dict[str, FunctionInfo], result: AnalysisResult,
+        se_info: Dict[str, SideEffectInfo]
     ) -> List[Dict[str, Any]]:
         """Detect pipelines by finding linear call chains grouped by package."""
         # Build adjacency: caller -> [callees within project]
@@ -102,7 +135,6 @@ class FlowExporter(Exporter):
         all_callees: Set[str] = set()
         for qname, fi in funcs.items():
             for callee in fi.calls:
-                # resolve to qualified name
                 resolved = self._resolve_callee(callee, funcs)
                 if resolved:
                     adj[qname].append(resolved)
@@ -124,27 +156,12 @@ class FlowExporter(Exporter):
         pipelines: List[Dict[str, Any]] = []
 
         for chain in chains:
-            # Skip if >50% of chain already used
             overlap = sum(1 for f in chain if f in used)
             if overlap > len(chain) * 0.5:
                 continue
 
-            # Determine pipeline name from package
             pkg = self._pipeline_name(chain, funcs)
-            stages = []
-            for qname in chain:
-                fi = funcs.get(qname)
-                if fi:
-                    cc = fi.complexity.get("cyclomatic_complexity", 0)
-                    purity = self._function_purity(fi, result)
-                    sig = self._compact_signature(fi)
-                    stages.append({
-                        "name": fi.name,
-                        "qualified": qname,
-                        "signature": sig,
-                        "cc": cc,
-                        "purity": purity,
-                    })
+            stages = self._build_stages(chain, funcs, se_info)
 
             if stages:
                 pure_count = sum(1 for s in stages if s["purity"] == "pure")
@@ -163,6 +180,29 @@ class FlowExporter(Exporter):
                 break
 
         return pipelines
+
+    def _build_stages(
+        self, chain: List[str], funcs: Dict[str, FunctionInfo],
+        se_info: Dict[str, SideEffectInfo]
+    ) -> List[Dict[str, Any]]:
+        """Build pipeline stage info using AST-based engines."""
+        stages = []
+        for qname in chain:
+            fi = funcs.get(qname)
+            if not fi:
+                continue
+            cc = fi.complexity.get("cyclomatic_complexity", 0)
+            se = se_info.get(qname)
+            purity = se.classification if se else "pure"
+            sig = self._type_engine.get_typed_signature(fi)
+            stages.append({
+                "name": fi.name,
+                "qualified": qname,
+                "signature": sig,
+                "cc": cc,
+                "purity": purity,
+            })
+        return stages
 
     def _trace_chain(
         self, start: str, adj: Dict[str, List[str]],
@@ -237,36 +277,34 @@ class FlowExporter(Exporter):
         return f"fan={fan_out}"
 
     # ------------------------------------------------------------------
-    # type usage — consumed/produced counts
+    # type usage — consumed/produced counts (AST-based, Sprint 2)
     # ------------------------------------------------------------------
     def _compute_type_usage(
-        self, funcs: Dict[str, FunctionInfo]
+        self, funcs: Dict[str, FunctionInfo],
+        type_info: Dict[str, Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
-        """Count how many functions consume/produce each type."""
+        """Count how many functions consume/produce each type using AST data."""
         consumed: Dict[str, int] = defaultdict(int)
         produced: Dict[str, int] = defaultdict(int)
 
         for qname, fi in funcs.items():
-            # Types from args (consumed)
-            for arg in fi.args:
-                if ":" in arg:
-                    type_name = arg.split(":")[-1].strip()
-                    type_name = self._normalize_type(type_name)
-                    if type_name:
-                        consumed[type_name] += 1
+            ti = type_info.get(qname, {})
+            # Types from AST-extracted args (consumed)
+            for arg in ti.get("args", []):
+                if arg["name"] == "self":
+                    continue
+                type_name = arg.get("type")
+                if type_name:
+                    normalized = self._normalize_type(type_name)
+                    if normalized:
+                        consumed[normalized] += 1
 
-            # Types from return (produced)
-            if fi.returns:
-                ret_type = self._normalize_type(fi.returns)
-                if ret_type:
-                    produced[ret_type] += 1
-
-            # Infer from function name patterns
-            inferred = self._infer_types_from_name(fi.name)
-            for t in inferred.get("consumed", []):
-                consumed[t] += 1
-            for t in inferred.get("produced", []):
-                produced[t] += 1
+            # Types from AST-extracted return (produced)
+            ret = ti.get("returns")
+            if ret:
+                normalized = self._normalize_type(ret)
+                if normalized:
+                    produced[normalized] += 1
 
         # Merge into ranked list
         all_types = set(consumed.keys()) | set(produced.keys())
@@ -308,60 +346,31 @@ class FlowExporter(Exporter):
             return "narrow scope"
         return ""
 
-    def _infer_types_from_name(self, name: str) -> Dict[str, List[str]]:
-        """Infer likely types from function name patterns."""
-        result: Dict[str, List[str]] = {"consumed": [], "produced": []}
-        name_lower = name.lower()
-
-        if "analyze" in name_lower and "file" in name_lower:
-            result["consumed"].append("Path")
-            result["produced"].append("AnalysisResult")
-        elif "analyze" in name_lower and "project" in name_lower:
-            result["consumed"].append("Path")
-            result["produced"].append("AnalysisResult")
-        elif "export" in name_lower:
-            result["consumed"].append("AnalysisResult")
-        elif "detect" in name_lower and "smell" in name_lower:
-            result["consumed"].append("AnalysisResult")
-            result["produced"].append("CodeSmell")
-        elif "normalize" in name_lower:
-            result["consumed"].append("str")
-            result["produced"].append("str")
-        elif "match" in name_lower and "intent" in name_lower:
-            result["consumed"].append("str")
-            result["produced"].append("IntentMatch")
-        elif "resolve" in name_lower:
-            result["consumed"].append("IntentMatch")
-            result["produced"].append("Entity")
-        elif "parse" in name_lower:
-            result["consumed"].append("str")
-            result["produced"].append("dict")
-
-        return result
-
     # ------------------------------------------------------------------
-    # side effect classification
+    # side effect classification (AST-based, Sprint 2)
     # ------------------------------------------------------------------
     def _classify_side_effects(
-        self, funcs: Dict[str, FunctionInfo], result: AnalysisResult
+        self, funcs: Dict[str, FunctionInfo],
+        se_info: Dict[str, SideEffectInfo]
     ) -> Dict[str, List[str]]:
-        """Classify functions by side-effect type."""
+        """Classify functions by side-effect type using AST analysis."""
         io_funcs: List[str] = []
         cache_funcs: List[str] = []
         mutation_funcs: List[str] = []
         pure_funcs: List[str] = []
 
         for qname, fi in funcs.items():
-            purity = self._function_purity(fi, result)
+            se = se_info.get(qname)
+            classification = se.classification if se else "pure"
             short = fi.name
             if fi.class_name:
                 short = f"{fi.class_name}.{fi.name}"
 
-            if purity == "IO":
+            if classification == "IO":
                 io_funcs.append(short)
-            elif purity == "cache":
+            elif classification == "cache":
                 cache_funcs.append(short)
-            elif purity == "mutation":
+            elif classification == "mutation":
                 mutation_funcs.append(short)
             else:
                 pure_funcs.append(short)
@@ -373,67 +382,98 @@ class FlowExporter(Exporter):
             "Pure": pure_funcs[:20],
         }
 
-    def _function_purity(self, fi: FunctionInfo, result: AnalysisResult) -> str:
-        """Classify function purity based on name and calls."""
-        name_lower = fi.name.lower()
-        calls_lower = [c.lower() for c in fi.calls]
-
-        # IO indicators
-        io_indicators = ["write", "read", "open", "save", "load", "export",
-                         "dump", "print", "mkdir", "rmdir", "remove"]
-        if any(ind in name_lower for ind in io_indicators):
-            return "IO"
-        if any(any(ind in c for ind in io_indicators) for c in calls_lower):
-            return "IO"
-
-        # Cache indicators
-        cache_indicators = ["cache", "memoize", "lru_cache", "store", "fetch"]
-        if any(ind in name_lower for ind in cache_indicators):
-            return "cache"
-        if any(any(ind in c for ind in cache_indicators) for c in calls_lower):
-            return "cache"
-
-        # Mutation indicators
-        mutation_indicators = ["set_", "update", "modify", "mutate", "append",
-                               "insert", "delete", "fix", "patch"]
-        if any(name_lower.startswith(ind) or ind in name_lower
-               for ind in mutation_indicators):
-            return "mutation"
-
-        return "pure"
-
     # ------------------------------------------------------------------
-    # contracts per pipeline
+    # contracts per pipeline (enhanced, Sprint 2)
     # ------------------------------------------------------------------
     def _compute_contracts(
         self, pipelines: List[Dict[str, Any]],
-        funcs: Dict[str, FunctionInfo]
+        funcs: Dict[str, FunctionInfo],
+        type_info: Dict[str, Dict[str, Any]],
+        se_info: Dict[str, SideEffectInfo]
     ) -> List[Dict[str, Any]]:
-        """Build contracts for each pipeline stage."""
+        """Build rich contracts for each pipeline stage with IN/OUT/SIDE-EFFECT."""
         contracts = []
         for pipeline in pipelines:
             stages_contracts = []
             for stage in pipeline["stages"]:
                 fi = funcs.get(stage["qualified"])
-                if fi:
-                    stages_contracts.append({
-                        "name": fi.name,
-                        "signature": stage["signature"],
-                        "cc": stage["cc"],
-                        "purity": stage["purity"],
-                        "note": self._contract_note(fi, stage["cc"]),
-                    })
+                if not fi:
+                    continue
+                ti = type_info.get(stage["qualified"], {})
+                se = se_info.get(stage["qualified"])
+
+                contract = self._build_stage_contract(fi, ti, se, stage)
+                stages_contracts.append(contract)
+
             contracts.append({
                 "pipeline": pipeline["name"],
                 "stages": stages_contracts,
             })
         return contracts
 
-    def _contract_note(self, fi: FunctionInfo, cc: float) -> str:
+    def _build_stage_contract(
+        self, fi: FunctionInfo,
+        ti: Dict[str, Any],
+        se: Optional[SideEffectInfo],
+        stage: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Build a rich contract for a single pipeline stage."""
+        # IN types
+        in_types = []
+        for arg in ti.get("args", []):
+            if arg["name"] == "self":
+                continue
+            t = arg.get("type", "")
+            in_types.append(f"{arg['name']}:{t}" if t else arg["name"])
+        in_str = ", ".join(in_types) if in_types else "()"
+
+        # OUT type
+        out_str = ti.get("returns") or "None"
+
+        # Side-effect info
+        side_effect = ""
+        if se and not se.is_pure:
+            side_effect = se.side_effect_summary
+
+        # Smell note
+        cc = stage["cc"]
+        smell = ""
         if cc >= CC_HIGH:
-            return f"SMELL: CC={cc:.0f} \u2192 split"
-        if self._function_purity(fi, None) == "IO":
-            return "IO"
+            smell = f"CC={cc:.0f} \u2192 split"
+
+        # Invariant (heuristic)
+        invariant = self._infer_invariant(fi, ti)
+
+        return {
+            "name": fi.name,
+            "signature": stage["signature"],
+            "in": in_str,
+            "out": out_str,
+            "cc": cc,
+            "purity": stage["purity"],
+            "side_effect": side_effect,
+            "smell": smell,
+            "invariant": invariant,
+            "source": ti.get("source", "none"),
+        }
+
+    def _infer_invariant(self, fi: FunctionInfo, ti: Dict[str, Any]) -> str:
+        """Infer a contract invariant from function semantics."""
+        name_lower = fi.name.lower()
+        ret = ti.get("returns", "")
+
+        if "normalize" in name_lower:
+            return "len(output) <= len(input)"
+        if "match" in name_lower and ret and "Match" in ret:
+            return "confidence \u2208 [0.0, 1.0]"
+        if "resolve" in name_lower:
+            return "all entities exist in analysis"
+        if "validate" in name_lower or "check" in name_lower:
+            return "raises on invalid input"
+        if "sort" in name_lower:
+            return "output is sorted"
+        if "filter" in name_lower:
+            return "len(output) <= len(input)"
         return ""
 
     # ------------------------------------------------------------------
@@ -499,12 +539,16 @@ class FlowExporter(Exporter):
         for contract in contracts:
             lines.append(f"  Pipeline: {contract['pipeline']}")
             for stage in contract["stages"]:
-                note = f"  {stage['note']}" if stage["note"] else ""
-                lines.append(
-                    f"    {stage['signature']:<45s}"
-                    f" CC={stage['cc']:<4.0f} {stage['purity']}{note}"
-                )
-            lines.append("")
+                lines.append(f"    {stage['signature']}")
+                lines.append(f"      IN:  {stage['in']}")
+                lines.append(f"      OUT: {stage['out']}")
+                if stage.get("side_effect"):
+                    lines.append(f"      SIDE-EFFECT: {stage['side_effect']}")
+                if stage.get("invariant"):
+                    lines.append(f"      INVARIANT: {stage['invariant']}")
+                if stage.get("smell"):
+                    lines.append(f"      SMELL: {stage['smell']}")
+                lines.append("")
         return lines
 
     def _render_data_types(self, ctx: Dict[str, Any]) -> List[str]:
@@ -512,7 +556,23 @@ class FlowExporter(Exporter):
         if not types:
             return ["DATA_TYPES: no type information available"]
 
-        lines = ["DATA_TYPES (by cross-function usage):"]
+        # Count type sources
+        type_info = ctx.get("type_info", {})
+        n_annotated = sum(
+            1 for ti in type_info.values()
+            if ti.get("source") == "annotation"
+        )
+        n_inferred = sum(
+            1 for ti in type_info.values()
+            if ti.get("source") == "inferred"
+        )
+        n_total = len(type_info)
+
+        lines = [
+            f"DATA_TYPES (by cross-function usage)"
+            f" [{n_annotated} annotated, {n_inferred} inferred"
+            f" / {n_total} functions]:"
+        ]
         for t in types:
             label = f"  {t['label']}" if t["label"] else ""
             lines.append(
@@ -520,7 +580,7 @@ class FlowExporter(Exporter):
                 f" produced:{t['produced']:<3}{label}"
             )
 
-        # Hub types summary
+        # Hub types summary with split recommendations
         hubs = [t for t in types if t["consumed"] >= HUB_TYPE_THRESHOLD]
         if hubs:
             lines.append("")
@@ -528,8 +588,14 @@ class FlowExporter(Exporter):
             for h in hubs:
                 lines.append(
                     f"    {h['type']} \u2192 {h['consumed']} consumers"
-                    f" \u2192 split into sub-interfaces"
+                    f" \u2192 split into:"
                 )
+                recs = HUB_SPLIT_RECOMMENDATIONS.get(h["type"], [])
+                if recs:
+                    for rec in recs:
+                        lines.append(f"      - {rec}")
+                else:
+                    lines.append("      - (analyze consumers to suggest sub-interfaces)")
 
         return lines
 
@@ -562,35 +628,21 @@ class FlowExporter(Exporter):
     # ------------------------------------------------------------------
     # utility helpers
     # ------------------------------------------------------------------
-    def _compact_signature(self, fi: FunctionInfo) -> str:
-        """Build compact type signature: name(Type->ReturnType)"""
-        args_types = []
-        for arg in fi.args:
-            if arg == "self":
-                continue
-            if ":" in arg:
-                args_types.append(arg.split(":")[-1].strip())
-            else:
-                args_types.append(arg)
-
-        input_str = ",".join(args_types) if args_types else ""
-        ret = fi.returns or ""
-        if ret:
-            return f"{fi.name}({input_str}\u2192{ret})"
-        return f"{fi.name}({input_str})"
-
     def _infer_input_type(
         self, first_stage: Dict[str, Any],
         funcs: Dict[str, FunctionInfo]
     ) -> str:
+        """Infer input type of pipeline entry point using type engine."""
         fi = funcs.get(first_stage["qualified"])
-        if fi and fi.args:
-            for arg in fi.args:
-                if arg == "self":
-                    continue
-                if ":" in arg:
-                    return arg.split(":")[-1].strip()
-                return arg
+        if not fi:
+            return "?"
+        args = self._type_engine.get_arg_types(fi)
+        for arg in args:
+            if arg["name"] == "self":
+                continue
+            if arg.get("type"):
+                return arg["type"]
+            return arg["name"]
         return "?"
 
     def _resolve_callee(

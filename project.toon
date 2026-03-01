@@ -1,6 +1,6 @@
-# code2flow | 54f 13550L | python:54
+# code2flow | 56f 14429L | python:56
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
-M[54]:
+M[56]:
   benchmarks/benchmark_performance.py,181
   benchmarks/test_performance.py,154
   code2flow/__init__.py,37
@@ -12,16 +12,18 @@ M[54]:
   code2flow/analysis/data_analysis.py,228
   code2flow/analysis/dfg.py,165
   code2flow/analysis/smells.py,163
-  code2flow/cli.py,357
+  code2flow/cli.py,382
   code2flow/core/__init__.py,34
   code2flow/core/analyzer.py,593
   code2flow/core/config.py,136
   code2flow/core/models.py,155
   code2flow/core/streaming_analyzer.py,510
-  code2flow/exporters/__init__.py,15
+  code2flow/exporters/__init__.py,28
   code2flow/exporters/base.py,9
+  code2flow/exporters/flow_exporter.py,486
   code2flow/exporters/json_exporter.py,13
   code2flow/exporters/llm_exporter.py,174
+  code2flow/exporters/map_exporter.py,166
   code2flow/exporters/mermaid_exporter.py,53
   code2flow/exporters/toon.py,796
   code2flow/exporters/yaml_exporter.py,86
@@ -136,6 +138,10 @@ D:
     i: abc.{ABC,abstractmethod},core.models.AnalysisResult
     e: Exporter
     Exporter: export(2)  # Abstract base class for all exporters.
+  code2flow/exporters/flow_exporter.py:
+    i: ast,datetime,collections.defaultdict,pathlib.Path,typing
+    e: CC_HIGH,FAN_OUT_THRESHOLD,HUB_TYPE_THRESHOLD,EXCLUDE_PATTERNS,FlowExporter
+    FlowExporter: export(2),_build_context(1),_detect_pipelines(2),_trace_chain(4),_pipeline_name(2)  # Export to flow.toon — data-flow focus...
   code2flow/exporters/json_exporter.py:
     i: json,base.Exporter,core.models.AnalysisResult,pathlib.Path
     e: JSONExporter
@@ -144,6 +150,10 @@ D:
     i: base.Exporter,core.models.{AnalysisResult,FunctionInfo},pathlib.Path,typing.{Any,Dict,List,Tuple}
     e: LLMPromptExporter
     LLMPromptExporter: export(2),_get_overview(1),_get_architecture_by_module(1),_get_important_entries(1),_get_key_entry_points(1)  # Export LLM-ready analysis summary wit...
+  code2flow/exporters/map_exporter.py:
+    i: datetime,base.Exporter,collections.defaultdict,pathlib.Path,typing
+    e: EXCLUDE_PATTERNS,MapExporter
+    MapExporter: export(2),_render_header(1),_render_module_list(1),_render_details(1),_function_signature(1)  # Export to project.map — structural ma...
   code2flow/exporters/mermaid_exporter.py:
     i: base.Exporter,core.models.AnalysisResult,pathlib.Path,typing.Dict
     e: MermaidExporter

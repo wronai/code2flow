@@ -6,6 +6,8 @@ from .call_graph import CallGraphExtractor
 from .coupling import CouplingAnalyzer
 from .smells import SmellDetector
 from .data_analysis import DataAnalyzer
+from .type_inference import TypeInferenceEngine
+from .side_effects import SideEffectDetector
 
 __all__ = [
     'CFGExtractor',
@@ -13,5 +15,7 @@ __all__ = [
     'CallGraphExtractor',
     'CouplingAnalyzer',
     'SmellDetector',
-    'DataAnalyzer'
+    'DataAnalyzer',
+    'TypeInferenceEngine',
+    'SideEffectDetector',
 ]
