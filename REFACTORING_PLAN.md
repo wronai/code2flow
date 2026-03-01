@@ -1,18 +1,22 @@
-# Plan Refaktoryzacji code2flow
+# Plan Refaktoryzacji code2llm (v0.4.0)
 
 ## Podsumowanie Zmian
 
 Refaktoryzacja monolitycznego `flow.py` (1145 linii) w modularną paczkę Python,
-a następnie wprowadzenie **taksonomii 4 formatów** (v0.3.0).
+wprowadzenie **taksonomii 4 formatów** (v0.3.0), a następnie:
+- **Rename**: `code2flow` → `code2llm` (v0.4.0)
+- **Cleanup**: usunięcie martwego kodu (optimization/, visualizers/)
+- **Reorganizacja**: generatory przeniesione do `generators/` subpakietu
+- **Testy**: nazwy sprint-based → feature-based
 
-## Nowa Struktura (v0.3.0)
+## Aktualna Struktura (v0.4.0)
 
 ```
-code2flow/
-├── code2flow/                  # Główna paczka
-│   ├── __init__.py            # Eksportuje publiczne API (v0.3.0)
-│   ├── __main__.py            # Entry point: python -m code2flow
-│   ├── cli.py                 # CLI: code2flow komenda (map,toon,flow,context,all)
+code2llm/
+├── code2llm/                  # Główna paczka
+│   ├── __init__.py            # Eksportuje publiczne API (v0.4.0)
+│   ├── __main__.py            # Entry point: python -m code2llm
+│   ├── cli.py                 # CLI: code2llm (map,toon,flow,context,all)
 │   ├── core/                  # Klasy bazowe i konfiguracja
 │   │   ├── __init__.py
 │   │   ├── config.py          # Config, ANALYSIS_MODES, NODE_COLORS
@@ -25,22 +29,45 @@ code2flow/
 │   │   ├── coupling.py        # CouplingAnalyzer
 │   │   ├── data_analysis.py   # DataAnalyzer
 │   │   ├── dfg.py             # DFGExtractor - Data Flow Graph
+│   │   ├── pipeline_detector.py # PipelineDetector (networkx)
+│   │   ├── side_effects.py    # SideEffectDetector
+│   │   ├── type_inference.py  # TypeInference (AST-based)
 │   │   └── smells.py          # SmellDetector
-│   ├── exporters/             # Eksport do formatów (4 główne + dodatkowe)
+│   ├── exporters/             # Eksport do formatów (7 eksporterów)
 │   │   ├── __init__.py
 │   │   ├── base.py            # Exporter ABC
 │   │   ├── toon.py            # ToonExporter → analysis.toon (diagnostyka)
-│   │   ├── map_exporter.py    # MapExporter → project.map (struktura) ⭐ NEW
-│   │   ├── flow_exporter.py   # FlowExporter → flow.toon (data-flow) ⭐ NEW
-│   │   ├── llm_exporter.py    # LLMPromptExporter → context.md (LLM)
+│   │   ├── map_exporter.py    # MapExporter → map.toon (struktura)
+│   │   ├── flow_exporter.py   # FlowExporter → flow.toon (data-flow)
+│   │   ├── context_exporter.py # ContextExporter → context.md (LLM)
+│   │   ├── llm_exporter.py    # backward-compat shim → ContextExporter
 │   │   ├── yaml_exporter.py   # YAMLExporter → analysis.yaml
 │   │   ├── json_exporter.py   # JSONExporter → analysis.json
 │   │   └── mermaid_exporter.py # MermaidExporter → *.mmd
+│   ├── generators/            # Generatory (przeniesione z root-level)
+│   │   ├── __init__.py
+│   │   ├── llm_flow.py        # LLM flow summary generator
+│   │   ├── llm_task.py        # LLM task breakdown generator
+│   │   └── mermaid.py         # Mermaid PNG generator
 │   ├── nlp/                   # NLP pipeline
-│   ├── optimization/          # Optymalizacje
-│   ├── visualizers/           # Wizualizacja
-│   ├── patterns/              # Detekcja wzorców
+│   ├── patterns/              # Detekcja wzorców (do podłączenia w v0.5)
 │   └── refactor/              # Silnik refaktoryzacji
+├── tests/
+│   ├── test_analyzer.py
+│   ├── test_edge_cases.py
+│   ├── test_nlp_pipeline.py
+│   ├── test_flow_exporter.py      # (was test_sprint2_flow.py)
+│   ├── test_pipeline_detector.py  # (was test_sprint3_pipelines.py)
+│   ├── test_deep_analysis.py      # (was test_sprint4.py)
+│   ├── test_prompt_engine.py      # (was test_sprint5.py)
+│   ├── test_toon_v2.py
+│   ├── test_refactoring_engine.py
+│   ├── test_format_quality.py
+│   └── test_advanced_analysis.py
+├── benchmarks/
+│   ├── benchmark_performance.py
+│   ├── benchmark_format_quality.py
+│   └── test_performance.py
 ├── setup.py
 ├── pyproject.toml
 ├── Makefile
@@ -48,24 +75,28 @@ code2flow/
 └── README.md
 ```
 
+### Usunięte w v0.4.0
+- `optimization/` — 1590L martwego kodu (zero importów z zewnątrz)
+- `visualizers/` — 150L martwego kodu (PNG via mermaid)
+
 ## Kluczowe Decyzje Architektoniczne
 
 ### 1. Separacja Odpowiedzialności
 - **core/**: Modele danych i główny analyzer
-- **extractors/**: Logika parsowania AST (CFG, DFG, Call Graph)
-- **exporters/**: Formaty wyjściowe (YAML, JSON, Mermaid)
-- **visualizers/**: Renderowanie grafów
+- **analysis/**: Logika parsowania AST (CFG, DFG, Call Graph, pipelines, side effects)
+- **exporters/**: Formaty wyjściowe (TOON, YAML, JSON, Mermaid, Context)
+- **generators/**: Generatory LLM flow, task, Mermaid PNG
 - **patterns/**: Detekcja wzorców behawioralnych
 
 ### 2. API Publiczne
 ```python
-from code2flow import ProjectAnalyzer, Config
-from code2flow.core.models import AnalysisResult
+from code2llm import ProjectAnalyzer, Config
+from code2llm.core.models import AnalysisResult
 ```
 
 ### 3. CLI
 ```bash
-code2flow /path/to/project -m hybrid -o ./output --format yaml,json,mermaid,png
+code2llm /path/to/project -m hybrid -o ./output -f toon,map,flow,context,all
 ```
 
 ### 4. Konfiguracja
@@ -75,8 +106,8 @@ code2flow /path/to/project -m hybrid -o ./output --format yaml,json,mermaid,png
 
 ## Porównanie z Narzędziami Referencyjnymi
 
-| Cecha | code2flow | PyCG | Pyan | Angr | Code2Logic |
-|-------|-----------|------|------|------|------------|
+| Cecha | code2llm | PyCG | Pyan | Angr | Code2Logic |
+|-------|----------|------|------|------|------------|
 | CFG | ✓ | ✓ | ✗ | ✓ | ✓ |
 | DFG | ✓ | ✗ | ✗ | ✓ | ✓ |
 | Call Graph | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -87,22 +118,21 @@ code2flow /path/to/project -m hybrid -o ./output --format yaml,json,mermaid,png
 ## Przyszłe Rozszerzenia
 
 ### Priorytet Wysoki
-1. [ ] Testy jednostkowe (pytest)
-2. [ ] CI/CD pipeline (GitHub Actions)
-3. [ ] Type hints (mypy compliant)
-4. [ ] Obsługa dynamicznej analizy (sys.settrace)
+1. [ ] CI/CD pipeline (GitHub Actions)
+2. [ ] Type hints (mypy compliant)
+3. [ ] Obsługa dynamicznej analizy (sys.settrace)
 
 ### Priorytet Średni
-5. [ ] Więcej formatów wyjściowych (Graphviz DOT, PlantUML)
-6. [ ] Interaktywna wizualizacja (D3.js/Plotly)
-7. [ ] Plugin system dla custom extractors
-8. [ ] Cache analizy (pickle/JSON)
+4. [ ] Więcej formatów wyjściowych (Graphviz DOT, PlantUML)
+5. [ ] Interaktywna wizualizacja (D3.js/Plotly)
+6. [ ] Plugin system dla custom extractors
+7. [ ] Cache analizy (pickle/JSON)
 
 ### Priorytet Niski
-9. [ ] Wsparcie dla Cython
-10. [ ] Analiza bytecode (dis)
-11. [ ] Integracja z IDE (VS Code extension)
-12. [ ] Web UI (Flask/FastAPI)
+8. [ ] Wsparcie dla Cython
+9. [ ] Analiza bytecode (dis)
+10. [ ] Integracja z IDE (VS Code extension)
+11. [ ] Web UI (Flask/FastAPI)
 
 ## Komendy Makefile
 
@@ -111,9 +141,9 @@ make install       # pip install -e .
 make dev-install   # pip install -e ".[dev]"
 make test          # pytest tests/
 make lint          # flake8 + black --check
-make format        # black code2flow/
-make typecheck     # mypy code2flow/
-make run           # code2flow ../python/stts_core
+make format        # black code2llm/
+make typecheck     # mypy code2llm/
+make run           # code2llm ../python/stts_core
 make build         # python setup.py sdist bdist_wheel
 make clean         # rm -rf build/ dist/
 make check         # lint + typecheck + test
@@ -122,16 +152,15 @@ make check         # lint + typecheck + test
 ## Instalacja
 
 ```bash
-cd debug/
 pip install -e .
-code2flow /path/to/project -v
+code2llm /path/to/project -v
 ```
 
 ## Użycie Programowe
 
 ```python
-from code2flow import ProjectAnalyzer, Config
-from code2flow.exporters.base import YAMLExporter
+from code2llm import ProjectAnalyzer, Config
+from code2llm.exporters import YAMLExporter
 
 config = Config(mode='hybrid', max_depth_enumeration=10)
 analyzer = ProjectAnalyzer(config)
@@ -153,7 +182,7 @@ Wszystkie eksporty YAML/JSON domyślnie **ukrywają puste wartości**:
 
 Aby pokazać wszystkie pola (np. dla debugowania):
 ```bash
-code2flow /path/to/project --full
+code2llm /path/to/project --full
 ```
 
 Programowo:
@@ -177,18 +206,17 @@ result.to_dict(include_defaults=True)  # Include all fields
 - **Black** do formatowania
 - **isort** do importów (opcjonalnie)
 
-## Status: ✅ Ukończone
+## Status: ✅ Ukończone (v0.4.0)
 
-- [x] Struktura katalogów
+- [x] Rename code2flow → code2llm
+- [x] Struktura katalogów (reorganizacja generators/)
 - [x] Moduły core/
-- [x] Moduły extractors/
-- [x] Moduły exporters/
-- [x] Moduły visualizers/
-- [x] Moduły patterns/
+- [x] Moduły analysis/ (+ pipeline_detector, side_effects, type_inference)
+- [x] Moduły exporters/ (7 eksporterów, wszystkie podłączone do CLI)
+- [x] Moduły generators/ (przeniesione z root-level)
+- [x] Usunięcie martwego kodu (optimization/, visualizers/)
 - [x] CLI
-- [x] setup.py
-- [x] pyproject.toml
+- [x] setup.py / pyproject.toml
 - [x] Makefile
-- [x] requirements.txt
-- [ ] Tests (do zrobienia)
+- [x] Testy (feature-named)
 - [ ] Dokumentacja API (do zrobienia)

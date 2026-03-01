@@ -199,7 +199,7 @@ class TestExporters:
     
     def test_json_export(self, sample_result, tmp_path):
         """Test JSON export."""
-        from code2llm.exporters.base import JSONExporter
+        from code2llm.exporters import JSONExporter
         
         output = tmp_path / "output.json"
         exporter = JSONExporter()
@@ -212,7 +212,7 @@ class TestExporters:
     
     def test_mermaid_export(self, sample_result, tmp_path):
         """Test Mermaid export."""
-        from code2llm.exporters.base import MermaidExporter
+        from code2llm.exporters import MermaidExporter
         
         output = tmp_path / "output.mmd"
         exporter = MermaidExporter()
