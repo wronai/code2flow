@@ -143,17 +143,18 @@ code2llm /path/to/project -o my_analysis
 
 ## Output Files
 
-| File | Description | Size |
-|------|-------------|------|
-| `analysis.toon` | **🎯 Optimized TOON format** (default) | ~200KB |
-| `analysis.yaml` | Complete structured analysis data | ~2.5MB |
-| `analysis.json` | JSON format for programmatic use | ~2.6MB |
-| `flow.mmd` | Full Mermaid flowchart (all nodes) | ~9KB |
-| `compact_flow.mmd` | Compact flowchart - deduplicated nodes | ~9KB |
-| `calls.mmd` | Function call graph | ~9KB |
-| `cfg.png` | Control flow visualization | ~7MB |
-| `call_graph.png` | Call graph visualization | ~3.7MB |
-| `llm_prompt.md` | LLM-ready analysis summary | ~35KB |
+| File | Format | Description |
+|------|--------|-------------|
+| `analysis.toon` | TOON | **🎯 Diagnostyka zdrowia** — CC, god modules, COUPLING, LAYERS |
+| `evolution.toon` | TOON | **Kolejka refaktoryzacji** — NEXT, RISKS, METRICS-TARGET |
+| `flow.toon` | TOON | **Przepływ danych** — PIPELINES, CONTRACTS, SIDE_EFFECTS |
+| `project.map` | TOON | **Mapa strukturalna** — moduły, sygnatury, importy |
+| `context.md` | Markdown | **Kontekst dla LLM** — architektura, API, flow |
+| `analysis.yaml` | YAML | Pełne dane strukturalne |
+| `analysis.json` | JSON | Dane maszynowe |
+| `flow.mmd` | Mermaid | Diagram z CC-styled nodes |
+| `calls.mmd` | Mermaid | Graf wywołań (edges only) |
+| `compact_flow.mmd` | Mermaid | Moduły zagregowane |
 
 ## 🎯 TOON v2 Format Structure
 
@@ -254,6 +255,36 @@ The analysis provides specific guidance for:
 3. Maintaining data dependencies
 4. Recreating state machines
 5. Preserving decision logic
+
+## 📁 Examples
+
+| Example | Description | Use Case |
+|---------|-------------|----------|
+| [basic-usage](examples/basic-usage/) | Wszystkie komendy CLI | Szybki start |
+| [devops-workflow](examples/devops-workflow/) | Bash: metryki w README, commits, hooks | DevOps |
+| [ci-cd](examples/ci-cd/) | GitHub Actions, pre-commit, Makefile | Automatyzacja |
+| [claude-code](examples/claude-code/) | Automatyczna refaktoryzacja z Claude | AI-assisted |
+| [shell-llm](examples/shell-llm/) | aider, llm, sgpt, fabric | Shell LLM |
+| [litellm](examples/litellm/) | Python skrypt + dowolny LLM | Programmatic |
+
+### Najczęstsze komendy
+
+```bash
+# Szybki health check
+code2llm . -f toon -o output/
+
+# Co refaktoryzować najpierw?
+code2llm . -f evolution -o output/ --no-png
+
+# Wszystkie formaty
+code2llm . -f all -o output/ --no-png
+
+# Benchmark before/after
+python benchmarks/benchmark_evolution.py .
+
+# Kontekst do LLM
+code2llm . -f context -o output/ && cat output/context.md
+```
 
 ## Advanced Features
 
@@ -533,10 +564,14 @@ python validate_toon.py output/analysis.toon
 
 ## 📚 Additional Resources
 
-- [TOON Format Validation](validate_toon.py) - Built-in validation tool
-- [Project Testing Script](project.sh) - Comprehensive test suite
-- [CLI Reference](code2llm/cli.py) - Complete command-line interface
-- [Exporter Implementation](code2llm/exporters/base.py) - TOON format implementation
+- [Examples](examples/) — 6 example projects (CLI, DevOps, CI/CD, LLM integration)
+- [Basic Usage](examples/basic-usage/) — Complete CLI reference
+- [DevOps Workflow](examples/devops-workflow/) — Metrics in README, commits, hooks
+- [CHANGELOG](CHANGELOG.md) — Release history
+- [ROADMAP](ROADMAP.md) — Development roadmap
+- [TODO](TODO.md) — Task backlog
+- [TOON Format Validation](validate_toon.py) — Built-in validation tool
+- [Benchmarks](benchmarks/) — Performance and evolution benchmarks
 
 ---
 
