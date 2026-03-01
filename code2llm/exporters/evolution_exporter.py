@@ -1,0 +1,317 @@
+"""Evolution Exporter — prioritized refactoring queue for iterative improvement.
+
+Generates evolution.toon with:
+  NEXT[N]         — ranked refactoring actions (impact × effort)
+  RISKS[N]        — breaking changes and compatibility notes
+  METRICS-TARGET  — measurable goals vs current baseline
+  HISTORY         — comparison with previous evolution.toon
+"""
+
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+from .base import Exporter
+from ..core.models import AnalysisResult, FunctionInfo
+
+
+# Thresholds
+CC_SPLIT_THRESHOLD = 15
+FAN_OUT_THRESHOLD = 10
+GOD_MODULE_LINES = 500
+HUB_TYPE_THRESHOLD = 10
+
+
+class EvolutionExporter(Exporter):
+    """Export evolution.toon — prioritized refactoring queue."""
+
+    # Exclude patterns (mirrors ToonExporter)
+    EXCLUDE_PATTERNS = {
+        'venv', '.venv', 'env', '.env', 'publish-env', 'test-env',
+        'site-packages', 'node_modules', '__pycache__', '.git',
+        'dist', 'build', 'egg-info', '.tox', '.mypy_cache',
+    }
+
+    def _is_excluded(self, path: str) -> bool:
+        """Check if path should be excluded (venv, site-packages, etc.)."""
+        path_lower = path.lower().replace('\\', '/')
+        for pattern in self.EXCLUDE_PATTERNS:
+            if f'/{pattern}/' in path_lower or path_lower.startswith(f'{pattern}/'):
+                return True
+            if pattern in path_lower.split('/'):
+                return True
+        return False
+
+    def export(self, result: AnalysisResult, output_path: str, **kwargs) -> None:
+        """Generate evolution.toon."""
+        ctx = self._build_context(result)
+
+        sections: List[str] = []
+        sections.extend(self._render_header(ctx))
+        sections.append("")
+        sections.extend(self._render_next(ctx))
+        sections.append("")
+        sections.extend(self._render_risks(ctx))
+        sections.append("")
+        sections.extend(self._render_metrics_target(ctx))
+        sections.append("")
+        sections.extend(self._render_history(ctx, output_path))
+
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(sections) + "\n")
+
+    # ------------------------------------------------------------------
+    # context builder
+    # ------------------------------------------------------------------
+    def _build_context(self, result: AnalysisResult) -> Dict[str, Any]:
+        ctx: Dict[str, Any] = {
+            "result": result,
+            "timestamp": datetime.now().strftime("%Y-%m-%d"),
+        }
+        ctx["funcs"] = self._compute_func_data(result)
+        ctx["god_modules"] = self._compute_god_modules(result)
+        ctx["hub_types"] = self._compute_hub_types(result)
+
+        # Overall metrics
+        all_cc = [f["cc"] for f in ctx["funcs"]]
+        ctx["avg_cc"] = round(sum(all_cc) / len(all_cc), 1) if all_cc else 0.0
+        ctx["max_cc"] = max(all_cc) if all_cc else 0
+        ctx["total_funcs"] = len(all_cc)
+        ctx["total_files"] = len(set(f["file"] for f in ctx["funcs"])) or 1
+        ctx["high_cc_count"] = len([c for c in all_cc if c >= CC_SPLIT_THRESHOLD])
+        ctx["critical_count"] = len([c for c in all_cc if c >= 10])
+
+        return ctx
+
+    def _compute_func_data(self, result: AnalysisResult) -> List[Dict]:
+        """Compute per-function metrics, excluding venv."""
+        func_data = []
+        for qname, fi in result.functions.items():
+            if self._is_excluded(fi.file):
+                continue
+            cc = fi.complexity.get("cyclomatic_complexity", 0)
+            fan_out = len(set(fi.calls))
+            fan_in = len(set(fi.called_by))
+            func_data.append({
+                "qname": qname, "name": fi.name,
+                "class_name": fi.class_name, "cc": cc,
+                "fan_out": fan_out, "fan_in": fan_in,
+                "impact": cc * max(fan_out, 1),
+                "file": fi.file, "module": fi.module,
+            })
+        return sorted(func_data, key=lambda x: x["impact"], reverse=True)
+
+    def _compute_god_modules(self, result: AnalysisResult) -> List[Dict]:
+        """Identify god modules (≥500 lines) from project files."""
+        file_stats = defaultdict(lambda: {"lines": 0, "funcs": 0, "classes": set(), "max_cc": 0})
+        pp = Path(result.project_path) if result.project_path else None
+
+        # Scan file sizes
+        if pp and pp.is_dir():
+            for py in pp.rglob("*.py"):
+                fpath = str(py)
+                if self._is_excluded(fpath):
+                    continue
+                try:
+                    lc = len(py.read_text(encoding="utf-8", errors="ignore").splitlines())
+                    file_stats[fpath]["lines"] = lc
+                except Exception:
+                    pass
+
+        # Aggregate function/class data
+        for qname, fi in result.functions.items():
+            if self._is_excluded(fi.file):
+                continue
+            fs = file_stats[fi.file]
+            fs["funcs"] += 1
+            fs["max_cc"] = max(fs["max_cc"], fi.complexity.get("cyclomatic_complexity", 0))
+            if fi.class_name:
+                fs["classes"].add(fi.class_name)
+        for qname, ci in result.classes.items():
+            if not self._is_excluded(ci.file):
+                file_stats[ci.file]["classes"].add(ci.name)
+
+        # Filter to god modules
+        god_modules = []
+        for fpath, stats in file_stats.items():
+            if stats["lines"] >= GOD_MODULE_LINES:
+                rel = fpath
+                if pp:
+                    try:
+                        rel = str(Path(fpath).relative_to(pp))
+                    except ValueError:
+                        pass
+                god_modules.append({
+                    "file": rel, "lines": stats["lines"],
+                    "funcs": stats["funcs"], "classes": len(stats["classes"]),
+                    "max_cc": stats["max_cc"],
+                })
+        god_modules.sort(key=lambda x: x["lines"], reverse=True)
+        return god_modules
+
+    def _compute_hub_types(self, result: AnalysisResult) -> List[Dict]:
+        """Identify hub types consumed by many functions."""
+        type_consumers: Dict[str, int] = defaultdict(int)
+        type_producers: Dict[str, int] = defaultdict(int)
+        for qname, fi in result.functions.items():
+            ret = fi.complexity.get("return_type", "")
+            if ret:
+                type_producers[ret] += 1
+            for arg_type in fi.complexity.get("arg_types", []):
+                if arg_type:
+                    type_consumers[arg_type] += 1
+        hub_types = [
+            {"type": t, "consumers": c, "producers": type_producers.get(t, 0)}
+            for t, c in type_consumers.items()
+            if c >= HUB_TYPE_THRESHOLD
+        ]
+        hub_types.sort(key=lambda x: x["consumers"], reverse=True)
+        return hub_types
+
+    # ------------------------------------------------------------------
+    # render sections
+    # ------------------------------------------------------------------
+    def _render_header(self, ctx: Dict[str, Any]) -> List[str]:
+        result = ctx["result"]
+        return [
+            f"# code2llm/evolution | {ctx['total_funcs']} func"
+            f" | {ctx['total_files']}f | {ctx['timestamp']}",
+        ]
+
+    def _render_next(self, ctx: Dict[str, Any]) -> List[str]:
+        """Render NEXT — ranked refactoring queue."""
+        actions: List[Dict[str, Any]] = []
+
+        # 1. God modules → split
+        for gm in ctx["god_modules"][:3]:
+            actions.append({
+                "priority": "!!",
+                "action": "SPLIT",
+                "target": gm["file"],
+                "why": f"{gm['lines']}L, {gm['classes']} classes, max CC={gm['max_cc']}",
+                "effort": "~4h",
+                "impact_score": gm["lines"] * gm["max_cc"],
+            })
+
+        # 2. High CC functions → split
+        for f in ctx["funcs"][:20]:
+            if f["cc"] >= CC_SPLIT_THRESHOLD:
+                display = f["name"]
+                if f["class_name"]:
+                    display = f"{f['class_name']}.{f['name']}"
+                actions.append({
+                    "priority": "!!" if f["cc"] >= 25 else "!",
+                    "action": "SPLIT-FUNC",
+                    "target": f"{display}  CC={f['cc']}  fan={f['fan_out']}",
+                    "why": f"CC={f['cc']} exceeds {CC_SPLIT_THRESHOLD}",
+                    "effort": "~1h",
+                    "impact_score": f["impact"],
+                })
+
+        # 3. Hub types → interface segregation
+        for ht in ctx["hub_types"][:3]:
+            if ht["consumers"] >= 20:
+                actions.append({
+                    "priority": "!",
+                    "action": "INTERFACE-SPLIT",
+                    "target": f"{ht['type']}  consumed:{ht['consumers']}",
+                    "why": f"Hub type with {ht['consumers']} consumers → split interface",
+                    "effort": "~6h",
+                    "impact_score": ht["consumers"] * 10,
+                })
+
+        # Sort by impact and limit
+        actions.sort(key=lambda x: x["impact_score"], reverse=True)
+        actions = actions[:10]
+
+        if not actions:
+            return ["NEXT[0]: no refactoring needed"]
+
+        lines = [f"NEXT[{len(actions)}] (ranked by impact):"]
+        for i, a in enumerate(actions, 1):
+            lines.append(
+                f"  [{i}] {a['priority']:2s} {a['action']:15s} {a['target']}"
+            )
+            lines.append(
+                f"      WHY: {a['why']}"
+            )
+            lines.append(
+                f"      EFFORT: {a['effort']}  IMPACT: {a['impact_score']}"
+            )
+            lines.append("")
+
+        return lines
+
+    def _render_risks(self, ctx: Dict[str, Any]) -> List[str]:
+        """Render RISKS — potential breaking changes."""
+        risks: List[str] = []
+
+        # God module splits may break imports
+        for gm in ctx["god_modules"][:3]:
+            risks.append(
+                f"⚠ Splitting {gm['file']} may break {gm['funcs']} import paths"
+            )
+
+        # Hub type splits change public API
+        for ht in ctx["hub_types"][:2]:
+            if ht["consumers"] >= 20:
+                risks.append(
+                    f"⚠ Splitting {ht['type']} changes API for {ht['consumers']} consumers"
+                )
+
+        if not risks:
+            return ["RISKS[0]: none"]
+
+        lines = [f"RISKS[{len(risks)}]:"]
+        for r in risks:
+            lines.append(f"  {r}")
+        return lines
+
+    def _render_metrics_target(self, ctx: Dict[str, Any]) -> List[str]:
+        """Render METRICS-TARGET — baseline vs goals."""
+        avg = ctx["avg_cc"]
+        max_cc = ctx["max_cc"]
+        gods = len(ctx["god_modules"])
+        hubs = len(ctx["hub_types"])
+        high = ctx["high_cc_count"]
+
+        # Compute targets (halve the worst metrics)
+        target_avg = round(min(avg * 0.7, 5.0), 1)
+        target_max = min(max_cc // 2, 20)
+        target_gods = 0
+        target_high = max(high // 2, 0)
+
+        lines = [
+            "METRICS-TARGET:",
+            f"  CC̄:          {avg} → ≤{target_avg}",
+            f"  max-CC:      {max_cc} → ≤{target_max}",
+            f"  god-modules: {gods} → {target_gods}",
+            f"  high-CC(≥{CC_SPLIT_THRESHOLD}): {high} → ≤{target_high}",
+            f"  hub-types:   {hubs} → ≤{max(hubs - 2, 0)}",
+        ]
+        return lines
+
+    def _render_history(self, ctx: Dict[str, Any], output_path: str) -> List[str]:
+        """Render HISTORY — load previous evolution.toon if exists."""
+        lines = ["HISTORY:"]
+
+        prev_path = Path(output_path)
+        if prev_path.exists():
+            try:
+                prev_content = prev_path.read_text(encoding="utf-8")
+                # Extract previous metrics line
+                for line in prev_content.splitlines():
+                    if line.strip().startswith("CC̄:"):
+                        prev_avg = line.split("→")[0].strip().split()[-1]
+                        lines.append(f"  prev CC̄={prev_avg} → now CC̄={ctx['avg_cc']}")
+                        break
+                else:
+                    lines.append(f"  previous evolution.toon found but no metrics parsed")
+            except Exception:
+                lines.append(f"  (could not read previous evolution.toon)")
+        else:
+            lines.append(f"  (first run — no previous data)")
+
+        return lines
