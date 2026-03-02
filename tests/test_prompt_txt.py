@@ -74,7 +74,7 @@ class TestPromptTxtGeneration:
         content = prompt_file.read_text()
         
         # Check that project path is shown
-        assert "Project:" in content
+        assert "we are in project path:" in content
         assert "/home/user/myproject" in content
         
         # Check that existing files are listed with paths and descriptions
@@ -115,7 +115,7 @@ class TestPromptTxtGeneration:
         assert "You are an AI assistant" in content, "Main instruction should be present"
         assert "Task:" in content, "Task section should be present"
         assert "Constraints:" in content, "Constraints section should be present"
-        assert "Project:" in content, "Project path should be present"
+        assert "we are in project path:" in content, "Project path should be present"
     
     def test_prompt_txt_content_structure(self, temp_output_dir, mock_args):
         """Test the overall structure of generated prompt.txt."""
@@ -136,7 +136,7 @@ class TestPromptTxtGeneration:
         # Check structure
         assert any("You are an AI assistant" in line for line in lines), \
             "Prompt should start with AI assistant instruction"
-        assert any("Project:" in line for line in lines), \
+        assert any("we are in project path:" in line for line in lines), \
             "Project path should be present"
         assert any("Files for analysis:" in line for line in lines), \
             "Files section should be present"
