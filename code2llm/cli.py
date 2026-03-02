@@ -454,36 +454,45 @@ def _export_prompt_txt(args, output_dir: Path, formats: list[str]) -> None:
     prompt_path = output_dir / 'prompt.txt'
 
     files = [
-        'analysis.toon',
-        'context.md',
-        'evolution.toon',
-        'project.toon',
-        'README.md',
+        ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
+        ('context.md', 'LLM narrative - architecture summary, key entry points, process flows, public API surface'),
+        ('evolution.toon', 'Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history'),
+        ('project.toon', 'Project logic - compact module view from code2logic, file sizes, dependencies overview'),
+        ('README.md', 'Documentation - complete guide to all generated files, usage examples, interpretation'),
     ]
-    existing = [f for f in files if (output_dir / f).exists()]
-    missing = [f for f in files if (output_dir / f).exists() is False]
+    
+    existing = [(name, desc) for name, desc in files if (output_dir / name).exists()]
+    missing = [name for name, desc in files if (output_dir / name).exists() is False]
 
     lines: list[str] = []
-    lines.append("You are an AI assistant helping me understand and improve a codebase.")
-    lines.append("Use the attached/generated files as the authoritative context.")
+    lines.append("Przeanalizuj załączone pliki poniżej i przeprowadź refaktoryzację projektu ./")
     lines.append("")
-    lines.append("Files:")
-    for f in existing:
-        lines.append(f"- {f}")
-    if missing:
+    lines.append("PLIKI DO ANALIZY:")
+    lines.append("")
+    
+    for name, desc in existing:
+        lines.append(f"{name}")
+        lines.append(f"CEL: {desc}")
         lines.append("")
-        lines.append("Missing (not generated in this run):")
-        for f in missing:
-            lines.append(f"- {f}")
+    
+    if missing:
+        lines.append("BRAKUJĄCE PLIKI (nie wygenerowane w tym uruchomieniu):")
+        for name in missing:
+            lines.append(f"- {name}")
+        lines.append("")
+    
+    lines.append("ZADANIE DLA LLM:")
+    lines.append("1. Przeanalizuj health diagnostics (analysis.toon) - zidentyfikuj krytyczne problemy")
+    lines.append("2. Sprawdź refactoring queue (evolution.toon) - priorytetyzowane akcje")
+    lines.append("3. Zrozum architekturę (context.md) - struktura modułów i przepływy")
+    lines.append("4. Przejrzyj logikę projektu (project.toon) - zależności i struktura")
+    lines.append("5. Przygotuj plan refaktoryzacji - konkretne kroki z priorytetami")
     lines.append("")
-    lines.append("Task:")
-    lines.append("- Summarize the architecture and main flows.")
-    lines.append("- Identify the highest-risk areas and propose a refactoring plan.")
-    lines.append("- If you suggest changes, keep behavior backward compatible and provide concrete steps.")
-    lines.append("")
-    lines.append("Constraints:")
-    lines.append("- Prefer minimal, incremental changes.")
-    lines.append("- If uncertain, ask clarifying questions.")
+    lines.append("WYMAGANIA:")
+    lines.append("- Utrzymaj zgodność API (nie zmieniaj publicznych interfejsów)")
+    lines.append("- Stosuj zmiany inkrementalne (małe, bezpieczne kroki)")
+    lines.append("- Podaj konkretne ścieżki plików i nazwy funkcji do zmiany")
+    lines.append("- Wyjaśnij ryzyka każdej proponowanej zmiany")
 
     prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
     if args.verbose:

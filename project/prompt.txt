@@ -1,0 +1,18 @@
+You are an AI assistant helping me understand and improve a codebase.
+Use the attached/generated files as the authoritative context.
+
+Files:
+- analysis.toon
+- context.md
+- evolution.toon
+- project.toon
+- README.md
+
+Task:
+- Summarize the architecture and main flows.
+- Identify the highest-risk areas and propose a refactoring plan.
+- If you suggest changes, keep behavior backward compatible and provide concrete steps.
+
+Constraints:
+- Prefer minimal, incremental changes.
+- If uncertain, ask clarifying questions.
