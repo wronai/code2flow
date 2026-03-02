@@ -410,12 +410,21 @@ def _export_code2logic(args, source_path: Path, output_dir: Path, formats: list[
         cmd.append('-q')
 
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        if args.verbose:
+            res = subprocess.run(cmd, capture_output=True, text=True)
+        else:
+            res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True)
     except Exception as e:
         print(f"Error running code2logic: {e}", file=sys.stderr)
         sys.exit(1)
 
     if res.returncode != 0:
+        if not args.verbose:
+            try:
+                res = subprocess.run(cmd, capture_output=True, text=True)
+            except Exception as e:
+                print(f"Error running code2logic: {e}", file=sys.stderr)
+                sys.exit(1)
         if res.stdout:
             print(res.stdout, file=sys.stderr)
         if res.stderr:

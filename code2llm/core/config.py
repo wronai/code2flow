@@ -38,7 +38,8 @@ class FilterConfig:
     exclude_patterns: List[str] = field(default_factory=lambda: [
         "*test*", "*__pycache__*", "*.pyc", "*venv*", "*.venv*",
         "*node_modules*", "*.git*", "*build*", "*dist*",
-        "*_test.py", "test_*.py", "conftest.py"
+        "*_test.py", "test_*.py", "conftest.py",
+        "*demo_langs/invalid*",
     ])
     include_patterns: List[str] = field(default_factory=list)
     min_function_lines: int = 1

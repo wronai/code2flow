@@ -1,4 +1,4 @@
-# code2llm | 121f 19727L | python:105/go:4/java:4/php:4/rust:4/typescript:4
+# code2llm | 121f 19736L | python:105/go:4/java:4/php:4/rust:4/typescript:4
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[121]:
   badges/server.py,91
@@ -22,7 +22,7 @@ M[121]:
   code2llm/analysis/side_effects.py,260
   code2llm/analysis/smells.py,163
   code2llm/analysis/type_inference.py,252
-  code2llm/cli.py,554
+  code2llm/cli.py,563
   code2llm/core/__init__.py,34
   code2llm/core/analyzer.py,165
   code2llm/core/config.py,136
