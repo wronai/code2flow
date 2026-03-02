@@ -204,7 +204,7 @@ def add_validator_to_core(project: Path) -> None:
     with open(project / "core.py", "a") as f:
         f.write(textwrap.dedent("""
         class Validator:
-            """Validator - also exists in utils.py."""
+            '''Validator - also exists in utils.py.'''
             def __init__(self, config: Config):
                 self.config = config
 
