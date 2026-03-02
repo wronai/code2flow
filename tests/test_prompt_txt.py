@@ -27,8 +27,9 @@ class TestPromptTxtGeneration:
     def test_prompt_txt_not_generated_without_code2logic_format(self, temp_output_dir, mock_args):
         """Test that prompt.txt is NOT generated when code2logic is not in formats."""
         formats = ['toon', 'evolution']
+        source_path = Path('/home/user/myproject')
         
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         assert not prompt_file.exists(), "prompt.txt should not be generated without code2logic format"
@@ -36,12 +37,13 @@ class TestPromptTxtGeneration:
     def test_prompt_txt_generated_with_code2logic_format(self, temp_output_dir, mock_args):
         """Test that prompt.txt IS generated when code2logic is in formats."""
         formats = ['toon', 'evolution', 'code2logic']
+        source_path = Path('/home/user/myproject')
         
         # Create some existing files
         (temp_output_dir / 'analysis.toon').write_text('test')
         (temp_output_dir / 'context.md').write_text('test')
         
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         assert prompt_file.exists(), "prompt.txt should be generated with code2logic format"
@@ -49,99 +51,113 @@ class TestPromptTxtGeneration:
     def test_prompt_txt_generated_with_all_format(self, temp_output_dir, mock_args):
         """Test that prompt.txt IS generated when 'all' is in formats."""
         formats = ['all']
+        source_path = Path('/home/user/myproject')
         
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         assert prompt_file.exists(), "prompt.txt should be generated with 'all' format"
     
     def test_prompt_txt_lists_existing_files(self, temp_output_dir, mock_args):
-        """Test that prompt.txt correctly lists existing files with descriptions."""
+        """Test that prompt.txt correctly lists existing files with paths and descriptions."""
         formats = ['code2logic']
+        source_path = Path('/home/user/myproject')
         
         # Create some files that should be detected
         expected_files = ['analysis.toon', 'context.md']
         for f in expected_files:
             (temp_output_dir / f).write_text('test content')
         
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         content = prompt_file.read_text()
         
-        # Check that existing files are listed with descriptions
-        assert "FILES FOR ANALYSIS:" in content
+        # Check that project path is shown
+        assert "Project:" in content
+        assert "/home/user/myproject" in content
+        
+        # Check that existing files are listed with paths and descriptions
+        assert "Files for analysis:" in content
         for f in expected_files:
             assert f in content, f"Existing file {f} should be listed in prompt.txt"
-            # Check for description line
-            assert f"PURPOSE:" in content, "Description should be present for each file"
+            # Check for path format with description
+            assert "- " in content, "File should be listed with bullet point"
         
         # Check that missing files are marked
-        assert "MISSING FILES" in content or "project.toon" in content, "Missing files should be indicated"
+        assert "Missing files" in content or "project.toon" in content, "Missing files should be indicated"
     
     def test_prompt_txt_shows_missing_files(self, temp_output_dir, mock_args):
         """Test that prompt.txt shows missing files section when files don't exist."""
         formats = ['code2logic']
+        source_path = Path('/home/user/myproject')
         
         # Don't create any files - all should be missing
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         content = prompt_file.read_text()
         
-        assert "MISSING FILES" in content, "Missing section should be present when files don't exist"
+        assert "Missing files" in content, "Missing section should be present when files don't exist"
         assert "analysis.toon" in content, "Missing files should be listed"
     
     def test_prompt_txt_contains_task_instructions(self, temp_output_dir, mock_args):
         """Test that prompt.txt contains task instructions for LLM."""
         formats = ['code2logic']
+        source_path = Path('/home/user/myproject')
         
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         content = prompt_file.read_text()
         
-        # Check for key sections in English
-        assert "TASK FOR LLM:" in content, "Task section should be present"
-        assert "REQUIREMENTS:" in content, "Requirements section should be present"
-        assert "Analyze the attached files" in content, "Main instruction should be present"
+        # Check for key sections
+        assert "You are an AI assistant" in content, "Main instruction should be present"
+        assert "Task:" in content, "Task section should be present"
+        assert "Constraints:" in content, "Constraints section should be present"
+        assert "Project:" in content, "Project path should be present"
     
     def test_prompt_txt_content_structure(self, temp_output_dir, mock_args):
         """Test the overall structure of generated prompt.txt."""
         formats = ['code2logic']
+        source_path = Path('/home/user/myproject')
         
         # Create all expected files
         all_files = ['analysis.toon', 'context.md', 'evolution.toon', 'project.toon', 'README.md']
         for f in all_files:
             (temp_output_dir / f).write_text('test')
         
-        _export_prompt_txt(mock_args, temp_output_dir, formats)
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
         
         prompt_file = temp_output_dir / 'prompt.txt'
         content = prompt_file.read_text()
         lines = content.split('\n')
         
-        # Check structure in English
-        assert any("Analyze the attached files" in line for line in lines), \
-            "Prompt should start with English instruction"
-        assert any("FILES FOR ANALYSIS:" in line for line in lines), \
-            "Files section should be present in English"
+        # Check structure
+        assert any("You are an AI assistant" in line for line in lines), \
+            "Prompt should start with AI assistant instruction"
+        assert any("Project:" in line for line in lines), \
+            "Project path should be present"
+        assert any("Files for analysis:" in line for line in lines), \
+            "Files section should be present"
         
         # All files should be listed without missing section
-        assert "MISSING FILES" not in content, "No missing section when all files exist"
+        assert "Missing files" not in content, "No missing section when all files exist"
         for f in all_files:
             assert f in content, f"All files should be listed: {f}"
         
-        # Check for descriptions
-        assert "PURPOSE:" in content, "Descriptions should be present"
+        # Check for file paths with descriptions
+        assert "- " in content, "Files should be listed with bullet points"
+        assert "Health diagnostics" in content, "Descriptions should be present"
     
     def test_prompt_txt_no_verbose_output(self, temp_output_dir):
         """Test that no print occurs when verbose is False."""
         args = MagicMock()
         args.verbose = False
         formats = ['code2logic']
+        source_path = Path('/home/user/myproject')
         
         # Should not raise or print anything
-        _export_prompt_txt(args, temp_output_dir, formats)
+        _export_prompt_txt(args, temp_output_dir, formats, source_path)
         
         assert (temp_output_dir / 'prompt.txt').exists()

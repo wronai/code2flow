@@ -445,13 +445,17 @@ def _export_code2logic(args, source_path: Path, output_dir: Path, formats: list[
         print(f"  - CODE2LOGIC (project logic): {target}")
 
 
-def _export_prompt_txt(args, output_dir: Path, formats: list[str]) -> None:
+def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: Optional[Path] = None) -> None:
     """Generate prompt.txt useful to send to an LLM."""
     # Keep it conservative: generate when code2logic is requested.
     if 'code2logic' not in formats and 'all' not in formats:
         return
 
     prompt_path = output_dir / 'prompt.txt'
+    
+    # Determine project path for display
+    project_path = str(source_path) if source_path else './'
+    output_rel_path = str(output_dir.relative_to(Path.cwd()) if output_dir.is_relative_to(Path.cwd()) else output_dir)
 
     files = [
         ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
@@ -465,34 +469,33 @@ def _export_prompt_txt(args, output_dir: Path, formats: list[str]) -> None:
     missing = [name for name, desc in files if (output_dir / name).exists() is False]
 
     lines: list[str] = []
-    lines.append("Analyze the attached files below and perform refactoring of the project ./")
+    lines.append("You are an AI assistant helping me understand and improve a codebase.")
+    lines.append("Use the attached/generated files as the authoritative context.")
     lines.append("")
-    lines.append("FILES FOR ANALYSIS:")
+    lines.append(f"we are in project path: {project_path}")
     lines.append("")
+    lines.append("Files for analysis:")
     
     for name, desc in existing:
-        lines.append(f"{name}")
-        lines.append(f"PURPOSE: {desc}")
-        lines.append("")
+        file_path = f"{output_rel_path}/{name}"
+        lines.append(f"- {file_path}  ({desc})")
     
     if missing:
-        lines.append("MISSING FILES (not generated in this run):")
-        for name in missing:
-            lines.append(f"- {name}")
         lines.append("")
+        lines.append("Missing files (not generated in this run):")
+        for name in missing:
+            file_path = f"{output_rel_path}/{name}"
+            lines.append(f"- {file_path}")
     
-    lines.append("TASK FOR LLM:")
-    lines.append("1. Analyze health diagnostics (analysis.toon) - identify critical issues")
-    lines.append("2. Check refactoring queue (evolution.toon) - prioritized actions")
-    lines.append("3. Understand architecture (context.md) - module structure and flows")
-    lines.append("4. Review project logic (project.toon) - dependencies and structure")
-    lines.append("5. Prepare refactoring plan - concrete steps with priorities")
     lines.append("")
-    lines.append("REQUIREMENTS:")
-    lines.append("- Maintain API compatibility (do not change public interfaces)")
-    lines.append("- Use incremental changes (small, safe steps)")
-    lines.append("- Provide concrete file paths and function names to change")
-    lines.append("- Explain risks of each proposed change")
+    lines.append("Task:")
+    lines.append("- Summarize the architecture and main flows.")
+    lines.append("- Identify the highest-risk areas and propose a refactoring plan.")
+    lines.append("- If you suggest changes, keep behavior backward compatible and provide concrete steps.")
+    lines.append("")
+    lines.append("Constraints:")
+    lines.append("- Prefer minimal, incremental changes.")
+    lines.append("- If uncertain, ask clarifying questions.")
 
     prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
     if args.verbose:
@@ -517,7 +520,7 @@ def _run_exports(args, result, output_dir: Path, source_path: Optional[Path] = N
 
         if source_path is not None:
             _export_code2logic(args, source_path, output_dir, formats)
-            _export_prompt_txt(args, output_dir, formats)
+            _export_prompt_txt(args, output_dir, formats, source_path)
         
         if args.refactor:
             _export_refactor_prompts(args, result, output_dir)

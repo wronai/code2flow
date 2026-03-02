@@ -1,9 +1,9 @@
-# code2llm/evolution | 690 func | 65f | 2026-03-02
+# code2llm/evolution | 694 func | 65f | 2026-03-02
 
 NEXT[6] (ranked by impact):
   [1] !! SPLIT           code2llm/cli.py
-      WHY: 673L, 0 classes, max CC=15
-      EFFORT: ~4h  IMPACT: 10095
+      WHY: 685L, 0 classes, max CC=15
+      EFFORT: ~4h  IMPACT: 10275
 
   [2] !! SPLIT           validate_toon.py
       WHY: 530L, 0 classes, max CC=17
@@ -34,9 +34,9 @@ RISKS[3]:
 METRICS-TARGET:
   CC̄:          4.1 → ≤2.9
   max-CC:      18 → ≤9
-  god-modules: 4 → 0
+  god-modules: 5 → 0
   high-CC(≥15): 5 → ≤2
   hub-types:   0 → ≤0
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=4.1 → now CC̄=4.1

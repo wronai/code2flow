@@ -4,10 +4,10 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Analysis Mode**: static
-- **Total Functions**: 690
+- **Total Functions**: 694
 - **Total Classes**: 97
 - **Modules**: 82
-- **Entry Points**: 551
+- **Entry Points**: 555
 
 ## Architecture by Module
 
@@ -503,10 +503,6 @@ Key functions that process and transform data:
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
-
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).
 - **Output to**: time.time, time.time, self._step_normalize, stages.append, time.time
@@ -514,6 +510,10 @@ Key functions that process and transform data:
 ### code2llm.nlp.pipeline.NLPPipeline._format_action
 > 4e. Format action recommendation.
 - **Output to**: result.get_intent, result.get_entities
+
+### code2llm.nlp.pipeline.NLPPipeline._format_response
+> 4e. Format human-readable response.
+- **Output to**: None.join, lines.append, lines.append, lines.append, result.get_intent
 
 ## Behavioral Patterns
 

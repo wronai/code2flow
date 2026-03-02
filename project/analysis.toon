@@ -1,12 +1,12 @@
-# code2llm | 73f 13658L | py:73 | 2026-03-02
-# CC̄=4.4 | critical:41/690 | dups:0 | cycles:0
+# code2llm | 73f 13767L | py:73 | 2026-03-02
+# CC̄=4.4 | critical:41/694 | dups:0 | cycles:0
 
 HEALTH[5]:
   🟡 CC    main CC=17 (limit:15)
   🟡 CC    _find_data_pipelines CC=17 (limit:15)
   🟡 CC    _export_code2logic CC=15 (limit:15)
-  🟡 CC    _infer_from_name CC=17 (limit:15)
   🟡 CC    _resolve_callee CC=18 (limit:15)
+  🟡 CC    _infer_from_name CC=17 (limit:15)
 
 REFACTOR[1]:
   1. split 5 high-CC methods  (CC>15)
@@ -21,12 +21,12 @@ COUPLING:
 
 LAYERS:
   code2llm/                       CC̄=4.5    ←in:2  →out:1
-  │ !! cli                        673L  0C   19m  CC=15     ←2
+  │ !! cli                        685L  0C   19m  CC=15     ←2
+  │ !! readme_exporter            501L  1C    7m  CC=13     ←0
   │ !! metrics                    501L  1C   27m  CC=12     ←0
   │ !! pipeline_detector          486L  3C   14m  CC=18     ←0
   │ !  mermaid                    477L  0C   16m  CC=13     ←1
   │ !  llm_flow                   472L  1C   24m  CC=14     ←0
-  │ !  readme_exporter            404L  1C    3m  CC=13     ←0
   │ !  flow_exporter              391L  1C   14m  CC=10     ←0
   │ !  pipeline                   388L  3C   20m  CC=10     ←0
   │ !  file_analyzer              365L  1C   16m  CC=12     ←0
@@ -111,7 +111,7 @@ LAYERS:
 
 DUPLICATES[0]: none
 
-FUNCTIONS (CC≥10, 41 of 586):
+FUNCTIONS (CC≥10, 41 of 590):
    18.0  PipelineDetector._resolve_callee           21n   6exit  cond+ret  !! split
    17.0  main                                       21n   3exit  loops+cond+ret  !! split
    17.0  DataAnalyzer._find_data_pipelines          14n   2exit  loops+cond+ret  !! split
@@ -127,6 +127,7 @@ FUNCTIONS (CC≥10, 41 of 586):
    14.0  StreamingScanner.quick_scan_file           15n   2exit  loops+cond+ret
    13.0  parse_evolution_metrics                    16n   2exit  loops+cond+ret
    13.0  parse_evolution_metrics                    16n   2exit  loops+cond+ret
+   13.0  _export_prompt_txt                         11n   2exit  loops+cond+ret
    13.0  PipelineDetector._find_pipeline_paths      17n   2exit  loops+cond+ret
    13.0  SideEffectDetector._check_calls            22n   3exit  cond+ret
    13.0  EntityResolver.resolve                     18n   2exit  loops+cond+ret
@@ -142,7 +143,6 @@ FUNCTIONS (CC≥10, 41 of 586):
    12.0  _check_node_ids                            15n   1exit  loops+cond
    12.0  MetricsComputer._compute_file_metrics      21n   2exit  loops+cond+ret
    12.0  FileAnalyzer._process_function             14n   2exit  loops+cond+ret
-   11.0  _export_prompt_txt                         11n   2exit  loops+cond+ret
    11.0  ToonRenderer.render_refactor               14n   3exit  loops+cond+ret
    10.0  NLPPipeline._format_action                 29n  10exit  cond+ret
    10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
@@ -155,7 +155,7 @@ FUNCTIONS (CC≥10, 41 of 586):
    10.0  ToonRenderer.render_classes                11n   3exit  loops+cond+ret
 
   summary:
-    critical(≥10): 41 | high(5-10): 200 | medium(2-5): 222 | low(<2): 123
+    critical(≥10): 41 | high(5-10): 203 | medium(2-5): 223 | low(<2): 123
     7% CC≥10  41% CC≥5
 
 HOTSPOTS:
@@ -195,6 +195,7 @@ CLASSES:
   ModuleDetailRenderer           ████████                   9m  CC̄=4.4   max=7   
   ProjectAnalyzer                ███████                    8m  CC̄=6.4   max=8   
   PatternDetector                ███████                    8m  CC̄=4.6   max=9   
+  READMEExporter                 ██████                     7m  CC̄=5.6   max=13  
   YAMLExporter                   ██████                     7m  CC̄=3.1   max=8   
   PromptEngine                   ██████                     7m  CC̄=5.0   max=12  
   StreamingAnalyzer              █████                      6m  CC̄=4.0   max=12  
@@ -208,7 +209,6 @@ CLASSES:
   AnalysisResult                 ███                        4m  CC̄=1.0   max=1   
   NLPPipelineResult              ███                        4m  CC̄=2.0   max=3   
   SmartPrioritizer               ███                        4m  CC̄=5.2   max=9   
-  READMEExporter                 ██                         3m  CC̄=6.3   max=13  
   ToonExporter                   ██                         3m  CC̄=1.0   max=1   
   FastFileFilter                 ██                         3m  CC̄=6.0   max=8   
   SideEffectInfo                 █                          2m  CC̄=1.0   max=1   
@@ -310,7 +310,7 @@ D:
     _export_context_fallback(args,result,output_dir,formats)
     _export_readme(args,result,output_dir)
     _export_code2logic(args,source_path,output_dir,formats)
-    _export_prompt_txt(args,output_dir,formats)
+    _export_prompt_txt(args,output_dir,formats,source_path)
     _run_exports(args,result,output_dir,source_path)
     _export_simple_formats(args,result,output_dir,formats)
     _export_yaml(args,result,output_dir)
@@ -407,6 +407,10 @@ S...
       export(2)  CC=5.0
         → _extract_insights(2)  CC=13.0
         → _generate_readme_content(6)  CC=1.0
+        → _get_existing_files(1)  CC=2.0
+        → _build_core_files_section(2)  CC=6.0
+        → _build_llm_files_section(1)  CC=5.0
+        → _build_viz_files_section(1)  CC=7.0
   code2llm/exporters/map_exporter.py:
     e: MapExporter
     MapExporter  # Export to map.toon — structural map with modules, imports, s...
@@ -572,6 +576,10 @@ Sections: P...
     e: SmellDetector
     SmellDetector  # Detect code smells from analysis results....
       __init__(1)  CC=1.0
+  code2llm/analysis/dfg.py:
+    e: DFGExtractor
+    DFGExtractor  # Extract Data Flow Graph from AST....
+      __init__(1)  CC=1.0
   code2llm/nlp/intent_matching.py:
     e: IntentMatch,IntentMatchingResult,IntentMatcher
     IntentMatch  # Single intent match result....
@@ -579,10 +587,6 @@ Sections: P...
       get_best_intent(0)  CC=2.0
     IntentMatcher  # Match queries to intents using fuzzy and keyword matching....
       __init__(2)  CC=3.0
-  code2llm/analysis/dfg.py:
-    e: DFGExtractor
-    DFGExtractor  # Extract Data Flow Graph from AST....
-      __init__(1)  CC=1.0
   code2llm/exporters/toon/module_detail.py:
     e: ModuleDetailRenderer
     ModuleDetailRenderer  # Renders detailed module information....
@@ -687,6 +691,11 @@ Unlike simple L...
     e: APIHandler
     APIHandler  # Handles API requests and responses....
       __init__(0)  CC=1.0
+  examples/streaming-analyzer/sample_project/database.py:
+    e: DatabaseConnection
+    DatabaseConnection  # Simple database connection simulator....
+      __init__(1)  CC=2.0
+        → _load_data(0)  CC=3.0
   examples/streaming-analyzer/demo.py:
     e: demo_quick_strategy,demo_standard_strategy,demo_deep_strategy,demo_incremental_analysis,demo_memory_limited,demo_custom_progress,main
     demo_quick_strategy()
@@ -696,16 +705,6 @@ Unlike simple L...
     demo_memory_limited()
     demo_custom_progress()
     main()
-  examples/streaming-analyzer/sample_project/database.py:
-    e: DatabaseConnection
-    DatabaseConnection  # Simple database connection simulator....
-      __init__(1)  CC=2.0
-        → _load_data(0)  CC=3.0
-  badges/server.py:
-    e: index,generate_badges,get_badges
-    index()
-    generate_badges()
-    get_badges()
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()
@@ -715,6 +714,11 @@ Unlike simple L...
     update_pyproject_toml(new_version)
     update_version_file(new_version)
     main()
+  badges/server.py:
+    e: index,generate_badges,get_badges
+    index()
+    generate_badges()
+    get_badges()
   benchmarks/benchmark_format_quality.py:
     e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
     _print_benchmark_header()
@@ -790,8 +794,8 @@ Unlike simple L...
   code2llm/refactor/__init__.py:
   code2llm/patterns/__init__.py:
   code2llm/core/core/__init__.py:
+  code2llm/core/streaming/__init__.py:
   code2llm/core/streaming/strategies.py:
     e: ScanStrategy
     ScanStrategy  # Scanning methodology configuration....
-  code2llm/core/streaming/__init__.py:
   examples/streaming-analyzer/sample_project/__init__.py:
