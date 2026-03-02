@@ -10,7 +10,7 @@ from pathlib import Path
 
 def create_core_py(project: Path) -> None:
     """Utwórz core.py z god function, hub type, high fan-out i side-effect."""
-    (project / "core.py").write_text(textwrap.dedent("""
+    code = """
         from typing import List, Dict, Optional
         from dataclasses import dataclass
 
@@ -32,7 +32,7 @@ def create_core_py(project: Path) -> None:
         _cache: Dict[str, Result] = {}
 
         def cache_result(key: str, result: Result) -> None:
-            """Side effect: mutates global cache."""
+            '''Side effect: mutates global cache.'''
             global _cache
             _cache[key] = result
 
@@ -40,7 +40,7 @@ def create_core_py(project: Path) -> None:
             return _cache.get(key)
 
         def process_everything(data: list, config: Config) -> Result:
-            """God function - does too many things."""
+            '''God function - does too many things.'''
             # validate
             if not data:
                 return Result(errors=["empty data"])
@@ -80,11 +80,11 @@ def create_core_py(project: Path) -> None:
             return Result(data=results, metadata=metadata)
 
         def unused_helper(x: int) -> int:
-            """Dead code - never called."""
+            '''Dead code - never called.'''
             return x * 2 + 1
 
         def main(config: Config) -> None:
-            """High fan-out entry point."""
+            '''High fan-out entry point.'''
             data = extract_data(config)
             validated = parse_input(data)
             schema_ok = validate_schema(validated)
@@ -94,12 +94,13 @@ def create_core_py(project: Path) -> None:
             result = load_data(transformed, config)
             cache_result("latest", result)
             report(result, config)
-    """))
+    """
+    (project / "core.py").write_text(textwrap.dedent(code))
 
 
 def create_etl_py(project: Path) -> None:
     """Utwórz etl.py z funkcjami pipeline ETL."""
-    (project / "etl.py").write_text(textwrap.dedent("""\
+    code = '''
         from typing import List, Dict
         from core import Config, Result
 
@@ -125,12 +126,13 @@ def create_etl_py(project: Path) -> None:
             with open(config.output_path + "/output.json", "w") as f:
                 json.dump(data, f)
             return Result(data=data, metadata={"loaded": str(len(data))})
-    """))
+    '''
+    (project / "etl.py").write_text(textwrap.dedent(code))
 
 
 def create_validation_py(project: Path) -> None:
     """Utwórz validation.py z pipeline'em walidacji."""
-    (project / "validation.py").write_text(textwrap.dedent("""\
+    code = '''
         from typing import List, Dict, Optional
         from core import Result
 
@@ -167,12 +169,13 @@ def create_validation_py(project: Path) -> None:
             if all_errors:
                 return Result(errors=all_errors)
             return None
-    """))
+    '''
+    (project / "validation.py").write_text(textwrap.dedent(code))
 
 
 def create_utils_py(project: Path) -> None:
     """Utwórz utils.py z duplikatem klasy Validator."""
-    (project / "utils.py").write_text(textwrap.dedent("""\
+    code = '''
         from core import Result, Config
 
         class Validator:
@@ -196,7 +199,8 @@ def create_utils_py(project: Path) -> None:
             """No type annotations - bad practice."""
             v = Validator(config)
             return v.validate(data)
-    """))
+    '''
+    (project / "utils.py").write_text(textwrap.dedent(code))
 
 
 def add_validator_to_core(project: Path) -> None:

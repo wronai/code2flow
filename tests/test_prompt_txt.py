@@ -73,9 +73,9 @@ class TestPromptTxtGeneration:
         prompt_file = temp_output_dir / 'prompt.txt'
         content = prompt_file.read_text()
         
-        # Check that project path is shown
+        # Check that project name is shown (just folder name, not full path)
         assert "we are in project path:" in content
-        assert "/home/user/myproject" in content
+        assert "myproject" in content
         
         # Check that existing files are listed with paths and descriptions
         assert "Files for analysis:" in content

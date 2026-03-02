@@ -1,3 +1,26 @@
+## [0.5.12] - 2026-03-02
+
+### Summary
+
+feat(docs): code analysis engine
+
+### Docs
+
+- docs: update README
+- docs: update context.md
+
+### Test
+
+- update tests/test_prompt_txt.py
+
+### Other
+
+- update benchmarks/project_generator.py
+- update code2llm/cli.py
+- update project/analysis.toon
+- update project/evolution.toon
+
+
 ## [0.5.11] - 2026-03-02
 
 ### Summary

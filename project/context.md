@@ -4,9 +4,9 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Analysis Mode**: static
-- **Total Functions**: 694
+- **Total Functions**: 700
 - **Total Classes**: 97
-- **Modules**: 82
+- **Modules**: 83
 - **Entry Points**: 555
 
 ## Architecture by Module
@@ -169,7 +169,7 @@ Main execution flows into the system:
 
 ### benchmarks.benchmark_format_quality.run_benchmark
 > Run the full format quality benchmark.
-- **Calls**: benchmarks.benchmark_format_quality._print_benchmark_header, Path, create_ground_truth_project, benchmarks.benchmark_format_quality._print_ground_truth_info, output_dir.mkdir, benchmarks.reporting.print_results, benchmarks.reporting.build_report, tempfile.mkdtemp
+- **Calls**: benchmarks.benchmark_format_quality._print_benchmark_header, Path, benchmarks.project_generator.create_ground_truth_project, benchmarks.benchmark_format_quality._print_ground_truth_info, output_dir.mkdir, benchmarks.reporting.print_results, benchmarks.reporting.build_report, tempfile.mkdtemp
 
 ### code2llm.nlp.intent_matching.IntentMatcher._calculate_similarity
 > Calculate string similarity using configured algorithm.

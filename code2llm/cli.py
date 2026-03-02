@@ -453,9 +453,20 @@ def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: 
 
     prompt_path = output_dir / 'prompt.txt'
     
-    # Determine absolute paths for display
-    project_path = str(source_path.resolve()) if source_path else str(Path.cwd().resolve())
-    output_abs_path = str(output_dir.resolve())
+    # Determine project name and relative output path for display
+    if source_path:
+        project_path = source_path.name if source_path.name else str(source_path)
+        try:
+            output_rel_path = str(output_dir.relative_to(source_path))
+        except ValueError:
+            output_rel_path = str(output_dir)
+    else:
+        cwd = Path.cwd()
+        project_path = cwd.name
+        try:
+            output_rel_path = str(output_dir.relative_to(cwd))
+        except ValueError:
+            output_rel_path = str(output_dir)
 
     files = [
         ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
@@ -477,14 +488,14 @@ def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: 
     lines.append("Files for analysis:")
     
     for name, desc in existing:
-        file_path = f"{output_abs_path}/{name}"
+        file_path = f"{output_rel_path}/{name}"
         lines.append(f"- {file_path}  ({desc})")
     
     if missing:
         lines.append("")
         lines.append("Missing files (not generated in this run):")
         for name in missing:
-            file_path = f"{output_abs_path}/{name}"
+            file_path = f"{output_rel_path}/{name}"
             lines.append(f"- {file_path}")
     
     lines.append("")
