@@ -234,6 +234,12 @@ Strategy Options (--strategy):
         help='Analyze only specific subproject (e.g., --only-subproject src)'
     )
     
+    parser.add_argument(
+        '--validate',
+        action='store_true',
+        help='Validate generated chunked output - check all chunks have required files'
+    )
+    
     return parser
 
 
@@ -273,6 +279,78 @@ def _print_start_info(args, source_path: Path, output_dir: Path) -> None:
         print(f"Output: {output_dir}")
 
 
+def _validate_chunked_output(output_dir: Path, args) -> bool:
+    """Validate generated chunked output.
+    
+    Checks:
+    1. All chunks have required files (analysis.toon, context.md, evolution.toon)
+    2. Files are not empty
+    3. Report summary
+    
+    Returns True if valid, False otherwise.
+    """
+    import sys
+    from pathlib import Path
+    
+    if not output_dir.exists():
+        print(f"✗ Output directory does not exist: {output_dir}", file=sys.stderr)
+        return False
+    
+    # Find all chunk directories
+    chunk_dirs = [d for d in output_dir.iterdir() if d.is_dir()]
+    
+    if not chunk_dirs:
+        print(f"✗ No chunk directories found in: {output_dir}", file=sys.stderr)
+        return False
+    
+    required_files = ['analysis.toon', 'context.md', 'evolution.toon']
+    issues = []
+    valid_chunks = []
+    
+    print(f"\n🔍 Validating {len(chunk_dirs)} chunks in: {output_dir}")
+    print("-" * 50)
+    
+    for chunk_dir in sorted(chunk_dirs):
+        chunk_name = chunk_dir.name
+        chunk_issues = []
+        
+        for req_file in required_files:
+            file_path = chunk_dir / req_file
+            if not file_path.exists():
+                chunk_issues.append(f"  missing {req_file}")
+            elif file_path.stat().st_size == 0:
+                chunk_issues.append(f"  empty {req_file}")
+        
+        if chunk_issues:
+            issues.append((chunk_name, chunk_issues))
+            print(f"✗ {chunk_name}")
+            for issue in chunk_issues:
+                print(f"    {issue}")
+        else:
+            # Get file sizes
+            sizes = []
+            for req_file in required_files:
+                size = (chunk_dir / req_file).stat().st_size
+                sizes.append(f"{req_file}:{size//1024}KB" if size > 1024 else f"{req_file}:{size}B")
+            valid_chunks.append(chunk_name)
+            print(f"✓ {chunk_name} ({', '.join(sizes)})")
+    
+    print("-" * 50)
+    print(f"\n📊 Validation Summary:")
+    print(f"  Total chunks: {len(chunk_dirs)}")
+    print(f"  Valid: {len(valid_chunks)}")
+    print(f"  Issues: {len(issues)}")
+    
+    if issues:
+        print(f"\n⚠️  {len(issues)} chunk(s) have issues:")
+        for chunk_name, chunk_issues in issues:
+            print(f"    - {chunk_name}")
+        return False
+    else:
+        print(f"\n✅ All {len(valid_chunks)} chunks are valid!")
+        return True
+
+
 def main():
     """Main CLI entry point."""
     # Handle special sub-commands first
@@ -286,10 +364,20 @@ def main():
 
     source_path, output_dir = _validate_and_setup(args)
     _print_start_info(args, source_path, output_dir)
+    
+    # Validate mode - only check existing output
+    if args.validate:
+        is_valid = _validate_chunked_output(output_dir, args)
+        return 0 if is_valid else 1
 
     # Analyze → Export
     result = _run_analysis(args, source_path, output_dir)
     _run_exports(args, result, output_dir, source_path=source_path)
+    
+    # Auto-validate after chunked analysis
+    if args.chunk and args.verbose:
+        print(f"\n🔍 Auto-validating chunked output...")
+        _validate_chunked_output(output_dir, args)
 
     if args.verbose:
         print(f"\nAll outputs saved to: {output_dir}")
