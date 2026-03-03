@@ -180,6 +180,104 @@ def _normalize_code2logic_output(found: Path, target: Path, args) -> List[Path]:
     )
 
 
+def _export_chunked_prompt_txt(args, output_dir: Path, formats: list[str], source_path: Optional[Path] = None, subprojects: list = None) -> None:
+    """Generate prompt.txt for chunked analysis with all subproject files."""
+    if 'code2logic' not in formats and 'all' not in formats:
+        return
+
+    prompt_path = output_dir / 'prompt.txt'
+    
+    # Determine project name and relative output path
+    if source_path:
+        project_path = source_path.name if source_path.name else str(source_path)
+        try:
+            output_rel_path = str(output_dir.relative_to(source_path))
+        except ValueError:
+            output_rel_path = str(output_dir)
+    else:
+        cwd = Path.cwd()
+        project_path = cwd.name
+        try:
+            output_rel_path = str(output_dir.relative_to(cwd))
+        except ValueError:
+            output_rel_path = str(output_dir)
+
+    lines: list[str] = []
+    lines.append("You are an AI assistant helping me understand and improve a codebase.")
+    lines.append("Use the attached/generated files as the authoritative context.")
+    lines.append("")
+    lines.append(f"we are in project path: {project_path}")
+    lines.append("")
+    lines.append("Files for analysis:")
+    
+    # Main files (merged summaries)
+    main_files = [
+        ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
+        ('context.md', 'LLM narrative - architecture summary, key entry points, process flows, public API surface'),
+        ('evolution.toon', 'Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history'),
+        ('project.toon', 'Project logic - compact module view from code2logic, file sizes, dependencies overview'),
+        ('README.md', 'Documentation - complete guide to all generated files, usage examples, interpretation'),
+    ]
+    
+    # Add main existing files
+    for name, desc in main_files:
+        if (output_dir / name).exists():
+            file_path = f"{output_rel_path}/{name}"
+            lines.append(f"- {file_path}  ({desc})")
+    
+    # Add chunked subproject files
+    if subprojects:
+        lines.append("")
+        lines.append("Subproject Analysis Files (hierarchical chunking for large repository):")
+        
+        for sp in subprojects:
+            sp_dir = output_dir / sp.name.replace('.', '_')
+            if not sp_dir.exists():
+                continue
+            
+            level_name = {0: 'root', 1: 'L1', 2: 'L2', 3: 'chunk'}.get(sp.level, f'L{sp.level}')
+            
+            # Check which files exist for this subproject
+            sp_files = []
+            if (sp_dir / 'analysis.toon').exists():
+                sp_files.append('analysis.toon')
+            if (sp_dir / 'context.md').exists():
+                sp_files.append('context.md')
+            if (sp_dir / 'evolution.toon').exists():
+                sp_files.append('evolution.toon')
+            
+            if sp_files:
+                file_list = ', '.join(sp_files)
+                lines.append(f"- {output_rel_path}/{sp.name.replace('.', '_')}/  [{level_name}] ~{sp.estimated_size_kb}KB - Contains: {file_list}")
+    
+    # Check for missing files
+    missing_main = [name for name, _ in main_files if not (output_dir / name).exists() and name != 'project.toon']
+    if missing_main:
+        lines.append("")
+        lines.append("Missing files (not generated in this run):")
+        for name in missing_main:
+            file_path = f"{output_rel_path}/{name}"
+            lines.append(f"- {file_path}")
+    
+    lines.append("")
+    lines.append("Task:")
+    lines.append("- Summarize the architecture and main flows.")
+    lines.append("- Identify the highest-risk areas and propose a refactoring plan.")
+    lines.append("- If you suggest changes, keep behavior backward compatible and provide concrete steps.")
+    lines.append("")
+    lines.append("Constraints:")
+    lines.append("- Prefer minimal, incremental changes.")
+    lines.append("- If uncertain, ask clarifying questions.")
+    lines.append("")
+    lines.append("Note: This repository was analyzed using hierarchical chunking due to its size.")
+    lines.append("      Start with the main files (analysis.toon, context.md) for overview,")
+    lines.append("      then examine specific subproject directories as needed.")
+
+    prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
+    if args.verbose:
+        print(f"  - PROMPT (chunked): {prompt_path}")
+
+
 def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: Optional[Path] = None) -> None:
     """Generate prompt.txt useful to send to an LLM."""
     # Keep it conservative: generate when code2logic is requested.
@@ -434,6 +532,6 @@ def _export_chunked_results(args, result, output_dir: Path, source_path: Path, f
     
     if source_path is not None:
         _export_code2logic(args, source_path, output_dir, formats)
-        _export_prompt_txt(args, output_dir, formats, source_path)
+        _export_chunked_prompt_txt(args, output_dir, formats, source_path, subprojects)
     
     _export_readme(args, result, output_dir)

@@ -1,3 +1,14 @@
+## [0.5.20] - 2026-03-03
+
+### Summary
+
+feat(goal): CLI interface improvements
+
+### Other
+
+- update code2llm/cli_exports.py
+
+
 ## [0.5.19] - 2026-03-03
 
 ### Summary
