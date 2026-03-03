@@ -184,15 +184,37 @@ class ProjectAnalyzer:
     
     def _build_call_graph(self, result: AnalysisResult) -> None:
         """Build call graph and find entry points."""
+        # Build lookup maps for O(1) resolution
+        # Map simple name -> list of full names (for overloaded methods)
+        simple_to_full: Dict[str, List[str]] = {}
+        for known_name in result.functions:
+            simple_name = known_name.split('.')[-1]
+            if simple_name not in simple_to_full:
+                simple_to_full[simple_name] = []
+            simple_to_full[simple_name].append(known_name)
+        
         # Map calls between functions
         for func_name, func in result.functions.items():
-            for called in func.calls:
-                # Try to resolve to a known function
-                for known_name in result.functions:
-                    if known_name.endswith(f".{called}") or known_name == called:
-                        func.calls[func.calls.index(called)] = known_name
-                        result.functions[known_name].called_by.append(func_name)
-                        break
+            for idx, called in enumerate(func.calls):
+                # Try exact match first, then suffix match
+                if called in result.functions:
+                    resolved = called
+                elif called in simple_to_full:
+                    # Use first match if multiple (common case: single match)
+                    candidates = simple_to_full[called]
+                    # Prefer exact module match if available
+                    resolved = None
+                    for cand in candidates:
+                        if func_name.rsplit('.', 1)[0] == cand.rsplit('.', 1)[0]:
+                            resolved = cand
+                            break
+                    if resolved is None:
+                        resolved = candidates[0]
+                else:
+                    continue  # Unknown function
+                
+                func.calls[idx] = resolved
+                result.functions[resolved].called_by.append(func_name)
         
         # Find entry points (not called by anything)
         for func_name, func in result.functions.items():

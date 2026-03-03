@@ -67,7 +67,16 @@ class RefactoringAnalyzer:
         """Calculate betweenness centrality for bottleneck detection."""
         if len(call_graph) > 0:
             try:
-                centrality = nx.betweenness_centrality(call_graph)
+                node_count = len(call_graph)
+                # For large graphs, use sampling to avoid exponential time complexity
+                if node_count > 500:
+                    if self.config.verbose:
+                        print(f"  Large graph ({node_count} nodes), using sampled centrality...")
+                    # Sample 20% of nodes, max 500
+                    k = min(int(node_count * 0.2), 500)
+                    centrality = nx.betweenness_centrality(call_graph, k=k)
+                else:
+                    centrality = nx.betweenness_centrality(call_graph)
                 for func_name, score in centrality.items():
                     if func_name in result.functions:
                         result.functions[func_name].centrality = score
@@ -78,6 +87,11 @@ class RefactoringAnalyzer:
     def _detect_cycles(self, call_graph: nx.DiGraph, result: AnalysisResult) -> None:
         """Detect circular dependencies."""
         try:
+            # Limit cycle detection for large graphs
+            if len(call_graph) > 1000:
+                if self.config.verbose:
+                    print(f"  Skipping cycle detection for large graph ({len(call_graph)} nodes)")
+                return
             cycles = list(nx.simple_cycles(call_graph))
             if cycles:
                 result.metrics["project"] = result.metrics.get("project", {})
@@ -89,6 +103,11 @@ class RefactoringAnalyzer:
     def _detect_communities(self, call_graph: nx.DiGraph, result: AnalysisResult) -> None:
         """Detect communities (module groups)."""
         try:
+            # Limit community detection for large graphs
+            if len(call_graph) > 1000:
+                if self.config.verbose:
+                    print(f"  Skipping community detection for large graph ({len(call_graph)} nodes)")
+                return
             from networkx.algorithms import community
             # Using Louvain if available, otherwise greedy modularity
             if hasattr(community, 'louvain_communities'):
