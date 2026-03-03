@@ -239,6 +239,51 @@ class ProjectAnalyzer:
         if self.config.verbose:
             print(f"  - Call graph complete: {len(result.entry_points)} entry points found", flush=True)
     
+    def analyze_files(self, files: List[Tuple[str, str]], project_path: str) -> AnalysisResult:
+        """Analyze specific list of files (for chunked analysis).
+        
+        Args:
+            files: List of (file_path, module_name) tuples
+            project_path: Base project path for the result
+        """
+        start_time = time.time()
+        
+        if self.config.verbose:
+            print(f"Analyzing {len(files)} specific files")
+        
+        # Analyze files
+        if self.config.performance.parallel_enabled and len(files) > 1:
+            results = self._analyze_parallel(files)
+        else:
+            results = self._analyze_sequential(files)
+        
+        # Merge results
+        merged = self._merge_results(results, project_path)
+        
+        # Build call graph
+        self._build_call_graph(merged)
+        
+        if not self.config.performance.skip_pattern_detection:
+            self._detect_patterns(merged)
+        
+        # Refactoring analysis
+        self.refactoring_analyzer.perform_refactoring_analysis(merged)
+        
+        # Calculate stats
+        elapsed = time.time() - start_time
+        merged.stats = {
+            'files_processed': len(files),
+            'functions_found': len(merged.functions),
+            'classes_found': len(merged.classes),
+            'nodes_created': len(merged.nodes),
+            'edges_created': len(merged.edges),
+            'patterns_detected': len(merged.patterns),
+            'analysis_time_seconds': round(elapsed, 2),
+            'cache_hits': sum(r.get('cache_hits', 0) for r in results),
+        }
+        
+        return merged
+    
     def _detect_patterns(self, result: AnalysisResult) -> None:
         """Detect behavioral patterns."""
         # Detect recursion

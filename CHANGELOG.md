@@ -1,3 +1,14 @@
+## [0.5.23] - 2026-03-03
+
+### Summary
+
+refactor(code2llm): code analysis engine
+
+### Other
+
+- update code2llm/core/analyzer.py
+
+
 ## [0.5.22] - 2026-03-03
 
 ### Summary
