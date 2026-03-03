@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from .exporters import (
     YAMLExporter, JSONExporter, MermaidExporter,
@@ -185,9 +185,30 @@ def _export_chunked_prompt_txt(args, output_dir: Path, formats: list[str], sourc
     if 'code2logic' not in formats and 'all' not in formats:
         return
 
-    prompt_path = output_dir / 'prompt.txt'
+    project_path, output_rel_path = _get_prompt_paths(source_path, output_dir)
+    lines = _build_prompt_header(project_path)
     
-    # Determine project name and relative output path
+    # Add main files section
+    lines.extend(_build_main_files_section(output_dir, output_rel_path))
+    
+    # Add subprojects section
+    if subprojects:
+        lines.extend(_build_subprojects_section(subprojects, output_dir, output_rel_path))
+    
+    # Add missing files section
+    lines.extend(_build_missing_files_section(output_dir, output_rel_path))
+    
+    # Add footer
+    lines.extend(_build_prompt_footer())
+
+    prompt_path = output_dir / 'prompt.txt'
+    prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
+    if args.verbose:
+        print(f"  - PROMPT (chunked): {prompt_path}")
+
+
+def _get_prompt_paths(source_path: Optional[Path], output_dir: Path) -> Tuple[str, str]:
+    """Determine project name and relative output path."""
     if source_path:
         project_path = source_path.name if source_path.name else str(source_path)
         try:
@@ -201,16 +222,24 @@ def _export_chunked_prompt_txt(args, output_dir: Path, formats: list[str], sourc
             output_rel_path = str(output_dir.relative_to(cwd))
         except ValueError:
             output_rel_path = str(output_dir)
-
-    lines: list[str] = []
-    lines.append("You are an AI assistant helping me understand and improve a codebase.")
-    lines.append("Use the attached/generated files as the authoritative context.")
-    lines.append("")
-    lines.append(f"we are in project path: {project_path}")
-    lines.append("")
-    lines.append("Files for analysis:")
     
-    # Main files (merged summaries)
+    return project_path, output_rel_path
+
+
+def _build_prompt_header(project_path: str) -> List[str]:
+    """Build header section of prompt."""
+    return [
+        "You are an AI assistant helping me understand and improve a codebase.",
+        "Use the attached/generated files as the authoritative context.",
+        "",
+        f"we are in project path: {project_path}",
+        "",
+        "Files for analysis:",
+    ]
+
+
+def _build_main_files_section(output_dir: Path, output_rel_path: str) -> List[str]:
+    """Build main files section."""
     main_files = [
         ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
         ('context.md', 'LLM narrative - architecture summary, key entry points, process flows, public API surface'),
@@ -219,63 +248,74 @@ def _export_chunked_prompt_txt(args, output_dir: Path, formats: list[str], sourc
         ('README.md', 'Documentation - complete guide to all generated files, usage examples, interpretation'),
     ]
     
-    # Add main existing files
+    lines = []
     for name, desc in main_files:
         if (output_dir / name).exists():
-            file_path = f"{output_rel_path}/{name}"
-            lines.append(f"- {file_path}  ({desc})")
+            lines.append(f"- {output_rel_path}/{name}  ({desc})")
     
-    # Add chunked subproject files
-    if subprojects:
-        lines.append("")
-        lines.append("Subproject Analysis Files (hierarchical chunking for large repository):")
-        
-        for sp in subprojects:
-            sp_dir = output_dir / sp.name.replace('.', '_')
-            if not sp_dir.exists():
-                continue
-            
-            level_name = {0: 'root', 1: 'L1', 2: 'L2', 3: 'chunk'}.get(sp.level, f'L{sp.level}')
-            
-            # Check which files exist for this subproject
-            sp_files = []
-            if (sp_dir / 'analysis.toon').exists():
-                sp_files.append('analysis.toon')
-            if (sp_dir / 'context.md').exists():
-                sp_files.append('context.md')
-            if (sp_dir / 'evolution.toon').exists():
-                sp_files.append('evolution.toon')
-            
-            if sp_files:
-                file_list = ', '.join(sp_files)
-                lines.append(f"- {output_rel_path}/{sp.name.replace('.', '_')}/  [{level_name}] ~{sp.estimated_size_kb}KB - Contains: {file_list}")
-    
-    # Check for missing files
-    missing_main = [name for name, _ in main_files if not (output_dir / name).exists() and name != 'project.toon']
-    if missing_main:
-        lines.append("")
-        lines.append("Missing files (not generated in this run):")
-        for name in missing_main:
-            file_path = f"{output_rel_path}/{name}"
-            lines.append(f"- {file_path}")
-    
-    lines.append("")
-    lines.append("Task:")
-    lines.append("- Summarize the architecture and main flows.")
-    lines.append("- Identify the highest-risk areas and propose a refactoring plan.")
-    lines.append("- If you suggest changes, keep behavior backward compatible and provide concrete steps.")
-    lines.append("")
-    lines.append("Constraints:")
-    lines.append("- Prefer minimal, incremental changes.")
-    lines.append("- If uncertain, ask clarifying questions.")
-    lines.append("")
-    lines.append("Note: This repository was analyzed using hierarchical chunking due to its size.")
-    lines.append("      Start with the main files (analysis.toon, context.md) for overview,")
-    lines.append("      then examine specific subproject directories as needed.")
+    return lines
 
-    prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
-    if args.verbose:
-        print(f"  - PROMPT (chunked): {prompt_path}")
+
+def _build_subprojects_section(subprojects: list, output_dir: Path, output_rel_path: str) -> List[str]:
+    """Build subprojects section."""
+    lines = [
+        "",
+        "Subproject Analysis Files (hierarchical chunking for large repository):",
+    ]
+    
+    for sp in subprojects:
+        sp_dir = output_dir / sp.name.replace('.', '_')
+        if not sp_dir.exists():
+            continue
+        
+        level_name = {0: 'root', 1: 'L1', 2: 'L2', 3: 'chunk'}.get(sp.level, f'L{sp.level}')
+        
+        sp_files = _get_existing_files(sp_dir, ['analysis.toon', 'context.md', 'evolution.toon'])
+        
+        if sp_files:
+            file_list = ', '.join(sp_files)
+            lines.append(f"- {output_rel_path}/{sp.name.replace('.', '_')}/  [{level_name}] ~{sp.estimated_size_kb}KB - Contains: {file_list}")
+    
+    return lines
+
+
+def _get_existing_files(directory: Path, filenames: List[str]) -> List[str]:
+    """Get list of existing files from directory."""
+    return [f for f in filenames if (directory / f).exists()]
+
+
+def _build_missing_files_section(output_dir: Path, output_rel_path: str) -> List[str]:
+    """Build missing files section."""
+    main_files = ['analysis.toon', 'context.md', 'evolution.toon', 'project.toon', 'README.md']
+    missing = [f for f in main_files if f != 'project.toon' and not (output_dir / f).exists()]
+    
+    if not missing:
+        return []
+    
+    lines = ["", "Missing files (not generated in this run):"]
+    for name in missing:
+        lines.append(f"- {output_rel_path}/{name}")
+    
+    return lines
+
+
+def _build_prompt_footer() -> List[str]:
+    """Build footer section of prompt."""
+    return [
+        "",
+        "Task:",
+        "- Summarize the architecture and main flows.",
+        "- Identify the highest-risk areas and propose a refactoring plan.",
+        "- If you suggest changes, keep behavior backward compatible and provide concrete steps.",
+        "",
+        "Constraints:",
+        "- Prefer minimal, incremental changes.",
+        "- If uncertain, ask clarifying questions.",
+        "",
+        "Note: This repository was analyzed using hierarchical chunking due to its size.",
+        "      Start with the main files (analysis.toon, context.md) for overview,",
+        "      then examine specific subproject directories as needed.",
+    ]
 
 
 def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: Optional[Path] = None) -> None:

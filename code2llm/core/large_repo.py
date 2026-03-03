@@ -139,10 +139,11 @@ class HierarchicalRepoSplitter:
             # Skip hidden and cache directories
             skip_dirs = {
                 '.git', '.github', '.vscode', '.idea',
-                '__pycache__', 'node_modules', '.venv', 'venv',
+                '__pycache__', 'node_modules', '.venv', 'venv', 'fresh_env', 'test-env',
                 '.tox', '.pytest_cache', '.mypy_cache',
                 'build', 'dist', 'egg-info', '.eggs',
-                'htmlcov', '.coverage', '.cache'
+                'htmlcov', '.coverage', '.cache',
+                'lib', 'lib64', 'site-packages', 'include', 'bin', 'share',  # venv internals
             }
             
             if dir_name.startswith('.') or dir_name in skip_dirs:
@@ -155,14 +156,34 @@ class HierarchicalRepoSplitter:
         return sorted(dirs, key=lambda d: d.name.lower())
     
     def _split_level2(self, level1_path: Path, project_path: Path) -> List[SubProject]:
-        """Split level 1 directory into level 2 subdirectories."""
+        """Split level 1 directory into level 2 subdirectories with merging."""
         chunks = []
         
-        # Get level 2 subdirectories
-        level2_dirs = [d for d in level1_path.iterdir() if d.is_dir() and not d.name.startswith('.')]
+        # Get and categorize subdirectories
+        small_dirs, large_dirs = self._categorize_subdirs(level1_path, project_path)
         
-        # Sort by priority
+        # Process large directories (need file-level chunking)
+        chunks.extend(self._process_large_dirs(large_dirs, level1_path, project_path))
+        
+        # Merge and process small directories
+        if small_dirs:
+            chunks.extend(self._merge_small_dirs(small_dirs, level1_path, project_path))
+        
+        # Process files directly in level1
+        chunks.extend(self._process_level1_files(level1_path, project_path))
+        
+        return chunks
+    
+    def _categorize_subdirs(
+        self, level1_path: Path, project_path: Path
+    ) -> Tuple[List, List]:
+        """Categorize subdirectories into small and large based on size."""
+        level2_dirs = [d for d in level1_path.iterdir() 
+                      if d.is_dir() and not d.name.startswith('.')]
         level2_dirs.sort(key=lambda d: self._calculate_priority(d.name, 2), reverse=True)
+        
+        small_dirs = []
+        large_dirs = []
         
         for dir_path in level2_dirs:
             files = self._collect_files_in_dir(dir_path, project_path)
@@ -170,50 +191,118 @@ class HierarchicalRepoSplitter:
                 continue
             
             estimated_kb = len(files) * 3
+            priority = self._calculate_priority(dir_path.name, 2)
             
-            if estimated_kb <= self.size_limit_kb:
-                # Level 2 dir fits
-                chunks.append(SubProject(
-                    name=f"{level1_path.name}.{dir_path.name}",
-                    path=dir_path,
-                    relative_path=str(dir_path.relative_to(project_path)),
-                    files=files,
-                    level=2,
-                    priority=self._calculate_priority(dir_path.name, 2)
-                ))
+            if estimated_kb > self.size_limit_kb:
+                large_dirs.append((dir_path, files, estimated_kb, priority))
             else:
-                # Level 2 still too big - chunk by file count
-                file_chunks = self._chunk_by_files(
-                    files, level1_path.name, dir_path.name, 
-                    dir_path, project_path
-                )
-                chunks.extend(file_chunks)
+                small_dirs.append((dir_path, files, estimated_kb, priority))
         
-        # Add any files directly in level1 (not in subdirs)
+        return small_dirs, large_dirs
+    
+    def _process_large_dirs(
+        self, large_dirs: List, level1_path: Path, project_path: Path
+    ) -> List[SubProject]:
+        """Process large directories with file-level chunking."""
+        chunks = []
+        for dir_path, files, estimated_kb, priority in large_dirs:
+            file_chunks = self._chunk_by_files(
+                files, level1_path.name, dir_path.name, 
+                dir_path, project_path
+            )
+            chunks.extend(file_chunks)
+        return chunks
+    
+    def _process_level1_files(self, level1_path: Path, project_path: Path) -> List[SubProject]:
+        """Process Python files directly in level1 directory."""
+        chunks = []
+        
         level1_direct_files = [
             (str(f), f"{level1_path.name}.{f.stem}")
             for f in level1_path.glob("*.py")
             if not self._should_skip_file(str(f))
         ]
         
-        if level1_direct_files:
-            estimated_kb = len(level1_direct_files) * 3
-            
-            if estimated_kb <= self.size_limit_kb:
+        if not level1_direct_files:
+            return chunks
+        
+        estimated_kb = len(level1_direct_files) * 3
+        
+        if estimated_kb <= self.size_limit_kb:
+            chunks.append(SubProject(
+                name=f"{level1_path.name}._root",
+                path=level1_path,
+                relative_path=str(level1_path.relative_to(project_path)),
+                files=level1_direct_files,
+                level=2,
+                priority=self._calculate_priority(level1_path.name, 2) - 10
+            ))
+        else:
+            file_chunks = self._chunk_by_files(
+                level1_direct_files, level1_path.name, "_root",
+                level1_path, project_path
+            )
+            chunks.extend(file_chunks)
+        
+        return chunks
+    
+    def _merge_small_dirs(
+        self,
+        small_dirs: List[Tuple[Path, List, int, int]],
+        level1_path: Path,
+        project_path: Path
+    ) -> List[SubProject]:
+        """Merge small subdirectories into combined chunks up to size limit."""
+        chunks = []
+        
+        # Sort by priority (highest first)
+        small_dirs.sort(key=lambda x: x[3], reverse=True)
+        
+        current_chunk_files = []
+        current_chunk_names = []
+        current_size = 0
+        
+        for dir_path, files, estimated_kb, priority in small_dirs:
+            # Check if adding this dir would exceed limit
+            if current_chunk_files and (current_size + estimated_kb > self.size_limit_kb):
+                # Flush current chunk
+                chunk_name = f"{level1_path.name}.{'_'.join(current_chunk_names)}"
+                if len(current_chunk_names) > 3:
+                    chunk_name = f"{level1_path.name}.batch_{len(chunks)+1}"
+                
                 chunks.append(SubProject(
-                    name=f"{level1_path.name}._root",
+                    name=chunk_name,
                     path=level1_path,
                     relative_path=str(level1_path.relative_to(project_path)),
-                    files=level1_direct_files,
+                    files=current_chunk_files.copy(),
                     level=2,
-                    priority=self._calculate_priority(level1_path.name, 2) - 10
+                    priority=priority
                 ))
-            else:
-                file_chunks = self._chunk_by_files(
-                    level1_direct_files, level1_path.name, "_root",
-                    level1_path, project_path
-                )
-                chunks.extend(file_chunks)
+                
+                # Start new chunk
+                current_chunk_files = []
+                current_chunk_names = []
+                current_size = 0
+            
+            # Add to current chunk
+            current_chunk_files.extend(files)
+            current_chunk_names.append(dir_path.name)
+            current_size += estimated_kb
+        
+        # Flush remaining chunk
+        if current_chunk_files:
+            chunk_name = f"{level1_path.name}.{'_'.join(current_chunk_names)}"
+            if len(current_chunk_names) > 3:
+                chunk_name = f"{level1_path.name}.batch_{len(chunks)+1}"
+            
+            chunks.append(SubProject(
+                name=chunk_name,
+                path=level1_path,
+                relative_path=str(level1_path.relative_to(project_path)),
+                files=current_chunk_files,
+                level=2,
+                priority=30  # Default priority for merged batch
+            ))
         
         return chunks
     
@@ -321,8 +410,10 @@ class HierarchicalRepoSplitter:
         lower_path = file_str.lower()
         skip_patterns = [
             'test', '_test', 'conftest',
-            '__pycache__', '.venv', 'venv',
+            '__pycache__', '.venv', 'venv', 'fresh_env', 'test-env',
             'node_modules', '.git',
+            '/lib/', '/lib64/', '/site-packages/',  # venv internals
+            '/include/', '/bin/python', '/share/',
         ]
         return any(pattern in lower_path for pattern in skip_patterns)
     

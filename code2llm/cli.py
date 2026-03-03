@@ -308,9 +308,10 @@ def _run_analysis(args, source_path: Path, output_dir: Path):
     )
     
     # Check if we should use chunked analysis
+    # Auto-chunk when estimated output > chunk_size (default 256KB = ~85 files)
     use_chunking = (
         args.chunk or 
-        should_use_chunking(source_path, args.auto_chunk_threshold)
+        should_use_chunking(source_path, args.chunk_size)
     )
     
     if use_chunking:
