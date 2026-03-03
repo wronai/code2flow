@@ -49,7 +49,7 @@ def _export_context_fallback(args, result, output_dir: Path, formats: list):
 
 def _export_readme(args, result, output_dir: Path):
     """Export README.md documentation."""
-    if not args.readme or args.no_readme:
+    if not args.readme or getattr(args, 'no_readme', False):
         return
     exporter = READMEExporter()
     filepath = output_dir / 'README.md'

@@ -420,9 +420,10 @@ def _run_chunked_analysis(args, source_path: Path, output_dir: Path):
 
 
 def _analyze_subproject(args, subproject, output_dir: Path):
-    """Analyze a single subproject."""
+    """Analyze and export a single subproject."""
     from .core.analyzer import ProjectAnalyzer
     from .core.config import Config
+    from .cli_exports import _export_simple_formats, _export_evolution, _export_chunked_prompt_txt, _export_code2logic
     
     config = Config(
         mode=args.mode,
@@ -433,12 +434,27 @@ def _analyze_subproject(args, subproject, output_dir: Path):
         verbose=args.verbose
     )
     
-    # Temporarily modify analyzer to use only subproject files
     analyzer = ProjectAnalyzer(config)
     
-    # Analyze just this subproject's path
     try:
+        # Analyze subproject
         result = analyzer.analyze_project(str(subproject.path))
+        
+        # Export results for this subproject
+        formats = [f.strip() for f in args.format.split(',')]
+        if 'all' in formats:
+            formats = ['toon', 'context', 'evolution', 'code2logic']
+        
+        # Export simple formats (toon, context)
+        _export_simple_formats(args, result, output_dir, formats)
+        
+        # Export evolution
+        if 'evolution' in formats or 'all' in formats:
+            _export_evolution(args, result, output_dir)
+        
+        if args.verbose:
+            print(f"    ✓ Exported {subproject.name}: {len(result.functions)} functions")
+        
         return result
     except Exception as e:
         print(f"Warning: Failed to analyze {subproject.name}: {e}", file=sys.stderr)

@@ -89,7 +89,7 @@ def _split_by_modules(
     max_kb: int,
     prefix: str
 ) -> List[Path]:
-    """Split TOON file by module sections."""
+    """Split TOON file by module sections with balanced chunk sizes."""
     content = source_file.read_text(encoding='utf-8')
     lines = content.split('\n')
     
@@ -101,11 +101,17 @@ def _split_by_modules(
         header_lines.append(line)
     
     header = '\n'.join(header_lines)
+    header_bytes = len(header.encode('utf-8'))
     max_bytes = max_kb * 1024
+    
+    # Calculate target chunk size for more even distribution
+    # Aim for chunks between 60-80% of max for better balance
+    target_bytes_min = int(max_bytes * 0.6)  # 60% = ~150KB for 256KB limit
+    target_bytes_max = int(max_bytes * 0.8)  # 80% = ~200KB for 256KB limit
     
     chunks = []
     current_chunk = [header]
-    current_size = len(header.encode('utf-8'))
+    current_size = header_bytes
     chunk_num = 1
     
     for module_name, start, end in modules:
@@ -115,12 +121,12 @@ def _split_by_modules(
         # If single module exceeds limit, it goes in its own chunk
         if module_bytes > max_bytes:
             # Flush current chunk if not empty
-            if len(current_chunk) > 1:  # More than just header
+            if len(current_chunk) > 1:
                 chunk_file = _write_chunk(output_dir, prefix, chunk_num, '\n'.join(current_chunk))
                 chunks.append(chunk_file)
                 chunk_num += 1
                 current_chunk = [header]
-                current_size = len(header.encode('utf-8'))
+                current_size = header_bytes
             
             # Write oversized module as separate chunk
             chunk_file = _write_chunk(output_dir, prefix, chunk_num, 
@@ -128,17 +134,19 @@ def _split_by_modules(
             chunks.append(chunk_file)
             chunk_num += 1
             current_chunk = [header]
-            current_size = len(header.encode('utf-8'))
+            current_size = header_bytes
         
-        elif current_size + module_bytes > max_bytes:
-            # Flush current chunk
+        # Check if adding this module would exceed target OR we're well above minimum
+        elif (current_size + module_bytes > target_bytes_max or 
+              (current_size >= target_bytes_min and module_bytes > 0)):
+            # Flush current chunk - we've reached good size
             chunk_file = _write_chunk(output_dir, prefix, chunk_num, '\n'.join(current_chunk))
             chunks.append(chunk_file)
             chunk_num += 1
             
             # Start new chunk with this module
             current_chunk = [header, module_content]
-            current_size = len(header.encode('utf-8')) + module_bytes
+            current_size = header_bytes + module_bytes
         else:
             # Add to current chunk
             current_chunk.append(module_content)
@@ -222,17 +230,27 @@ def manage_toon_size(
 ) -> List[Path]:
     """Main entry point: check and split TOON file if needed.
     
+    Strategy:
+    - If file <= max_kb: keep as-is
+    - If file > max_kb but by < 10% (margin): keep as-is (not worth splitting)
+    - If file > max_kb + 10%: split into chunks of 150-250KB preserving structure
+    
     Returns list of final TOON file(s).
     """
     size_kb = get_file_size_kb(source_file)
+    margin_kb = max_kb * 0.10  # 10% margin - don't split if difference is small
     
-    if size_kb <= max_kb:
+    # Don't split if within limit or margin
+    if size_kb <= max_kb + margin_kb:
         if verbose:
-            print(f"  - {prefix}.toon: {size_kb:.1f}KB (within {max_kb}KB limit)")
+            if size_kb <= max_kb:
+                print(f"  - {prefix}.toon: {size_kb:.1f}KB (within {max_kb}KB limit)")
+            else:
+                print(f"  - {prefix}.toon: {size_kb:.1f}KB (margin: {size_kb-max_kb:.1f}KB < {margin_kb:.0f}KB, keeping single file)")
         return [source_file]
     
     if verbose:
-        print(f"  - {prefix}.toon: {size_kb:.1f}KB → splitting into chunks (>{max_kb}KB limit)")
+        print(f"  - {prefix}.toon: {size_kb:.1f}KB → splitting into ~{int(max_kb*0.6)}-{int(max_kb*0.8)}KB chunks")
     
     # Remove original and create chunks
     chunks = split_toon_file(source_file, output_dir, max_kb, prefix)
