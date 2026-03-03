@@ -1,3 +1,18 @@
+## [0.5.17] - 2026-03-03
+
+### Summary
+
+refactor(goal): CLI interface improvements
+
+### Other
+
+- update code2llm/cli.py
+- update code2llm/cli_exports.py
+- update code2llm/core/large_repo.py
+- update code2llm/parsers/toon_parser.py
+- update validate_toon.py
+
+
 ## [0.5.16] - 2026-03-03
 
 ### Summary

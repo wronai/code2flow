@@ -6,19 +6,16 @@ Analyze control flow, data flow, and call graphs of Python codebases.
 """
 
 import argparse
-import shutil
-import subprocess
 import sys
 from pathlib import Path
 from typing import List, Optional
 
 from .core.config import Config, ANALYSIS_MODES
 from .core.analyzer import ProjectAnalyzer
-from .exporters import (
-    YAMLExporter, JSONExporter, MermaidExporter,
-    ContextExporter, LLMPromptExporter,
-    ToonExporter, MapExporter, FlowExporter,
-    EvolutionExporter, READMEExporter,
+from .cli_exports import (
+    _export_evolution, _export_data_structures, _export_context_fallback,
+    _export_readme, _export_code2logic, _export_prompt_txt, _run_exports,
+    _export_simple_formats, _export_yaml, _export_mermaid, _export_refactor_prompts,
 )
 
 
@@ -199,9 +196,42 @@ Strategy Options (--strategy):
     )
     
     parser.add_argument(
-        '--no-readme',
+        '--chunk',
         action='store_true',
-        help='Disable automatic README.md generation'
+        help='Automatically split large repositories into smaller subprojects'
+    )
+    
+    parser.add_argument(
+        '--chunk-size',
+        type=int,
+        default=256,
+        help='Maximum output size per chunk in KB (default: 256)'
+    )
+    
+    parser.add_argument(
+        '--max-files-per-chunk',
+        type=int,
+        default=50,
+        help='Maximum files per chunk for large repos (default: 50)'
+    )
+    
+    parser.add_argument(
+        '--auto-chunk-threshold',
+        type=int,
+        default=100,
+        help='File count threshold to auto-enable chunking (default: 100)'
+    )
+    
+    parser.add_argument(
+        '--skip-subprojects',
+        nargs='+',
+        default=[],
+        help='Skip specific subprojects (e.g., --skip-subprojects tests examples)'
+    )
+    
+    parser.add_argument(
+        '--only-subproject',
+        help='Analyze only specific subproject (e.g., --only-subproject src)'
     )
     
     return parser
@@ -271,7 +301,22 @@ def _run_analysis(args, source_path: Path, output_dir: Path):
     """Run code analysis with configured strategy.
 
     Returns AnalysisResult or exits on error.
+    For large repos, may analyze in chunks and merge results.
     """
+    from .core.large_repo import LargeRepoSplitter, should_use_chunking
+    
+    # Check if we should use chunked analysis
+    use_chunking = (
+        args.chunk or 
+        should_use_chunking(source_path, args.auto_chunk_threshold)
+    )
+    
+    if use_chunking:
+        if args.verbose:
+            print(f"Large repository detected - using chunked analysis")
+        return _run_chunked_analysis(args, source_path, output_dir)
+    
+    # Standard single-analysis flow
     config = Config(
         mode=args.mode,
         max_depth_enumeration=args.max_depth,
@@ -299,6 +344,119 @@ def _run_analysis(args, source_path: Path, output_dir: Path):
     except Exception as e:
         print(f"Error during analysis: {e}", file=sys.stderr)
         sys.exit(1)
+
+
+def _run_chunked_analysis(args, source_path: Path, output_dir: Path):
+    """Analyze large repository in chunks by subproject."""
+    from .core.large_repo import LargeRepoSplitter, SubProject
+    
+    splitter = LargeRepoSplitter(
+        size_limit_kb=args.chunk_size,
+        max_files_per_chunk=args.max_files_per_chunk
+    )
+    
+    # Get analysis plan
+    subprojects = splitter.get_analysis_plan(source_path)
+    
+    if args.verbose:
+        print(f"Repository split into {len(subprojects)} subprojects:")
+        for sp in subprojects:
+            print(f"  - {sp.name}: {sp.file_count} files (~{sp.estimated_size_kb}KB)")
+    
+    # Filter subprojects if requested
+    if args.only_subproject:
+        subprojects = [sp for sp in subprojects if sp.name == args.only_subproject]
+        if not subprojects:
+            print(f"Error: Subproject '{args.only_subproject}' not found", file=sys.stderr)
+            sys.exit(1)
+    
+    if args.skip_subprojects:
+        subprojects = [sp for sp in subprojects if sp.name not in args.skip_subprojects]
+    
+    # Analyze each subproject
+    all_results = []
+    for i, subproject in enumerate(subprojects, 1):
+        if args.verbose:
+            print(f"\n[{i}/{len(subprojects)}] Analyzing: {subproject.name}")
+        
+        sp_output_dir = output_dir / subproject.name
+        sp_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        result = _analyze_subproject(args, subproject, sp_output_dir)
+        if result:
+            all_results.append((subproject.name, result, sp_output_dir))
+    
+    # Create merged summary
+    merged_result = _merge_chunked_results(all_results, source_path)
+    
+    if args.verbose:
+        print(f"\nChunked analysis complete:")
+        print(f"  - Subprojects analyzed: {len(all_results)}")
+        print(f"  - Total functions: {len(merged_result.functions)}")
+        print(f"  - Total classes: {len(merged_result.classes)}")
+    
+    return merged_result
+
+
+def _analyze_subproject(args, subproject, output_dir: Path):
+    """Analyze a single subproject."""
+    from .core.analyzer import ProjectAnalyzer
+    from .core.config import Config
+    
+    config = Config(
+        mode=args.mode,
+        max_depth_enumeration=args.max_depth,
+        detect_state_machines=not args.no_patterns,
+        detect_recursion=not args.no_patterns,
+        output_dir=str(output_dir),
+        verbose=args.verbose
+    )
+    
+    # Temporarily modify analyzer to use only subproject files
+    analyzer = ProjectAnalyzer(config)
+    
+    # Analyze just this subproject's path
+    try:
+        result = analyzer.analyze_project(str(subproject.path))
+        return result
+    except Exception as e:
+        print(f"Warning: Failed to analyze {subproject.name}: {e}", file=sys.stderr)
+        return None
+
+
+def _merge_chunked_results(all_results, source_path: Path):
+    """Merge results from multiple subproject analyses."""
+    from .core.models import AnalysisResult
+    
+    merged = AnalysisResult(project_path=str(source_path))
+    
+    for name, result, output_dir in all_results:
+        if not result:
+            continue
+        
+        # Prefix with subproject name to avoid collisions
+        prefix = f"{name}."
+        
+        # Merge functions
+        for func_name, func_info in result.functions.items():
+            new_name = f"{prefix}{func_name}" if '.' not in func_name else func_name
+            merged.functions[new_name] = func_info
+        
+        # Merge classes
+        for class_name, class_info in result.classes.items():
+            new_name = f"{prefix}{class_name}" if '.' not in class_name else class_name
+            merged.classes[new_name] = class_info
+        
+        # Merge modules
+        for mod_name, mod_info in result.modules.items():
+            new_name = f"{prefix}{mod_name}" if '.' not in mod_name else mod_name
+            merged.modules[new_name] = mod_info
+        
+        # Merge nodes and edges (simplified - just count)
+        merged.nodes.update(result.nodes)
+        merged.edges.extend(result.edges)
+    
+    return merged
 
 
 def _run_streaming_analysis(args, config, source_path: Path):
@@ -340,324 +498,6 @@ def _run_streaming_analysis(args, config, source_path: Path):
     # TODO: Modify streaming to accumulate results properly
     analyzer = ProjectAnalyzer(config)
     return analyzer.analyze_project(str(source_path))
-
-
-def _export_evolution(args, result, output_dir: Path):
-    """Export evolution.toon format."""
-    if 'evolution' not in [f.strip() for f in args.format.split(',')] and 'all' not in [f.strip() for f in args.format.split(',')]:
-        return
-    exporter = EvolutionExporter()
-    filepath = output_dir / 'evolution.toon'
-    exporter.export(result, str(filepath))
-    if args.verbose:
-        print(f"  - EVOLUTION (refactoring queue): {filepath}")
-
-
-def _export_data_structures(args, result, output_dir: Path):
-    """Export data structures YAML."""
-    if not args.data_structures:
-        return
-    exporter = YAMLExporter()
-    struct_path = output_dir / 'data_structures.yaml'
-    exporter.export_data_structures(result, str(struct_path), compact=True)
-    if args.verbose:
-        print(f"  - Data structures: {struct_path}")
-
-
-def _export_context_fallback(args, result, output_dir: Path, formats: list):
-    """Export context.md if not in formats."""
-    if 'context' in formats or 'all' in formats:
-        return
-    exporter = ContextExporter()
-    filepath = output_dir / 'context.md'
-    exporter.export(result, str(filepath))
-    if args.verbose:
-        print(f"  - CONTEXT (LLM narrative): {filepath}")
-
-
-def _export_readme(args, result, output_dir: Path):
-    """Export README.md documentation."""
-    if not args.readme or args.no_readme:
-        return
-    exporter = READMEExporter()
-    filepath = output_dir / 'README.md'
-    exporter.export(result, str(filepath))
-    if args.verbose:
-        print(f"  - README (documentation): {filepath}")
-
-
-def _export_code2logic(args, source_path: Path, output_dir: Path, formats: list[str]) -> None:
-    """Generate project.toon using external code2logic tool."""
-    if 'code2logic' not in formats and 'all' not in formats:
-        return
-
-    if shutil.which('code2logic') is None:
-        print("Error: requested format 'code2logic' but 'code2logic' executable was not found in PATH.", file=sys.stderr)
-        print("Install it with: pip install code2logic --upgrade", file=sys.stderr)
-        sys.exit(1)
-
-    # Align with the user's bash script:
-    # code2logic ./ -f toon --compact --name project -o ./project
-    cmd = [
-        'code2logic', str(source_path),
-        '-f', 'toon',
-        '--compact',
-        '--name', 'project',
-        '-o', str(output_dir),
-    ]
-
-    if not args.verbose:
-        cmd.append('-q')
-
-    try:
-        if args.verbose:
-            res = subprocess.run(cmd, capture_output=True, text=True)
-        else:
-            res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True)
-    except Exception as e:
-        print(f"Error running code2logic: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    if res.returncode != 0:
-        if not args.verbose:
-            try:
-                res = subprocess.run(cmd, capture_output=True, text=True)
-            except Exception as e:
-                print(f"Error running code2logic: {e}", file=sys.stderr)
-                sys.exit(1)
-        if res.stdout:
-            print(res.stdout, file=sys.stderr)
-        if res.stderr:
-            print(res.stderr, file=sys.stderr)
-        print(f"Error: code2logic failed (exit code {res.returncode}).", file=sys.stderr)
-        sys.exit(res.returncode)
-
-    # Normalize output location to: <output_dir>/project.toon
-    candidate_paths = [
-        output_dir / 'project.toon',
-        output_dir / 'project' / 'project.toon',
-        output_dir / 'project.toon.txt',
-    ]
-    found = next((p for p in candidate_paths if p.exists()), None)
-    if found is None:
-        # If code2logic changes its naming, show its stdout/stderr to help debugging.
-        if res.stdout:
-            print(res.stdout, file=sys.stderr)
-        if res.stderr:
-            print(res.stderr, file=sys.stderr)
-        print("Error: code2logic completed but project.toon was not found in the output directory.", file=sys.stderr)
-        sys.exit(1)
-
-    target = output_dir / 'project.toon'
-    if found != target:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(found, target)
-
-    if args.verbose:
-        print(f"  - CODE2LOGIC (project logic): {target}")
-
-
-def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: Optional[Path] = None) -> None:
-    """Generate prompt.txt useful to send to an LLM."""
-    # Keep it conservative: generate when code2logic is requested.
-    if 'code2logic' not in formats and 'all' not in formats:
-        return
-
-    prompt_path = output_dir / 'prompt.txt'
-    
-    # Determine project name and relative output path for display
-    if source_path:
-        project_path = source_path.name if source_path.name else str(source_path)
-        try:
-            output_rel_path = str(output_dir.relative_to(source_path))
-        except ValueError:
-            output_rel_path = str(output_dir)
-    else:
-        cwd = Path.cwd()
-        project_path = cwd.name
-        try:
-            output_rel_path = str(output_dir.relative_to(cwd))
-        except ValueError:
-            output_rel_path = str(output_dir)
-
-    files = [
-        ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
-        ('context.md', 'LLM narrative - architecture summary, key entry points, process flows, public API surface'),
-        ('evolution.toon', 'Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history'),
-        ('project.toon', 'Project logic - compact module view from code2logic, file sizes, dependencies overview'),
-        ('README.md', 'Documentation - complete guide to all generated files, usage examples, interpretation'),
-    ]
-    
-    existing = [(name, desc) for name, desc in files if (output_dir / name).exists()]
-    missing = [name for name, desc in files if (output_dir / name).exists() is False]
-
-    lines: list[str] = []
-    lines.append("You are an AI assistant helping me understand and improve a codebase.")
-    lines.append("Use the attached/generated files as the authoritative context.")
-    lines.append("")
-    lines.append(f"we are in project path: {project_path}")
-    lines.append("")
-    lines.append("Files for analysis:")
-    
-    for name, desc in existing:
-        file_path = f"{output_rel_path}/{name}"
-        lines.append(f"- {file_path}  ({desc})")
-    
-    if missing:
-        lines.append("")
-        lines.append("Missing files (not generated in this run):")
-        for name in missing:
-            file_path = f"{output_rel_path}/{name}"
-            lines.append(f"- {file_path}")
-    
-    lines.append("")
-    lines.append("Task:")
-    lines.append("- Summarize the architecture and main flows.")
-    lines.append("- Identify the highest-risk areas and propose a refactoring plan.")
-    lines.append("- If you suggest changes, keep behavior backward compatible and provide concrete steps.")
-    lines.append("")
-    lines.append("Constraints:")
-    lines.append("- Prefer minimal, incremental changes.")
-    lines.append("- If uncertain, ask clarifying questions.")
-
-    prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
-    if args.verbose:
-        print(f"  - PROMPT: {prompt_path}")
-
-
-def _run_exports(args, result, output_dir: Path, source_path: Optional[Path] = None):
-    """Export analysis results in requested formats."""
-    formats = [f.strip() for f in args.format.split(',')]
-    if 'all' in formats:
-        formats = ['toon', 'map', 'flow', 'context', 'code2logic', 'yaml', 'json', 'mermaid', 'evolution']
-
-    try:
-        _export_simple_formats(args, result, output_dir, formats)
-        
-        if 'mermaid' in formats:
-            _export_mermaid(args, result, output_dir)
-        
-        _export_evolution(args, result, output_dir)
-        _export_data_structures(args, result, output_dir)
-        _export_context_fallback(args, result, output_dir, formats)
-
-        if source_path is not None:
-            _export_code2logic(args, source_path, output_dir, formats)
-            _export_prompt_txt(args, output_dir, formats, source_path)
-        
-        if args.refactor:
-            _export_refactor_prompts(args, result, output_dir)
-        
-        _export_readme(args, result, output_dir)
-
-    except Exception as e:
-        print(f"Error during export: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def _export_simple_formats(args, result, output_dir: Path, formats):
-    """Export toon, map, flow, context, yaml, json formats."""
-    format_map = {
-        'toon': ('analysis.toon', ToonExporter, 'TOON (diagnostics)'),
-        'map': ('map.toon', MapExporter, 'MAP (structure)'),
-        'flow': ('flow.toon', FlowExporter, 'FLOW (data-flow)'),
-        'context': ('context.md', ContextExporter, 'CONTEXT (LLM narrative)'),
-    }
-
-    for fmt, (filename, exporter_cls, label) in format_map.items():
-        if fmt in formats:
-            exporter = exporter_cls()
-            filepath = output_dir / filename
-            exporter.export(result, str(filepath))
-            if args.verbose:
-                print(f"  - {label}: {filepath}")
-
-    if 'yaml' in formats:
-        _export_yaml(args, result, output_dir)
-
-    if 'json' in formats:
-        exporter = JSONExporter()
-        filepath = output_dir / 'analysis.json'
-        exporter.export(result, str(filepath), include_defaults=args.full)
-        if args.verbose:
-            print(f"  - JSON: {filepath}")
-
-
-def _export_yaml(args, result, output_dir: Path):
-    """Export YAML with optional split/separated modes."""
-    exporter = YAMLExporter()
-    if args.separate_orphans:
-        sep_dir = output_dir / 'separated'
-        exporter.export_separated(result, str(sep_dir), compact=True)
-        if args.verbose:
-            print(f"  - YAML (separated): {sep_dir}/")
-    elif args.split_output:
-        split_dir = output_dir / 'split'
-        exporter.export_split(result, str(split_dir), include_defaults=args.full)
-        if args.verbose:
-            print(f"  - YAML (split): {split_dir}/")
-    else:
-        filepath = output_dir / 'analysis.yaml'
-        exporter.export(result, str(filepath), include_defaults=args.full)
-        if args.verbose:
-            print(f"  - YAML: {filepath}")
-
-
-def _export_mermaid(args, result, output_dir: Path):
-    """Export Mermaid diagrams + optional PNG generation."""
-    exporter = MermaidExporter()
-    exporter.export(result, str(output_dir / 'flow.mmd'))
-    exporter.export_call_graph(result, str(output_dir / 'calls.mmd'))
-    exporter.export_compact(result, str(output_dir / 'compact_flow.mmd'))
-    if args.verbose:
-        print(f"  - Mermaid: {output_dir / '*.mmd'}")
-
-    if not args.no_png:
-        try:
-            from .generators.mermaid import generate_pngs
-            png_count = generate_pngs(output_dir, output_dir)
-            if args.verbose and png_count > 0:
-                print(f"  - PNG: {png_count} files generated")
-        except ImportError:
-            try:
-                import subprocess
-                script_path = Path(__file__).parent.parent / 'mermaid_to_png.py'
-                if script_path.exists():
-                    png_result = subprocess.run([
-                        'python', str(script_path),
-                        '--batch', str(output_dir), str(output_dir)
-                    ], capture_output=True, text=True, timeout=60)
-                    if png_result.returncode == 0 and args.verbose:
-                        print(f"  - PNG: {output_dir / '*.png'}")
-            except Exception:
-                if args.verbose:
-                    print(f"  - PNG: Skipped (install with: make install-mermaid)")
-    elif args.verbose:
-        print(f"  - PNG: Skipped (--no-png)")
-
-
-def _export_refactor_prompts(args, result, output_dir: Path):
-    """Generate AI-driven refactoring prompts."""
-    from .refactor.prompt_engine import PromptEngine
-    prompt_engine = PromptEngine(result)
-    prompts = prompt_engine.generate_prompts()
-
-    if prompts:
-        prompts_dir = output_dir / 'prompts'
-        prompts_dir.mkdir(parents=True, exist_ok=True)
-
-        if args.smell:
-            prompts = {k: v for k, v in prompts.items() if args.smell in k.lower()}
-
-        for filename, content in prompts.items():
-            prompt_path = prompts_dir / filename
-            prompt_path.write_text(content)
-
-        if args.verbose:
-            print(f"  - Refactoring prompts: {prompts_dir}/ ({len(prompts)} files)")
-    else:
-        if args.verbose:
-            print("  - Refactoring: No code smells detected.")
 
 
 def generate_llm_context(args_list):
