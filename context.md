@@ -4,10 +4,10 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Analysis Mode**: static
-- **Total Functions**: 645
-- **Total Classes**: 94
-- **Modules**: 76
-- **Entry Points**: 537
+- **Total Functions**: 700
+- **Total Classes**: 97
+- **Modules**: 83
+- **Entry Points**: 553
 
 ## Architecture by Module
 
@@ -25,6 +25,11 @@
 - **Functions**: 25
 - **File**: `validate_toon.py`
 
+### code2llm.generators.llm_flow
+- **Functions**: 24
+- **Classes**: 1
+- **File**: `llm_flow.py`
+
 ### code2llm.exporters.toon.renderer
 - **Functions**: 21
 - **Classes**: 1
@@ -35,15 +40,9 @@
 - **Classes**: 3
 - **File**: `pipeline.py`
 
-### code2llm.generators.llm_flow
-- **Functions**: 20
-- **Classes**: 1
-- **File**: `llm_flow.py`
-
-### code2llm.exporters.flow_exporter
-- **Functions**: 20
-- **Classes**: 1
-- **File**: `flow_exporter.py`
+### code2llm.cli
+- **Functions**: 19
+- **File**: `cli.py`
 
 ### code2llm.analysis.type_inference
 - **Functions**: 18
@@ -59,6 +58,11 @@
 - **Functions**: 17
 - **Classes**: 1
 - **File**: `cfg.py`
+
+### code2llm.analysis.data_analysis
+- **Functions**: 16
+- **Classes**: 1
+- **File**: `data_analysis.py`
 
 ### code2llm.nlp.entity_resolution
 - **Functions**: 16
@@ -79,43 +83,33 @@
 - **Classes**: 3
 - **File**: `intent_matching.py`
 
+### code2llm.exporters.evolution_exporter
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `evolution_exporter.py`
+
+### code2llm.generators.llm_task
+- **Functions**: 15
+- **File**: `llm_task.py`
+
 ### code2llm.analysis.pipeline_detector
 - **Functions**: 14
 - **Classes**: 3
 - **File**: `pipeline_detector.py`
 
-### code2llm.analysis.data_analysis
-- **Functions**: 13
+### code2llm.exporters.context_exporter
+- **Functions**: 14
 - **Classes**: 1
-- **File**: `data_analysis.py`
+- **File**: `context_exporter.py`
 
-### code2llm.analysis.call_graph
-- **Functions**: 13
+### code2llm.exporters.flow_exporter
+- **Functions**: 14
 - **Classes**: 1
-- **File**: `call_graph.py`
-
-### code2llm.nlp.normalization
-- **Functions**: 13
-- **Classes**: 2
-- **File**: `normalization.py`
-
-### code2llm.exporters.map_exporter
-- **Functions**: 13
-- **Classes**: 1
-- **File**: `map_exporter.py`
-
-### examples.streaming-analyzer.sample_project.database
-- **Functions**: 13
-- **Classes**: 1
-- **File**: `database.py`
+- **File**: `flow_exporter.py`
 
 ## Key Entry Points
 
 Main execution flows into the system:
-
-### benchmarks.benchmark_format_quality.run_benchmark
-> Run the full format quality benchmark.
-- **Calls**: print, print, print, print, Path, benchmarks.benchmark_format_quality.create_ground_truth_project, print, print
 
 ### validate_toon.main
 > Main validation function.
@@ -157,10 +151,6 @@ Main execution flows into the system:
 > Export simplified call graph — only connected nodes.
 - **Calls**: set, result.functions.items, sorted, set, self._write, self._module_of, result.functions.get, modules.items
 
-### code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules
-> Identify god modules (≥500 lines) from project files.
-- **Calls**: defaultdict, result.functions.items, result.classes.items, file_stats.items, god_modules.sort, Path, pp.is_dir, pp.rglob
-
 ### code2llm.exporters.context_exporter.ContextExporter.export
 > Generate comprehensive LLM prompt with architecture description.
 - **Calls**: lines.extend, lines.extend, self._get_important_entries, lines.extend, lines.extend, lines.extend, lines.extend, lines.extend
@@ -177,13 +167,9 @@ Main execution flows into the system:
 > Export analysis result to flow.toon format.
 - **Calls**: self._build_context, sections.extend, sections.append, sections.extend, sections.append, sections.extend, sections.append, sections.extend
 
-### code2llm.cli.main
-> Main CLI entry point.
-- **Calls**: code2llm.cli.create_parser, parser.parse_args, Path, Path, output_dir.mkdir, code2llm.cli._run_analysis, code2llm.cli._run_exports, llm_flow_main
-
-### code2llm.analysis.data_analysis.DataAnalyzer._analyze_data_types
-> Analyze data types and usage.
-- **Calls**: result.functions.items, sorted, func.name.lower, self._infer_parameter_types, self._infer_return_types, data_types.values, func.docstring.lower, None.join
+### benchmarks.benchmark_format_quality.run_benchmark
+> Run the full format quality benchmark.
+- **Calls**: benchmarks.benchmark_format_quality._print_benchmark_header, Path, benchmarks.project_generator.create_ground_truth_project, benchmarks.benchmark_format_quality._print_ground_truth_info, output_dir.mkdir, benchmarks.reporting.print_results, benchmarks.reporting.build_report, tempfile.mkdtemp
 
 ### code2llm.nlp.intent_matching.IntentMatcher._calculate_similarity
 > Calculate string similarity using configured algorithm.
@@ -201,50 +187,57 @@ Strategy:
 > Generate evolution.toon.
 - **Calls**: self._build_context, sections.extend, sections.append, sections.extend, sections.append, sections.extend, sections.append, sections.extend
 
-### scripts.benchmark_badges.parse_evolution_metrics
-> Extract metrics from evolution.toon content.
-- **Calls**: toon_content.splitlines, re.search, line.strip, line.startswith, m.group, re.search, line.startswith, m.group
-
 ### code2llm.exporters.yaml_exporter.YAMLExporter.export_grouped
 > Export with grouped CFG flows by function.
 - **Calls**: defaultdict, result.nodes.items, sorted, None.parent.mkdir, func_flows.items, sorted, open, yaml.dump
-
-### code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file
-> Quick scan - extract functions and classes only (no CFG).
-- **Calls**: ast.walk, None.read_text, self.cache.get, ModuleInfo, isinstance, ast.parse, ClassInfo, None.classes.append
 
 ### code2llm.core.streaming.prioritizer.SmartPrioritizer.prioritize_files
 > Score and sort files by importance.
 - **Calls**: self._build_import_graph, scored.sort, self._check_has_main, len, FilePriority, scored.append, reasons.append, reasons.append
 
+### code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file
+> Quick scan - extract functions and classes only (no CFG).
+- **Calls**: ast.walk, None.read_text, self.cache.get, ModuleInfo, isinstance, ast.parse, ClassInfo, None.classes.append
+
 ### examples.streaming-analyzer.demo.demo_incremental_analysis
 > Demonstrate incremental analysis.
 - **Calls**: print, print, IncrementalAnalyzer, print, incremental.get_changed_files, print, print, print
 
-### code2llm.generators.llm_flow.main
-- **Calls**: None.parse_args, Path, code2llm.generators.llm_flow._safe_read_yaml, code2llm.generators.llm_flow.generate_llm_flow, Path, output_path.parent.mkdir, output_path.write_text, input_path.exists
+### code2llm.exporters.flow_renderer.FlowRenderer.render_pipelines
+> Renderuj sekcję PIPELINES.
+- **Calls**: defaultdict, None.join, pl.get, pl.get, lines.append, pl.get, lines.append, lines.append
 
 ### code2llm.exporters.flow_exporter.FlowExporter._compute_type_usage
 > Count how many functions consume/produce each type using AST data.
 - **Calls**: defaultdict, defaultdict, funcs.items, type_list.sort, type_info.get, ti.get, ti.get, set
 
-### code2llm.exporters.flow_exporter.FlowExporter._render_pipelines
-- **Calls**: defaultdict, None.join, pl.get, pl.get, lines.append, pl.get, lines.append, lines.append
+### code2llm.generators.llm_flow.main
+- **Calls**: None.parse_args, Path, code2llm.generators.llm_flow._safe_read_yaml, code2llm.generators.llm_flow.generate_llm_flow, Path, output_path.parent.mkdir, output_path.write_text, input_path.exists
 
-### code2llm.exporters.context_exporter.ContextExporter._trace_flow
-> Trace execution flow from a function with cycle detection.
-- **Calls**: visited.add, sorted, None.join, set, func_name.split, None.append, calls_by_module.items, func_name.split
+### examples.litellm.run.main
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.parse_args, examples.litellm.run.run_analysis, print, examples.litellm.run.get_refactoring_advice, print
+
+### examples.streaming-analyzer.demo.main
+> Run all demos.
+- **Calls**: print, print, print, print, os.chdir, print, print, print
+
+### examples.functional_refactoring_example.generate
+> Generate command from natural language query.
+- **Calls**: click.command, click.argument, click.option, click.option, click.option, EvolutionaryCache, CommandGenerator, CommandContext
+
+### code2llm.exporters.map_exporter.MapExporter._render_map_module
+> Render a single module's detail: imports, exports, classes, funcs.
+- **Calls**: self._rel_path, lines.append, None.join, lines.append, result.classes.get, result.functions.get, lines.append, result.classes.get
+
+### examples.streaming-analyzer.demo.demo_custom_progress
+> Demonstrate custom progress tracking.
+- **Calls**: print, print, StreamingAnalyzer, ProgressTracker, analyzer.set_progress_callback, analyzer.analyze_streaming, time.time, update.get
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: run_benchmark
-```
-run_benchmark [benchmarks.benchmark_format_quality]
-```
-
-### Flow 2: main
+### Flow 1: main
 ```
 main [validate_toon]
   └─> load_file
@@ -252,14 +245,20 @@ main [validate_toon]
       └─> load_yaml
 ```
 
-### Flow 3: analyze_project
+### Flow 2: analyze_project
 ```
 analyze_project [code2llm.core.analyzer.ProjectAnalyzer]
 ```
 
-### Flow 4: export
+### Flow 3: export
 ```
 export [code2llm.exporters.toon.ToonExporter]
+```
+
+### Flow 4: run_benchmark
+```
+run_benchmark [benchmarks.benchmark_evolution]
+  └─> load_previous
 ```
 
 ### Flow 5: process
@@ -287,9 +286,10 @@ export_compact [code2llm.exporters.mermaid_exporter.MermaidExporter]
 export_call_graph [code2llm.exporters.mermaid_exporter.MermaidExporter]
 ```
 
-### Flow 10: _compute_god_modules
+### Flow 10: _compute_file_metrics
 ```
-_compute_god_modules [code2llm.exporters.evolution_exporter.EvolutionExporter]
+_compute_file_metrics [code2llm.exporters.toon.metrics.MetricsComputer]
+  └─ →> _is_excluded
 ```
 
 ## Key Classes
@@ -304,14 +304,6 @@ _compute_god_modules [code2llm.exporters.evolution_exporter.EvolutionExporter]
 - **Methods**: 21
 - **Key Methods**: code2llm.exporters.toon.renderer.ToonRenderer.render_header, code2llm.exporters.toon.renderer.ToonRenderer.render_health, code2llm.exporters.toon.renderer.ToonRenderer.render_refactor, code2llm.exporters.toon.renderer.ToonRenderer.render_coupling, code2llm.exporters.toon.renderer.ToonRenderer._select_top_packages, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_header, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_rows, code2llm.exporters.toon.renderer.ToonRenderer._build_coupling_row, code2llm.exporters.toon.renderer.ToonRenderer._coupling_row_tag, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_summary
 
-### code2llm.exporters.flow_exporter.FlowExporter
-> Export to flow.toon — data-flow focused format.
-
-Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TY
-- **Methods**: 20
-- **Key Methods**: code2llm.exporters.flow_exporter.FlowExporter.__init__, code2llm.exporters.flow_exporter.FlowExporter.export, code2llm.exporters.flow_exporter.FlowExporter._build_context, code2llm.exporters.flow_exporter.FlowExporter._pipeline_to_dict, code2llm.exporters.flow_exporter.FlowExporter._compute_transforms, code2llm.exporters.flow_exporter.FlowExporter._transform_label, code2llm.exporters.flow_exporter.FlowExporter._compute_type_usage, code2llm.exporters.flow_exporter.FlowExporter._normalize_type, code2llm.exporters.flow_exporter.FlowExporter._type_label, code2llm.exporters.flow_exporter.FlowExporter._classify_side_effects
-- **Inherits**: Exporter
-
 ### code2llm.analysis.type_inference.TypeInferenceEngine
 > Extract and infer type information from Python source files.
 
@@ -325,6 +317,11 @@ Operates on source files referenced by
 - **Key Methods**: code2llm.analysis.cfg.CFGExtractor.__init__, code2llm.analysis.cfg.CFGExtractor.extract, code2llm.analysis.cfg.CFGExtractor.new_node, code2llm.analysis.cfg.CFGExtractor.connect, code2llm.analysis.cfg.CFGExtractor.visit_FunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_AsyncFunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_If, code2llm.analysis.cfg.CFGExtractor.visit_For, code2llm.analysis.cfg.CFGExtractor.visit_While, code2llm.analysis.cfg.CFGExtractor.visit_Try
 - **Inherits**: ast.NodeVisitor
 
+### code2llm.analysis.data_analysis.DataAnalyzer
+> Analyze data flows, structures, and optimization opportunities.
+- **Methods**: 16
+- **Key Methods**: code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_flow, code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_structures, code2llm.analysis.data_analysis.DataAnalyzer._find_data_pipelines, code2llm.analysis.data_analysis.DataAnalyzer._find_state_patterns, code2llm.analysis.data_analysis.DataAnalyzer._find_data_dependencies, code2llm.analysis.data_analysis.DataAnalyzer._find_event_flows, code2llm.analysis.data_analysis.DataAnalyzer._detect_types_from_name, code2llm.analysis.data_analysis.DataAnalyzer._create_type_entry, code2llm.analysis.data_analysis.DataAnalyzer._update_type_stats, code2llm.analysis.data_analysis.DataAnalyzer._analyze_data_types
+
 ### code2llm.nlp.pipeline.NLPPipeline
 > Main NLP processing pipeline (4a-4e).
 - **Methods**: 16
@@ -337,6 +334,12 @@ Scans function bodies for IO operations,
 - **Methods**: 15
 - **Key Methods**: code2llm.analysis.side_effects.SideEffectDetector.__init__, code2llm.analysis.side_effects.SideEffectDetector.analyze_function, code2llm.analysis.side_effects.SideEffectDetector.analyze_all, code2llm.analysis.side_effects.SideEffectDetector.get_purity_score, code2llm.analysis.side_effects.SideEffectDetector._scan_node, code2llm.analysis.side_effects.SideEffectDetector._check_calls, code2llm.analysis.side_effects.SideEffectDetector._check_assignments, code2llm.analysis.side_effects.SideEffectDetector._check_globals, code2llm.analysis.side_effects.SideEffectDetector._check_yield, code2llm.analysis.side_effects.SideEffectDetector._check_delete
 
+### code2llm.exporters.evolution_exporter.EvolutionExporter
+> Export evolution.toon — prioritized refactoring queue.
+- **Methods**: 15
+- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
+- **Inherits**: Exporter
+
 ### code2llm.core.core.file_analyzer.FileAnalyzer
 > Analyzes a single file.
 - **Methods**: 15
@@ -347,10 +350,21 @@ Scans function bodies for IO operations,
 - **Methods**: 14
 - **Key Methods**: code2llm.nlp.entity_resolution.EntityResolver.__init__, code2llm.nlp.entity_resolution.EntityResolver.resolve, code2llm.nlp.entity_resolution.EntityResolver._extract_candidates, code2llm.nlp.entity_resolution.EntityResolver._extract_from_patterns, code2llm.nlp.entity_resolution.EntityResolver._disambiguate, code2llm.nlp.entity_resolution.EntityResolver._resolve_hierarchical, code2llm.nlp.entity_resolution.EntityResolver._resolve_aliases, code2llm.nlp.entity_resolution.EntityResolver._name_similarity, code2llm.nlp.entity_resolution.EntityResolver.load_from_analysis, code2llm.nlp.entity_resolution.EntityResolver.step_3a_extract_entities
 
-### code2llm.analysis.data_analysis.DataAnalyzer
-> Analyze data flows, structures, and optimization opportunities.
-- **Methods**: 13
-- **Key Methods**: code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_flow, code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_structures, code2llm.analysis.data_analysis.DataAnalyzer._find_data_pipelines, code2llm.analysis.data_analysis.DataAnalyzer._find_state_patterns, code2llm.analysis.data_analysis.DataAnalyzer._find_data_dependencies, code2llm.analysis.data_analysis.DataAnalyzer._find_event_flows, code2llm.analysis.data_analysis.DataAnalyzer._analyze_data_types, code2llm.analysis.data_analysis.DataAnalyzer._infer_parameter_types, code2llm.analysis.data_analysis.DataAnalyzer._infer_return_types, code2llm.analysis.data_analysis.DataAnalyzer._build_data_flow_graph
+### code2llm.exporters.context_exporter.ContextExporter
+> Export LLM-ready analysis summary with architecture and flows.
+
+Output: context.md — architecture na
+- **Methods**: 14
+- **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns, code2llm.exporters.context_exporter.ContextExporter._get_api_surface
+- **Inherits**: Exporter
+
+### code2llm.exporters.flow_exporter.FlowExporter
+> Export to flow.toon — data-flow focused format.
+
+Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TY
+- **Methods**: 14
+- **Key Methods**: code2llm.exporters.flow_exporter.FlowExporter.__init__, code2llm.exporters.flow_exporter.FlowExporter.export, code2llm.exporters.flow_exporter.FlowExporter._build_context, code2llm.exporters.flow_exporter.FlowExporter._pipeline_to_dict, code2llm.exporters.flow_exporter.FlowExporter._compute_transforms, code2llm.exporters.flow_exporter.FlowExporter._transform_label, code2llm.exporters.flow_exporter.FlowExporter._compute_type_usage, code2llm.exporters.flow_exporter.FlowExporter._normalize_type, code2llm.exporters.flow_exporter.FlowExporter._type_label, code2llm.exporters.flow_exporter.FlowExporter._classify_side_effects
+- **Inherits**: Exporter
 
 ### code2llm.analysis.pipeline_detector.PipelineDetector
 > Detect pipelines in a codebase using networkx graph analysis.
@@ -388,31 +402,17 @@ Keys: M=modules, D=details,
 - **Methods**: 13
 - **Key Methods**: examples.streaming-analyzer.sample_project.database.DatabaseConnection.__init__, examples.streaming-analyzer.sample_project.database.DatabaseConnection._load_data, examples.streaming-analyzer.sample_project.database.DatabaseConnection._save_data, examples.streaming-analyzer.sample_project.database.DatabaseConnection.get_user, examples.streaming-analyzer.sample_project.database.DatabaseConnection.get_user_settings, examples.streaming-analyzer.sample_project.database.DatabaseConnection.get_user_logs, examples.streaming-analyzer.sample_project.database.DatabaseConnection.update_user_settings, examples.streaming-analyzer.sample_project.database.DatabaseConnection.update_user_profile, examples.streaming-analyzer.sample_project.database.DatabaseConnection.delete_user, examples.streaming-analyzer.sample_project.database.DatabaseConnection.clear_user_data
 
-### code2llm.analysis.dfg.DFGExtractor
-> Extract Data Flow Graph from AST.
-- **Methods**: 12
-- **Key Methods**: code2llm.analysis.dfg.DFGExtractor.__init__, code2llm.analysis.dfg.DFGExtractor.extract, code2llm.analysis.dfg.DFGExtractor.visit_FunctionDef, code2llm.analysis.dfg.DFGExtractor.visit_Assign, code2llm.analysis.dfg.DFGExtractor.visit_AugAssign, code2llm.analysis.dfg.DFGExtractor.visit_For, code2llm.analysis.dfg.DFGExtractor.visit_Call, code2llm.analysis.dfg.DFGExtractor._extract_targets, code2llm.analysis.dfg.DFGExtractor._get_names, code2llm.analysis.dfg.DFGExtractor._extract_names
-- **Inherits**: ast.NodeVisitor
-
 ### code2llm.exporters.mermaid_exporter.MermaidExporter
 > Export call graph to Mermaid format.
 - **Methods**: 12
 - **Key Methods**: code2llm.exporters.mermaid_exporter.MermaidExporter.export, code2llm.exporters.mermaid_exporter.MermaidExporter._render_subgraphs, code2llm.exporters.mermaid_exporter.MermaidExporter._render_edges, code2llm.exporters.mermaid_exporter.MermaidExporter._render_cc_styles, code2llm.exporters.mermaid_exporter.MermaidExporter._get_cc, code2llm.exporters.mermaid_exporter.MermaidExporter.export_call_graph, code2llm.exporters.mermaid_exporter.MermaidExporter.export_compact, code2llm.exporters.mermaid_exporter.MermaidExporter._readable_id, code2llm.exporters.mermaid_exporter.MermaidExporter._safe_module, code2llm.exporters.mermaid_exporter.MermaidExporter._module_of
 - **Inherits**: Exporter
 
-### code2llm.exporters.context_exporter.ContextExporter
-> Export LLM-ready analysis summary with architecture and flows.
-
-Output: context.md — architecture na
+### code2llm.analysis.dfg.DFGExtractor
+> Extract Data Flow Graph from AST.
 - **Methods**: 12
-- **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns, code2llm.exporters.context_exporter.ContextExporter._get_api_surface
-- **Inherits**: Exporter
-
-### code2llm.exporters.evolution_exporter.EvolutionExporter
-> Export evolution.toon — prioritized refactoring queue.
-- **Methods**: 11
-- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types, code2llm.exporters.evolution_exporter.EvolutionExporter._render_header, code2llm.exporters.evolution_exporter.EvolutionExporter._render_next, code2llm.exporters.evolution_exporter.EvolutionExporter._render_risks, code2llm.exporters.evolution_exporter.EvolutionExporter._render_metrics_target
-- **Inherits**: Exporter
+- **Key Methods**: code2llm.analysis.dfg.DFGExtractor.__init__, code2llm.analysis.dfg.DFGExtractor.extract, code2llm.analysis.dfg.DFGExtractor.visit_FunctionDef, code2llm.analysis.dfg.DFGExtractor.visit_Assign, code2llm.analysis.dfg.DFGExtractor.visit_AugAssign, code2llm.analysis.dfg.DFGExtractor.visit_For, code2llm.analysis.dfg.DFGExtractor.visit_Call, code2llm.analysis.dfg.DFGExtractor._extract_targets, code2llm.analysis.dfg.DFGExtractor._get_names, code2llm.analysis.dfg.DFGExtractor._extract_names
+- **Inherits**: ast.NodeVisitor
 
 ## Data Transformation Functions
 
@@ -454,6 +454,17 @@ Key functions that process and transform data:
 > Validate toon format structure.
 - **Output to**: print, print, bool, bool, bool
 
+### benchmarks.format_evaluator.evaluate_format
+> Oceń pojedynczy format względem ground truth.
+- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+
+### scripts.bump_version.parse_version
+> Parse version string into tuple of (major, minor, patch)
+- **Output to**: version_str.split, tuple, int
+
+### scripts.bump_version.format_version
+> Format version tuple as string
+
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, m.group
@@ -470,27 +481,27 @@ Key functions that process and transform data:
 > Generate badges from format quality scores.
 - **Output to**: enumerate, badges.append, sorted, badges.append, format_scores.items
 
-### scripts.bump_version.parse_version
-> Parse version string into tuple of (major, minor, patch)
-- **Output to**: version_str.split, tuple, int
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
 
-### scripts.bump_version.format_version
-> Format version tuple as string
+### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
+- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
 
 ### code2llm.cli.create_parser
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
+### code2llm.cli._validate_and_setup
+> Validate source path and setup output directory.
+- **Output to**: Path, Path, output_dir.mkdir, print, print
+
 ### code2llm.cli._export_simple_formats
 > Export toon, map, flow, context, yaml, json formats.
 - **Output to**: format_map.items, code2llm.cli._export_yaml, JSONExporter, exporter.export, exporter_cls
 
-### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
-- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
-### benchmarks.benchmark_format_quality.evaluate_format
-> Evaluate a single format against ground truth.
-- **Output to**: FormatScore, content.lower, sum, KNOWN_PIPELINES.items, sum
+### benchmarks.benchmark_format_quality._generate_format_outputs
+> Generate all format outputs and evaluate them.
+- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
 ### code2llm.analysis.cfg.CFGExtractor._format_except
 > Format except handler.
@@ -504,18 +515,12 @@ Key functions that process and transform data:
 > 4e. Format action recommendation.
 - **Output to**: result.get_intent, result.get_entities
 
-### code2llm.nlp.pipeline.NLPPipeline._format_response
-> 4e. Format human-readable response.
-- **Output to**: None.join, lines.append, lines.append, lines.append, result.get_intent
-
-### code2llm.nlp.pipeline.NLPPipeline.step_4e_format
-> Step 4e: Output formatting.
-- **Output to**: self._format_response
-
-### code2llm.exporters.context_exporter.ContextExporter._get_process_flows
-- **Output to**: set, set, seen_base_names.add, self._trace_flow, ep_name.split
-
 ## Behavioral Patterns
+
+### recursion__is_excluded
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: code2llm.exporters.toon.ToonExporter._is_excluded
 
 ### state_machine_IncrementalAnalyzer
 - **Type**: state_machine
@@ -531,18 +536,14 @@ Key functions that process and transform data:
 
 Functions exposed as public API (no underscore prefix):
 
-- `benchmarks.benchmark_format_quality.evaluate_format` - 53 calls
-- `benchmarks.benchmark_format_quality.run_benchmark` - 47 calls
-- `benchmarks.benchmark_format_quality.print_results` - 46 calls
 - `validate_toon.main` - 45 calls
 - `code2llm.generators.llm_task.normalize_llm_task` - 43 calls
 - `code2llm.generators.llm_flow.render_llm_flow_md` - 42 calls
 - `benchmarks.benchmark_performance.main` - 41 calls
 - `validate_toon.analyze_class_differences` - 39 calls
-- `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 35 calls
+- `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 38 calls
 - `code2llm.exporters.toon.ToonExporter.export` - 35 calls
 - `benchmarks.benchmark_evolution.run_benchmark` - 34 calls
-- `code2llm.generators.llm_task.parse_llm_task_text` - 32 calls
 - `benchmarks.benchmark_performance.create_test_project` - 29 calls
 - `code2llm.nlp.pipeline.NLPPipeline.process` - 29 calls
 - `validate_toon.compare_modules` - 26 calls
@@ -556,21 +557,25 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.generators.mermaid.generate_single_png` - 24 calls
 - `scripts.benchmark_badges.main` - 23 calls
 - `code2llm.exporters.flow_exporter.FlowExporter.export` - 23 calls
-- `code2llm.cli.main` - 22 calls
+- `benchmarks.format_evaluator.evaluate_format` - 22 calls
+- `benchmarks.benchmark_format_quality.run_benchmark` - 22 calls
 - `code2llm.cli.generate_llm_context` - 21 calls
 - `code2llm.exporters.evolution_exporter.EvolutionExporter.export` - 20 calls
 - `validate_toon.compare_classes` - 19 calls
 - `scripts.benchmark_badges.parse_evolution_metrics` - 19 calls
 - `code2llm.exporters.yaml_exporter.YAMLExporter.export_grouped` - 19 calls
-- `code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file` - 19 calls
 - `code2llm.core.streaming.prioritizer.SmartPrioritizer.prioritize_files` - 19 calls
+- `code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file` - 19 calls
 - `examples.streaming-analyzer.demo.demo_incremental_analysis` - 19 calls
+- `code2llm.exporters.flow_renderer.FlowRenderer.render_pipelines` - 18 calls
 - `code2llm.generators.llm_flow.main` - 18 calls
 - `validate_toon.validate_toon_completeness` - 17 calls
 - `examples.litellm.run.main` - 17 calls
 - `examples.streaming-analyzer.demo.main` - 17 calls
 - `examples.functional_refactoring_example.generate` - 16 calls
 - `examples.streaming-analyzer.demo.demo_custom_progress` - 16 calls
+- `scripts.benchmark_badges.generate_performance_badges` - 15 calls
+- `code2llm.nlp.config.NLPConfig.from_yaml` - 15 calls
 
 ## System Interactions
 
@@ -578,8 +583,6 @@ How components interact:
 
 ```mermaid
 graph TD
-    run_benchmark --> print
-    run_benchmark --> Path
     main --> len
     main --> Path
     main --> print
@@ -594,6 +597,7 @@ graph TD
     export --> extend
     export --> append
     run_benchmark --> load_previous
+    run_benchmark --> print
     process --> time
     process --> _step_normalize
     process --> append
@@ -608,6 +612,7 @@ graph TD
     analyze_streaming --> len
     export_compact --> defaultdict
     export_compact --> items
+    export_call_graph --> set
 ```
 
 ## Reverse Engineering Guidelines

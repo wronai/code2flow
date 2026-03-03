@@ -37,6 +37,7 @@ class ProjectAnalyzer:
         
         if self.config.verbose:
             print(f"Found {len(files)} files to analyze")
+            print(f"  - Parallel: {self.config.performance.parallel_enabled}, Workers: {self.config.performance.parallel_workers}")
         
         # Analyze files
         if self.config.performance.parallel_enabled and len(files) > 1:
@@ -54,7 +55,11 @@ class ProjectAnalyzer:
             self._detect_patterns(merged)
             
         # Refactoring analysis
+        if self.config.verbose:
+            print(f"  - Running refactoring analysis...", flush=True)
         self.refactoring_analyzer.perform_refactoring_analysis(merged)
+        if self.config.verbose:
+            print(f"  - Refactoring analysis complete", flush=True)
         
         # Calculate stats
         elapsed = time.time() - start_time
@@ -121,6 +126,7 @@ class ProjectAnalyzer:
             }
             
             # Collect results as they complete
+            completed = 0
             for future in as_completed(future_to_file):
                 file_path, module_name = future_to_file[future]
                 try:
@@ -130,6 +136,9 @@ class ProjectAnalyzer:
                 except Exception as e:
                     if self.config.verbose:
                         print(f"Error analyzing {file_path}: {e}")
+                completed += 1
+                if self.config.verbose and completed % 10 == 0:
+                    print(f"  - Progress: {completed}/{len(files)} files analyzed ({completed*100//len(files)}%)", flush=True)
         
         return results
     
@@ -137,8 +146,9 @@ class ProjectAnalyzer:
         """Analyze files sequentially."""
         results = []
         analyzer = FileAnalyzer(self.config, self.cache)
+        total = len(files)
         
-        for file_path, module_name in files:
+        for i, (file_path, module_name) in enumerate(files, 1):
             try:
                 result = analyzer.analyze_file(file_path, module_name)
                 if result:
@@ -146,6 +156,8 @@ class ProjectAnalyzer:
             except Exception as e:
                 if self.config.verbose:
                     print(f"Error analyzing {file_path}: {e}")
+            if self.config.verbose and (i % 10 == 0 or i == total):
+                print(f"  - Progress: {i}/{total} files analyzed ({i*100//total}%)", flush=True)
         
         return results
     
@@ -184,6 +196,9 @@ class ProjectAnalyzer:
     
     def _build_call_graph(self, result: AnalysisResult) -> None:
         """Build call graph and find entry points."""
+        if self.config.verbose:
+            print(f"  - Building call graph for {len(result.functions)} functions...", flush=True)
+        
         # Build lookup maps for O(1) resolution
         # Map simple name -> list of full names (for overloaded methods)
         simple_to_full: Dict[str, List[str]] = {}
@@ -220,6 +235,9 @@ class ProjectAnalyzer:
         for func_name, func in result.functions.items():
             if not func.called_by:
                 result.entry_points.append(func_name)
+        
+        if self.config.verbose:
+            print(f"  - Call graph complete: {len(result.entry_points)} entry points found", flush=True)
     
     def _detect_patterns(self, result: AnalysisResult) -> None:
         """Detect behavioral patterns."""

@@ -1,3 +1,20 @@
+## [0.5.16] - 2026-03-03
+
+### Summary
+
+refactor(docs): code analysis engine
+
+### Docs
+
+- docs: update README
+- docs: update context.md
+
+### Other
+
+- update analysis.toon
+- update code2llm/core/analyzer.py
+
+
 ## [0.5.15] - 2026-03-03
 
 ### Summary
