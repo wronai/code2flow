@@ -5,9 +5,13 @@ code2llm - CLI for Python code flow analysis
 Analyze control flow, data flow, and call graphs of Python codebases.
 """
 
+# Suppress SyntaxWarning messages by setting PYTHONWARNINGS before any imports
+# that might trigger file parsing
+import os
+os.environ['PYTHONWARNINGS'] = 'ignore::SyntaxWarning'
+
 # Suppress stderr at OS level immediately to avoid syntax error messages from C parser
 # This must happen BEFORE any imports that might trigger file parsing
-import os
 import sys
 if os.name != 'nt':  # Unix-like systems
     _code2llm_null_fd = os.open(os.devnull, os.O_WRONLY)

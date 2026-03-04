@@ -3,6 +3,11 @@
 # Suppress stderr at OS level immediately to avoid syntax error messages from C parser
 # This must happen BEFORE any imports that might trigger file parsing
 import os
+import warnings
+
+# Suppress SyntaxWarning which prints 'invalid syntax' messages
+warnings.filterwarnings('ignore', category=SyntaxWarning)
+
 if os.name != 'nt':  # Unix-like systems
     _code2llm_main_null_fd = os.open(os.devnull, os.O_WRONLY)
     _code2llm_main_old_stderr_fd = os.dup(2)
