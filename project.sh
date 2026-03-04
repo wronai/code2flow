@@ -3,8 +3,13 @@
 # Activate virtual environment
 source .venv/bin/activate
 
-pip install -e .
-pip install code2llm --upgrade
+# Only reinstall if source changed (skip slow pip rebuild when unnecessary)
+if [ "$1" = "--reinstall" ] || [ ! -f .venv/lib/python*/site-packages/code2llm.egg-link ] && [ ! -d .venv/lib/python*/site-packages/__editable__.code2llm-*.pth ]; then
+    pip install -e . --no-build-isolation
+else
+    echo "✓ code2llm already installed (use --reinstall to force)"
+fi
+
 #code2llm ./ --streaming --strategy deep -o ./project
 code2llm ./ -f toon -o ./
 
@@ -12,13 +17,13 @@ echo "🚀 Testing different output formats..."
 
 # Test 1: Default TOON format
 echo "📊 Test 1: Default TOON format"
-source .venv/bin/activate && python -m code2llm ./ -v -o ./project -m hybrid -f toon
+python -m code2llm ./ -v -o ./project -m hybrid -f toon
 python validate_toon.py output_toon/analysis.toon
 
 # Test 2: All formats
 rm -rf output_all/
 echo "📊 Test 2: All formats (toon,yaml,json,mermaid,png)"
-source .venv/bin/activate && python -m code2llm ./ -v -o ./output_all -m hybrid -f all
+python -m code2llm ./ -v -o ./output_all -m hybrid -f all
 ls -la output_all/
 
 exit

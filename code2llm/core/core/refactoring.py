@@ -1,15 +1,10 @@
 """Refactoring analysis for code2llm."""
 
-import networkx as nx
-import vulture
 from pathlib import Path
 from typing import Optional
 
 from ..config import Config
 from ..models import AnalysisResult
-from ...analysis.call_graph import CallGraphExtractor
-from ...analysis.coupling import CouplingAnalyzer
-from ...analysis.smells import SmellDetector
 from .file_filter import FastFileFilter
 
 
@@ -26,6 +21,7 @@ class RefactoringAnalyzer:
             print("Performing refactoring analysis...")
             
         # 1. Calculate metrics (fan-in/fan-out)
+        from ...analysis.call_graph import CallGraphExtractor
         cg_ext = CallGraphExtractor(self.config)
         cg_ext.result = result
         cg_ext._calculate_metrics()
@@ -54,8 +50,9 @@ class RefactoringAnalyzer:
         if self.config.verbose:
             print(f"  Detected {len(result.smells)} code smells")
 
-    def _build_call_graph(self, result: AnalysisResult) -> nx.DiGraph:
+    def _build_call_graph(self, result: AnalysisResult):
         """Build networkx call graph."""
+        import networkx as nx
         G = nx.DiGraph()
         for func_name, func_info in result.functions.items():
             G.add_node(func_name)
@@ -63,7 +60,7 @@ class RefactoringAnalyzer:
                 G.add_edge(func_name, callee)
         return G
 
-    def _calculate_centrality(self, call_graph: nx.DiGraph, result: AnalysisResult) -> None:
+    def _calculate_centrality(self, call_graph, result: AnalysisResult) -> None:
         """Calculate betweenness centrality for bottleneck detection."""
         if len(call_graph) > 0:
             try:
@@ -74,8 +71,10 @@ class RefactoringAnalyzer:
                         print(f"  Large graph ({node_count} nodes), using sampled centrality...")
                     # Sample 20% of nodes, max 500
                     k = min(int(node_count * 0.2), 500)
+                    import networkx as nx
                     centrality = nx.betweenness_centrality(call_graph, k=k)
                 else:
+                    import networkx as nx
                     centrality = nx.betweenness_centrality(call_graph)
                 for func_name, score in centrality.items():
                     if func_name in result.functions:
@@ -84,7 +83,7 @@ class RefactoringAnalyzer:
                 if self.config.verbose:
                     print(f"Error calculating centrality: {e}")
 
-    def _detect_cycles(self, call_graph: nx.DiGraph, result: AnalysisResult) -> None:
+    def _detect_cycles(self, call_graph, result: AnalysisResult) -> None:
         """Detect circular dependencies."""
         try:
             # Limit cycle detection for large graphs
@@ -92,6 +91,7 @@ class RefactoringAnalyzer:
                 if self.config.verbose:
                     print(f"  Skipping cycle detection for large graph ({len(call_graph)} nodes)")
                 return
+            import networkx as nx
             cycles = list(nx.simple_cycles(call_graph))
             if cycles:
                 result.metrics["project"] = result.metrics.get("project", {})
@@ -100,7 +100,7 @@ class RefactoringAnalyzer:
             if self.config.verbose:
                 print(f"Error detecting cycles: {e}")
 
-    def _detect_communities(self, call_graph: nx.DiGraph, result: AnalysisResult) -> None:
+    def _detect_communities(self, call_graph, result: AnalysisResult) -> None:
         """Detect communities (module groups)."""
         try:
             # Limit community detection for large graphs
@@ -122,11 +122,13 @@ class RefactoringAnalyzer:
 
     def _analyze_coupling(self, result: AnalysisResult) -> None:
         """Analyze coupling between modules."""
+        from ...analysis.coupling import CouplingAnalyzer
         coupling_analyzer = CouplingAnalyzer(result)
         coupling_analyzer.analyze()
 
     def _detect_smells(self, result: AnalysisResult) -> None:
         """Detect code smells."""
+        from ...analysis.smells import SmellDetector
         smell_detector = SmellDetector(result)
         smell_detector.detect()
 
@@ -136,6 +138,7 @@ class RefactoringAnalyzer:
             print("Detecting dead code with vulture...")
             
         try:
+            import vulture
             v = vulture.Vulture(verbose=False)
             
             # vulture.scan takes the code content as a string

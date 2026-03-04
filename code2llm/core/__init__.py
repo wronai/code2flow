@@ -1,15 +1,5 @@
 """Core analysis components for code2llm."""
 
-from .analyzer import ProjectAnalyzer, FileCache, FastFileFilter
-from .streaming_analyzer import (
-    StreamingAnalyzer, 
-    IncrementalAnalyzer,
-    ScanStrategy,
-    SmartPrioritizer,
-    STRATEGY_QUICK,
-    STRATEGY_STANDARD,
-    STRATEGY_DEEP
-)
 from .config import Config, FAST_CONFIG, PerformanceConfig, FilterConfig
 from .models import (
     AnalysisResult, FlowNode, FlowEdge, 
@@ -34,3 +24,21 @@ __all__ = [
     'ClassInfo',
     'ModuleInfo',
 ]
+
+
+def __getattr__(name):
+    """Lazy import heavy modules on first access."""
+    _analyzer_names = {'ProjectAnalyzer', 'FileCache', 'FastFileFilter'}
+    if name in _analyzer_names:
+        from . import analyzer as _mod
+        return getattr(_mod, name)
+    
+    _streaming_names = {
+        'StreamingAnalyzer', 'IncrementalAnalyzer', 'ScanStrategy',
+        'SmartPrioritizer', 'STRATEGY_QUICK', 'STRATEGY_STANDARD', 'STRATEGY_DEEP',
+    }
+    if name in _streaming_names:
+        from . import streaming_analyzer as _mod
+        return getattr(_mod, name)
+    
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

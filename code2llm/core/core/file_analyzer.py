@@ -22,6 +22,7 @@ class FileAnalyzer:
     def __init__(self, config: Config, cache=None):
         self.config = config
         self.cache = cache
+        self._file_filter = FastFileFilter(config.filters)
         self.stats = {
             'files_processed': 0,
             'functions_found': 0,
@@ -180,8 +181,7 @@ class FileAnalyzer:
             for d in node.decorator_list
         )
         
-        filter_obj = FastFileFilter(self.config.filters)
-        if filter_obj.should_skip_function(line_count, is_private, is_property):
+        if self._file_filter.should_skip_function(line_count, is_private, is_property):
             return
         
         # Create function info

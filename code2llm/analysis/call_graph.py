@@ -2,7 +2,6 @@
 
 import ast
 from typing import Optional, Set, List, Dict
-import astroid
 
 from ..core.config import Config
 from ..core.models import AnalysisResult, FlowEdge
@@ -32,9 +31,10 @@ class CallGraphExtractor(ast.NodeVisitor):
         self.class_stack = []
         self.imports = {}
         
-        # Try to get astroid tree for better resolution
+        # Try to get astroid tree for better resolution (lazy import - heavy module)
         try:
-            self.astroid_tree = astroid.MANAGER.ast_from_file(file_path)
+            import astroid as _astroid
+            self.astroid_tree = _astroid.MANAGER.ast_from_file(file_path)
         except Exception:
             self.astroid_tree = None
             
@@ -188,7 +188,8 @@ class CallGraphExtractor(ast.NodeVisitor):
         try:
             # Find the corresponding astroid node by line/col
             # This is a bit slow but robust
-            for astroid_node in self.astroid_tree.nodes_of_class(astroid.Call):
+            import astroid as _astroid
+            for astroid_node in self.astroid_tree.nodes_of_class(_astroid.Call):
                 if astroid_node.lineno == node.lineno and astroid_node.col_offset == node.col_offset:
                     # Infer the targets
                     inferred = astroid_node.func.infer()

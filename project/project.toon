@@ -1,4 +1,4 @@
-# code2llm | 125f 21261L | python:109/go:4/java:4/php:4/rust:4/typescript:4
+# code2llm | 125f 21288L | python:109/go:4/java:4/php:4/rust:4/typescript:4
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[125]:
   badges/server.py,91
@@ -10,10 +10,10 @@ M[125]:
   benchmarks/project_generator.py,190
   benchmarks/reporting.py,144
   benchmarks/test_performance.py,181
-  code2llm/__init__.py,37
+  code2llm/__init__.py,40
   code2llm/__main__.py,4
-  code2llm/analysis/__init__.py,21
-  code2llm/analysis/call_graph.py,155
+  code2llm/analysis/__init__.py,30
+  code2llm/analysis/call_graph.py,156
   code2llm/analysis/cfg.py,219
   code2llm/analysis/coupling.py,61
   code2llm/analysis/data_analysis.py,246
@@ -24,14 +24,14 @@ M[125]:
   code2llm/analysis/type_inference.py,252
   code2llm/cli.py,508
   code2llm/cli_exports.py,444
-  code2llm/core/__init__.py,34
+  code2llm/core/__init__.py,38
   code2llm/core/analyzer.py,227
   code2llm/core/config.py,137
   code2llm/core/core/__init__.py,5
   code2llm/core/core/file_analyzer.py,295
   code2llm/core/core/file_cache.py,48
   code2llm/core/core/file_filter.py,33
-  code2llm/core/core/refactoring.py,139
+  code2llm/core/core/refactoring.py,142
   code2llm/core/large_repo.py,443
   code2llm/core/models.py,155
   code2llm/core/streaming/__init__.py,6
@@ -193,8 +193,13 @@ D:
     TestPerformanceBenchmarks: large_project(0),test_fast_mode_performance(1),test_caching_performance(1),test_parallel_vs_sequential(1),test_scaling_with_project_size(1)  # Performance benchmark tests.
     TestMemoryBenchmarks: test_memory_usage_stays_bounded(1)  # Memory usage benchmarks.
     save_test_report(results:dict;test_name:str)->str
+  code2llm/__init__.py:
+    i: core.config.{Config,FAST_CONFIG},core.models.{AnalysisResult,ClassInfo,FunctionInfo,Pattern}
+    __getattr__(name)
+  code2llm/analysis/__init__.py:
+    __getattr__(name)
   code2llm/analysis/call_graph.py:
-    i: ast,astroid,core.config.Config,core.models.{AnalysisResult,FlowEdge},typing.{Dict,List,Optional,Set}
+    i: ast,core.config.Config,core.models.{AnalysisResult,FlowEdge},typing.{Dict,List,Optional,Set}
     e: CallGraphExtractor
     CallGraphExtractor: __init__(1),extract(3),_calculate_metrics(0),visit_Import(1),visit_ImportFrom(1)  # Extract call graph from AST.
   code2llm/analysis/cfg.py:
@@ -253,6 +258,9 @@ D:
     _should_run_code2logic(formats:list[str])->bool
     _check_code2logic_installed()->None
     _build_code2logic_cmd(args;source_path:Path;output_dir:Path)->list[str]
+  code2llm/core/__init__.py:
+    i: config.{Config,FAST_CONFIG,FilterConfig,PerformanceConfig},models
+    __getattr__(name)
   code2llm/core/analyzer.py:
     i: time,concurrent.futures.{ProcessPoolExecutor,as_completed},config.{Config,FAST_CONFIG},pathlib.Path,typing.{Dict,List,Optional,Tuple}
     e: ProjectAnalyzer
@@ -279,7 +287,7 @@ D:
     e: FastFileFilter
     FastFileFilter: __init__(1),should_process(1),should_skip_function(4)  # Fast file filtering with pattern matc...
   code2llm/core/core/refactoring.py:
-    i: networkx,vulture,analysis.call_graph.CallGraphExtractor,analysis.coupling.CouplingAnalyzer,analysis.smells.SmellDetector,config.Config,file_filter.FastFileFilter,models.AnalysisResult,pathlib.Path,typing.Optional
+    i: config.Config,file_filter.FastFileFilter,models.AnalysisResult,pathlib.Path,typing.Optional
     e: RefactoringAnalyzer
     RefactoringAnalyzer: __init__(2),perform_refactoring_analysis(1),_build_call_graph(1),_calculate_centrality(2),_detect_cycles(2)  # Performs refactoring analysis on code.
   code2llm/core/large_repo.py:
@@ -501,7 +509,7 @@ D:
     new(id: u32 name: &str)->Self
     main()
   demo_langs/invalid/sample_bad.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1)
   demo_langs/valid/sample.go:
     i: fmt
@@ -540,7 +548,7 @@ D:
     process_users(&self)
     main()
   demo_langs/valid/sample.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1),processUsers(0)
   examples/functional_refactoring_example.py:
     i: json,re,abc.{ABC,abstractmethod},dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,Optional,Protocol}
@@ -642,7 +650,7 @@ D:
     new(id: u32 name: &str)->Self
     main()
   test_langs/invalid/sample_bad.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1)
   test_langs/valid/sample.go:
     i: fmt
@@ -681,7 +689,7 @@ D:
     process_users(&self)
     main()
   test_langs/valid/sample.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1),processUsers(0)
   test_python_only/valid/sample.py:
     i: dataclasses.dataclass,typing.{List,Optional}

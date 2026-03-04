@@ -1,3 +1,29 @@
+## [0.5.30] - 2026-03-04
+
+### Summary
+
+refactor(docs): code analysis engine
+
+### Docs
+
+- docs: update README
+- docs: update context.md
+
+### Other
+
+- update code2llm/__init__.py
+- update code2llm/analysis/__init__.py
+- update code2llm/analysis/call_graph.py
+- update code2llm/core/__init__.py
+- update code2llm/core/core/file_analyzer.py
+- update code2llm/core/core/refactoring.py
+- scripts: update project.sh
+- update project/analysis.toon
+- update project/batch_1/analysis.toon
+- update project/batch_1/evolution.toon
+- ... and 4 more
+
+
 ## [0.5.29] - 2026-03-04
 
 ### Summary
