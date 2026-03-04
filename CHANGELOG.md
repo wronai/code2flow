@@ -1,3 +1,20 @@
+## [0.5.26] - 2026-03-04
+
+### Summary
+
+refactor(docs): code analysis engine
+
+### Docs
+
+- docs: update context.md
+
+### Other
+
+- update analysis.toon
+- update batch_1/analysis.toon
+- update root/analysis.toon
+
+
 ## [0.5.25] - 2026-03-04
 
 ### Summary
