@@ -8,8 +8,8 @@ HEALTH[8]:
   🟡 CC    _export_chunked_results CC=17 (limit:15)
   🟡 CC    _find_data_pipelines CC=17 (limit:15)
   🟡 CC    _infer_from_name CC=17 (limit:15)
-  🟡 CC    _validate_chunked_output CC=15 (limit:15)
   🟡 CC    _export_prompt_txt CC=15 (limit:15)
+  🟡 CC    _validate_chunked_output CC=15 (limit:15)
 
 REFACTOR[1]:
   1. split 8 high-CC methods  (CC>15)
@@ -127,8 +127,8 @@ FUNCTIONS (CC≥10, 46 of 649):
    17.0  _export_chunked_results                    14n   1exit  loops+cond  !! split
    17.0  DataAnalyzer._find_data_pipelines          14n   2exit  loops+cond+ret  !! split
    17.0  TypeInferenceEngine._infer_from_name       13n   2exit  loops+cond+ret  !! split
-   15.0  _validate_chunked_output                   21n   5exit  loops+cond+ret  !! split
    15.0  _export_prompt_txt                         13n   2exit  loops+cond+ret  !! split
+   15.0  _validate_chunked_output                   21n   5exit  loops+cond+ret  !! split
    14.0  DataAnalyzer._find_event_flows              9n   2exit  loops+cond+ret
    14.0  DataAnalyzer._get_function_data_types      19n   2exit  cond+ret
    14.0  DataAnalyzer._analyze_optimization_opportunities   15n   2exit  loops+cond+ret
@@ -159,13 +159,13 @@ FUNCTIONS (CC≥10, 46 of 649):
    10.0  ProjectAnalyzer.analyze_project            17n   2exit  cond+ret
    10.0  _split_by_modules                          15n   2exit  loops+cond+ret
    10.0  NLPPipeline._format_action                 29n  10exit  cond+ret
-   10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
+   10.0  ContextExporter._trace_flow                14n   3exit  loops+cond+ret
    10.0  EvolutionExporter._build_context            3n   2exit  ret
    10.0  EvolutionExporter._render_next             16n   3exit  loops+cond+ret
+   10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
    10.0  FlowExporter._infer_invariant              21n   8exit  cond+ret
-   10.0  ContextExporter._trace_flow                14n   3exit  loops+cond+ret
-   10.0  render_llm_flow_md                         16n   2exit  loops+cond+ret
    10.0  _scan_brackets                             11n   1exit  loops+cond
+   10.0  render_llm_flow_md                         16n   2exit  loops+cond+ret
    10.0  ToonRenderer.render_classes                11n   3exit  loops+cond+ret
 
   summary:
@@ -196,8 +196,8 @@ CLASSES:
   EvolutionExporter              █████████████             15m  CC̄=4.7   max=10  
   FileAnalyzer                   █████████████             15m  CC̄=4.5   max=12  
   EntityResolver                 ████████████              14m  CC̄=3.7   max=13  
-  FlowExporter                   ████████████              14m  CC̄=5.6   max=10  
   ContextExporter                ████████████              14m  CC̄=4.8   max=10  
+  FlowExporter                   ████████████              14m  CC̄=5.6   max=10  
   PipelineDetector               ███████████               13m  CC̄=6.9   max=18    !!
   CallGraphExtractor             ███████████               13m  CC̄=4.2   max=9   
   IntentMatcher                  ███████████               13m  CC̄=3.5   max=7   
@@ -221,8 +221,8 @@ CLASSES:
   IncrementalAnalyzer            ████                       5m  CC̄=2.8   max=5   
   StreamingFileCache             ████                       5m  CC̄=2.0   max=4   
   UserService                    ███                        4m  CC̄=1.8   max=3   
-  NLPPipelineResult              ███                        4m  CC̄=2.0   max=3   
   AnalysisResult                 ███                        4m  CC̄=1.0   max=1   
+  NLPPipelineResult              ███                        4m  CC̄=2.0   max=3   
   SmartPrioritizer               ███                        4m  CC̄=5.2   max=9   
   ToonExporter                   ██                         3m  CC̄=1.0   max=1   
   FastFileFilter                 ██                         3m  CC̄=6.0   max=8   
@@ -247,10 +247,9 @@ CLASSES:
   IntentMatchingConfig                                      0m  CC̄=0.0   max=0.0 
   EntityResolutionConfig                                    0m  CC̄=0.0   max=0.0 
   MultilingualConfig                                        0m  CC̄=0.0   max=0.0 
+  SubProject                                                0m  CC̄=0.0   max=0.0 
   IntentMatch                                               0m  CC̄=0.0   max=0.0 
   Entity                                                    0m  CC̄=0.0   max=0.0 
-  SubProject                                                0m  CC̄=0.0   max=0.0 
-  PipelineStage                                             0m  CC̄=0.0   max=0.0 
   NormalizationResult                                       0m  CC̄=0.0   max=0.0 
   FlowNode                                                  0m  CC̄=0.0   max=0.0 
   FlowEdge                                                  0m  CC̄=0.0   max=0.0 
@@ -261,6 +260,7 @@ CLASSES:
   CodeSmell                                                 0m  CC̄=0.0   max=0.0 
   Mutation                                                  0m  CC̄=0.0   max=0.0 
   DataFlow                                                  0m  CC̄=0.0   max=0.0 
+  PipelineStage                                             0m  CC̄=0.0   max=0.0 
   FuncSummary                                               0m  CC̄=0.0   max=0.0 
   ScanStrategy                                              0m  CC̄=0.0   max=0.0 
   FilePriority                                              0m  CC̄=0.0   max=0.0 
@@ -546,16 +546,6 @@ S...
       is_successful(0)  CC=3.0
     NLPPipeline  # Main NLP processing pipeline (4a-4e)....
       __init__(1)  CC=2.0
-  code2llm/exporters/evolution_exporter.py:
-    e: EvolutionExporter
-    EvolutionExporter  # Export evolution.toon — prioritized refactoring queue....
-      _is_excluded(1)  CC=5.0
-  code2llm/exporters/flow_exporter.py:
-    e: FlowExporter
-    FlowExporter  # Export to flow.toon — data-flow focused format.
-
-Sections: P...
-      __init__(0)  CC=1.0
   code2llm/exporters/context_exporter.py:
     e: ContextExporter
     ContextExporter  # Export LLM-ready analysis summary with architecture and flow...
@@ -573,6 +563,16 @@ Sections: P...
         → _get_behavioral_patterns(1)  CC=4.0
         → _get_api_surface(1)  CC=5.0
         → _get_system_interactions(1)  CC=5.0
+  code2llm/exporters/evolution_exporter.py:
+    e: EvolutionExporter
+    EvolutionExporter  # Export evolution.toon — prioritized refactoring queue....
+      _is_excluded(1)  CC=5.0
+  code2llm/exporters/flow_exporter.py:
+    e: FlowExporter
+    FlowExporter  # Export to flow.toon — data-flow focused format.
+
+Sections: P...
+      __init__(0)  CC=1.0
   code2llm/analysis/call_graph.py:
     e: CallGraphExtractor
     CallGraphExtractor  # Extract call graph from AST....

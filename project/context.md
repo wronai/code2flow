@@ -181,20 +181,20 @@ Scans function bodies for IO operations,
 - **Methods**: 14
 - **Key Methods**: code2llm.nlp.entity_resolution.EntityResolver.__init__, code2llm.nlp.entity_resolution.EntityResolver.resolve, code2llm.nlp.entity_resolution.EntityResolver._extract_candidates, code2llm.nlp.entity_resolution.EntityResolver._extract_from_patterns, code2llm.nlp.entity_resolution.EntityResolver._disambiguate, code2llm.nlp.entity_resolution.EntityResolver._resolve_hierarchical, code2llm.nlp.entity_resolution.EntityResolver._resolve_aliases, code2llm.nlp.entity_resolution.EntityResolver._name_similarity, code2llm.nlp.entity_resolution.EntityResolver.load_from_analysis, code2llm.nlp.entity_resolution.EntityResolver.step_3a_extract_entities
 
-### code2llm.exporters.flow_exporter.FlowExporter
-> Export to flow.toon — data-flow focused format.
-
-Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TY
-- **Methods**: 14
-- **Key Methods**: code2llm.exporters.flow_exporter.FlowExporter.__init__, code2llm.exporters.flow_exporter.FlowExporter.export, code2llm.exporters.flow_exporter.FlowExporter._build_context, code2llm.exporters.flow_exporter.FlowExporter._pipeline_to_dict, code2llm.exporters.flow_exporter.FlowExporter._compute_transforms, code2llm.exporters.flow_exporter.FlowExporter._transform_label, code2llm.exporters.flow_exporter.FlowExporter._compute_type_usage, code2llm.exporters.flow_exporter.FlowExporter._normalize_type, code2llm.exporters.flow_exporter.FlowExporter._type_label, code2llm.exporters.flow_exporter.FlowExporter._classify_side_effects
-- **Inherits**: Exporter
-
 ### code2llm.exporters.context_exporter.ContextExporter
 > Export LLM-ready analysis summary with architecture and flows.
 
 Output: context.md — architecture na
 - **Methods**: 14
 - **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns, code2llm.exporters.context_exporter.ContextExporter._get_api_surface
+- **Inherits**: Exporter
+
+### code2llm.exporters.flow_exporter.FlowExporter
+> Export to flow.toon — data-flow focused format.
+
+Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TY
+- **Methods**: 14
+- **Key Methods**: code2llm.exporters.flow_exporter.FlowExporter.__init__, code2llm.exporters.flow_exporter.FlowExporter.export, code2llm.exporters.flow_exporter.FlowExporter._build_context, code2llm.exporters.flow_exporter.FlowExporter._pipeline_to_dict, code2llm.exporters.flow_exporter.FlowExporter._compute_transforms, code2llm.exporters.flow_exporter.FlowExporter._transform_label, code2llm.exporters.flow_exporter.FlowExporter._compute_type_usage, code2llm.exporters.flow_exporter.FlowExporter._normalize_type, code2llm.exporters.flow_exporter.FlowExporter._type_label, code2llm.exporters.flow_exporter.FlowExporter._classify_side_effects
 - **Inherits**: Exporter
 
 ### code2llm.analysis.pipeline_detector.PipelineDetector
@@ -243,17 +243,24 @@ Keys: M=modules, D=details,
 
 Key functions that process and transform data:
 
-### validate_toon.validate_toon_completeness
-> Validate toon format structure.
-- **Output to**: print, print, bool, bool, bool
-
 ### benchmarks.benchmark_evolution.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
 
+### validate_toon.validate_toon_completeness
+> Validate toon format structure.
+- **Output to**: print, print, bool, bool, bool
+
 ### benchmarks.format_evaluator.evaluate_format
 > Oceń pojedynczy format względem ground truth.
 - **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+
+### scripts.bump_version.parse_version
+> Parse version string into tuple of (major, minor, patch)
+- **Output to**: version_str.split, tuple, int
+
+### scripts.bump_version.format_version
+> Format version tuple as string
 
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
@@ -271,12 +278,19 @@ Key functions that process and transform data:
 > Generate badges from format quality scores.
 - **Output to**: enumerate, badges.append, sorted, badges.append, format_scores.items
 
-### scripts.bump_version.parse_version
-> Parse version string into tuple of (major, minor, patch)
-- **Output to**: version_str.split, tuple, int
+### benchmarks.benchmark_format_quality._generate_format_outputs
+> Generate all format outputs and evaluate them.
+- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
-### scripts.bump_version.format_version
-> Format version tuple as string
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
+
+### code2llm.cli_exports._export_simple_formats
+> Export toon, map, flow, context, yaml, json formats.
+- **Output to**: format_map.items, code2llm.cli_exports._export_yaml, JSONExporter, exporter.export, exporter_cls
+
+### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
+- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
 
 ### code2llm.cli.create_parser
 > Create CLI argument parser.
@@ -293,24 +307,6 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### demo_langs.valid.sample.UserService.process_users
-- **Output to**: print
-
-### code2llm.cli_exports._export_simple_formats
-> Export toon, map, flow, context, yaml, json formats.
-- **Output to**: format_map.items, code2llm.cli_exports._export_yaml, JSONExporter, exporter.export, exporter_cls
-
-### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
-- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
-### benchmarks.benchmark_format_quality._generate_format_outputs
-> Generate all format outputs and evaluate them.
-- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
-
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
-
 ### code2llm.core.toon_size_manager._parse_modules
 > Parse module sections from TOON content.
 
@@ -324,6 +320,10 @@ Returns list of (module_name, start_line, end_line).
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
 > Process Python files directly in level1 directory.
 - **Output to**: len, chunks.append, self._chunk_by_files, chunks.extend, str
+
+### code2llm.analysis.cfg.CFGExtractor._format_except
+> Format except handler.
+- **Output to**: self._expr_to_str
 
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).
@@ -341,9 +341,8 @@ Returns list of (module_name, start_line, end_line).
 > Step 4e: Output formatting.
 - **Output to**: self._format_response
 
-### code2llm.exporters.flow_renderer.FlowRenderer.render_transforms
-> Renderuj sekcję TRANSFORMS.
-- **Output to**: lines.append
+### code2llm.exporters.context_exporter.ContextExporter._get_process_flows
+- **Output to**: set, set, seen_base_names.add, self._trace_flow, ep_name.split
 
 ## Public API Surface
 
