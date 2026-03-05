@@ -12,8 +12,6 @@ When you run `code2llm ./ -f all`, the following files are created:
 |------|--------|---------|--------------|
 | `analysis.toon` | **TOON** | **🔥 Health diagnostics** - Complexity, god modules, coupling | 52 critical functions, 0 god modules |
 | `evolution.toon` | **TOON** | **📋 Refactoring queue** - Prioritized improvements | 0 refactoring actions needed |
-| `flow.toon` | **TOON** | **🔄 Data flow analysis** - Pipelines, contracts, types | Data dependencies and side effects |
-| `map.toon` | **TOON** | **🗺️ Structural map** - Modules, imports, signatures | Project architecture overview |
 | `project.toon` | **TOON** | **🧠 Project logic** - Compact module view from code2logic | Generated via code2logic integration |
 
 ### 🤖 LLM-Ready Documentation
@@ -23,13 +21,6 @@ When you run `code2llm ./ -f all`, the following files are created:
 | `prompt.txt` | **Text** | **📝 Ready-to-send prompt** - Lists all files with instructions | Attach to LLM conversation as context guide |
 | `context.md` | **Markdown** | **📖 LLM narrative** - Architecture summary | Paste into ChatGPT/Claude for code analysis |
 
-### 📊 Visualizations
-
-| File | Format | Purpose | Description |
-|------|--------|---------|-------------|
-| `flow.mmd` | **Mermaid** | **🔄 Control flow diagram** | Function call paths with complexity styling |
-| `calls.mmd` | **Mermaid** | **📞 Call graph** | Function dependencies (edges only) |
-| `compact_flow.mmd` | **Mermaid** | **📦 Module overview** | Aggregated module-level view |
 
 ## 🚀 Quick Start Commands
 
@@ -338,6 +329,6 @@ code2llm ./ -f yaml --separate-orphans
 **Analysis Date**: 2026-03-05  
 **Total Functions**: 820  
 **Total Classes**: 104  
-**Modules**: 99  
+**Modules**: 102  
 
 For more information about code2llm, visit: https://github.com/tom-sapletta/code2llm

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+clear
 # Activate virtual environment
 source .venv/bin/activate
 

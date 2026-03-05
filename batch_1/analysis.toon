@@ -1,12 +1,12 @@
-# code2llm | 90f 17199L | py:90 | 2026-03-05
+# code2llm | 90f 17220L | py:90 | 2026-03-05
 # CC̄=4.4 | critical:52/820 | dups:0 | cycles:0
 
 HEALTH[6]:
   🟡 CC    main CC=17 (limit:15)
-  🟡 CC    _validate_chunked_output CC=15 (limit:15)
   🟡 CC    _resolve_callee CC=18 (limit:15)
   🟡 CC    _find_data_pipelines CC=17 (limit:15)
   🟡 CC    _infer_from_name CC=17 (limit:15)
+  🟡 CC    _validate_chunked_output CC=15 (limit:15)
   🟡 CC    _export_chunked_results CC=17 (limit:15)
 
 REFACTOR[1]:
@@ -60,12 +60,12 @@ LAYERS:
   │ models                     194L  11C    6m  CC=8      ←0
   │ smells                     192L  1C    9m  CC=7      ←0
   │ !  flow_renderer              188L  1C    6m  CC=14     ←0
+  │ prompt                     183L  0C    9m  CC=6      ←1
   │ !  streaming_analyzer         181L  1C    6m  CC=12     ←0
   │ config                     178L  6C    0m  CC=0.0    ←0
   │ config                     174L  5C    2m  CC=1      ←0
   │ detector                   168L  1C    8m  CC=9      ←0
   │ article_view               163L  1C    9m  CC=7      ←0
-  │ prompt                     162L  0C    9m  CC=6      ←1
   │ module_detail              162L  1C    9m  CC=7      ←0
   │ !  prompt_engine              150L  1C    7m  CC=12     ←0
   │ toon_parser                147L  0C   10m  CC=8      ←1
@@ -193,9 +193,9 @@ HOTSPOTS:
   #2  run_benchmark                        fan=18   "calls 18 functions"
   #3  ProjectAnalyzer.analyze_project      fan=18   "analysis pipeline, 18 stages"
   #4  ToonExporter.export                  fan=18   "export with 18 outputs"
-  #5  NLPPipeline.process                  fan=17   "analysis pipeline, 17 stages"
-  #6  MermaidExporter.export_call_graph    fan=17   "export with 17 outputs"
-  #7  ProjectYAMLExporter._build_project_yaml  fan=17   "ProjectYAMLExporter method, fan-out=17"
+  #5  MermaidExporter.export_call_graph    fan=17   "export with 17 outputs"
+  #6  ProjectYAMLExporter._build_project_yaml  fan=17   "ProjectYAMLExporter method, fan-out=17"
+  #7  NLPPipeline.process                  fan=17   "analysis pipeline, 17 stages"
   #8  run_benchmark                        fan=16   "calls 16 functions"
   #9  evaluate_format                      fan=16   "16-way dispatch"
   #10 StreamingAnalyzer.analyze_streaming  fan=16   "analysis pipeline, 16 stages"
@@ -248,9 +248,9 @@ CLASSES:
   ToonExporter                   ██                         3m  CC̄=1.0   max=1   
   FastFileFilter                 ██                         3m  CC̄=6.0   max=8   
   SideEffectInfo                 █                          2m  CC̄=1.0   max=1   
+  BaseModel                      █                          2m  CC̄=5.0   max=8   
   NLPConfig                      █                          2m  CC̄=1.0   max=1   
   IntentMatchingResult           █                          2m  CC̄=2.0   max=2   
-  BaseModel                      █                          2m  CC̄=5.0   max=8   
   EntityResolutionResult         █                          2m  CC̄=2.5   max=3   
   Pipeline                                                  1m  CC̄=3.0   max=3   
   Exporter                                                  1m  CC̄=1.0   max=1   
@@ -264,12 +264,6 @@ CLASSES:
   DepthConfig                                               0m  CC̄=0.0   max=0.0 
   OutputConfig                                              0m  CC̄=0.0   max=0.0 
   Config                                                    0m  CC̄=0.0   max=0.0 
-  SubProject                                                0m  CC̄=0.0   max=0.0 
-  NormalizationConfig                                       0m  CC̄=0.0   max=0.0 
-  IntentMatchingConfig                                      0m  CC̄=0.0   max=0.0 
-  EntityResolutionConfig                                    0m  CC̄=0.0   max=0.0 
-  MultilingualConfig                                        0m  CC̄=0.0   max=0.0 
-  IntentMatch                                               0m  CC̄=0.0   max=0.0 
   FlowNode                                                  0m  CC̄=0.0   max=0.0 
   FlowEdge                                                  0m  CC̄=0.0   max=0.0 
   FunctionInfo                                              0m  CC̄=0.0   max=0.0 
@@ -279,9 +273,15 @@ CLASSES:
   CodeSmell                                                 0m  CC̄=0.0   max=0.0 
   Mutation                                                  0m  CC̄=0.0   max=0.0 
   DataFlow                                                  0m  CC̄=0.0   max=0.0 
+  NormalizationConfig                                       0m  CC̄=0.0   max=0.0 
+  IntentMatchingConfig                                      0m  CC̄=0.0   max=0.0 
+  EntityResolutionConfig                                    0m  CC̄=0.0   max=0.0 
+  MultilingualConfig                                        0m  CC̄=0.0   max=0.0 
+  IntentMatch                                               0m  CC̄=0.0   max=0.0 
+  SubProject                                                0m  CC̄=0.0   max=0.0 
+  NormalizationResult                                       0m  CC̄=0.0   max=0.0 
   Entity                                                    0m  CC̄=0.0   max=0.0 
   PipelineStage                                             0m  CC̄=0.0   max=0.0 
-  NormalizationResult                                       0m  CC̄=0.0   max=0.0 
   FuncSummary                                               0m  CC̄=0.0   max=0.0 
   ScanStrategy                                              0m  CC̄=0.0   max=0.0 
   FilePriority                                              0m  CC̄=0.0   max=0.0 
@@ -687,6 +687,10 @@ Stra...
     e: SmellDetector
     SmellDetector  # Detect code smells from analysis results....
       __init__(1)  CC=1.0
+  code2llm/analysis/dfg.py:
+    e: DFGExtractor
+    DFGExtractor  # Extract Data Flow Graph from AST....
+      __init__(1)  CC=1.0
   code2llm/nlp/intent_matching.py:
     e: IntentMatch,IntentMatchingResult,IntentMatcher
     IntentMatch  # Single intent match result....
@@ -694,10 +698,6 @@ Stra...
       get_best_intent(0)  CC=2.0
     IntentMatcher  # Match queries to intents using fuzzy and keyword matching....
       __init__(2)  CC=3.0
-  code2llm/analysis/dfg.py:
-    e: DFGExtractor
-    DFGExtractor  # Extract Data Flow Graph from AST....
-      __init__(1)  CC=1.0
   code2llm/exporters/article_view.py:
     e: ArticleViewGenerator
     ArticleViewGenerator  # Generate status.md — publishable project health article....
@@ -861,6 +861,11 @@ Unlike simple L...
     e: APIHandler
     APIHandler  # Handles API requests and responses....
       __init__(0)  CC=1.0
+  examples/streaming-analyzer/sample_project/database.py:
+    e: DatabaseConnection
+    DatabaseConnection  # Simple database connection simulator....
+      __init__(1)  CC=2.0
+        → _load_data(0)  CC=3.0
   examples/streaming-analyzer/demo.py:
     e: demo_quick_strategy,demo_standard_strategy,demo_deep_strategy,demo_incremental_analysis,demo_memory_limited,demo_custom_progress,main
     demo_quick_strategy()
@@ -870,11 +875,18 @@ Unlike simple L...
     demo_memory_limited()
     demo_custom_progress()
     main()
-  examples/streaming-analyzer/sample_project/database.py:
-    e: DatabaseConnection
-    DatabaseConnection  # Simple database connection simulator....
-      __init__(1)  CC=2.0
-        → _load_data(0)  CC=3.0
+  benchmarks/benchmark_format_quality.py:
+    e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
+    _print_benchmark_header()
+    _print_ground_truth_info(project_path)
+    _generate_format_outputs(result,output_dir)
+    _create_offline_scores()
+    run_benchmark()
+  badges/server.py:
+    e: index,generate_badges,get_badges
+    index()
+    generate_badges()
+    get_badges()
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()
@@ -884,18 +896,6 @@ Unlike simple L...
     update_pyproject_toml(new_version)
     update_version_file(new_version)
     main()
-  badges/server.py:
-    e: index,generate_badges,get_badges
-    index()
-    generate_badges()
-    get_badges()
-  benchmarks/benchmark_format_quality.py:
-    e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
-    _print_benchmark_header()
-    _print_ground_truth_info(project_path)
-    _generate_format_outputs(result,output_dir)
-    _create_offline_scores()
-    run_benchmark()
   code2llm/core/core/file_cache.py:
     e: FileCache
     FileCache  # Cache for parsed AST files....

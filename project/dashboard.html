@@ -60,12 +60,12 @@
 </p>
 
 <div class="grid">
-  <div class="card"><div class="value">4.5</div><div class="label">Avg CC</div></div>
-  <div class="card"><div class="value">53</div><div class="label">Critical (CC≥10)</div></div>
-  <div class="card"><div class="value">702</div><div class="label">Functions</div></div>
+  <div class="card"><div class="value">4.4</div><div class="label">Avg CC</div></div>
+  <div class="card"><div class="value">52</div><div class="label">Critical (CC≥10)</div></div>
+  <div class="card"><div class="value">716</div><div class="label">Functions</div></div>
   <div class="card"><div class="value">84</div><div class="label">Classes</div></div>
-  <div class="card"><div class="value">71</div><div class="label">Files</div></div>
-  <div class="card"><div class="value">20430</div><div class="label">Lines</div></div>
+  <div class="card"><div class="value">76</div><div class="label">Files</div></div>
+  <div class="card"><div class="value">20655</div><div class="label">Lines</div></div>
   <div class="card"><div class="value">1</div><div class="label">Duplicates</div></div>
   <div class="card"><div class="value">0</div><div class="label">Cycles</div></div>
 </div>
@@ -74,9 +74,9 @@
   <div class="chart-container">
     <h2 style="border:none;margin:0 0 .5rem;">Evolution (2026-03-05)</h2>
     <div class="evo-cards">
-      <div class="card"><div class="value">4.5</div><div class="label">CC̄ →</div></div>
-      <div class="card"><div class="value">53</div><div class="label">Critical →</div></div>
-      <div class="card"><div class="value">20430</div><div class="label">Lines</div></div>
+      <div class="card"><div class="value">4.4</div><div class="label">CC̄ →</div></div>
+      <div class="card"><div class="value">52</div><div class="label">Critical →</div></div>
+      <div class="card"><div class="value">20655</div><div class="label">Lines</div></div>
     </div>
     <p class="trend" style="margin-top:.5rem;">Run analysis multiple times to build a trend chart (≥3 data points needed).</p>
   </div>
@@ -91,13 +91,6 @@
 <table>
   <thead><tr><th>Severity</th><th>Target</th><th>Type</th><th>Value</th><th>Limit</th></tr></thead>
   <tbody>
-            <tr class="critical">
-                <td><span class="badge critical">critical</span></td>
-                <td>ProjectYAMLExporter._build_modules</td>
-                <td>high_fan_out</td>
-                <td>23</td>
-                <td>10</td>
-            </tr>
             <tr class="critical">
                 <td><span class="badge critical">critical</span></td>
                 <td>_summarize_functions</td>
@@ -124,13 +117,6 @@
                 <td>ToonExporter.export</td>
                 <td>high_fan_out</td>
                 <td>18</td>
-                <td>10</td>
-            </tr>
-            <tr class="error">
-                <td><span class="badge error">error</span></td>
-                <td>_run_chunked_analysis</td>
-                <td>high_fan_out</td>
-                <td>17</td>
                 <td>10</td>
             </tr>
             <tr class="error">
@@ -191,6 +177,20 @@
             </tr>
             <tr class="error">
                 <td><span class="badge error">error</span></td>
+                <td>ProjectYAMLExporter._build_refactoring</td>
+                <td>high_fan_out</td>
+                <td>15</td>
+                <td>10</td>
+            </tr>
+            <tr class="error">
+                <td><span class="badge error">error</span></td>
+                <td>_export_simple_formats</td>
+                <td>high_fan_out</td>
+                <td>15</td>
+                <td>10</td>
+            </tr>
+            <tr class="error">
+                <td><span class="badge error">error</span></td>
                 <td>_export_chunked_results</td>
                 <td>high_fan_out</td>
                 <td>15</td>
@@ -206,11 +206,6 @@
 <table>
   <thead><tr><th>Function</th><th>Fan-out</th><th>Note</th></tr></thead>
   <tbody>
-            <tr>
-                <td><strong>ProjectYAMLExporter._build_modules</strong></td>
-                <td>23</td>
-                <td>Orchestrates 23 calls</td>
-            </tr>
             <tr>
                 <td><strong>_summarize_functions</strong></td>
                 <td>21</td>
@@ -232,14 +227,6 @@
                 <td>Export with 18 outputs</td>
             </tr>
             <tr>
-                <td><strong>_run_chunked_analysis</strong></td>
-                <td>17</td>
-                <td>Analyze large repository using hierarchical chunking.
-
-Strategy:
-1. Level 1 fold</td>
-            </tr>
-            <tr>
                 <td><strong>NLPPipeline.process</strong></td>
                 <td>17</td>
                 <td>Analysis pipeline, 17 stages</td>
@@ -258,74 +245,84 @@ Strategy:
                 <td><strong>run_benchmark</strong></td>
                 <td>16</td>
                 <td>Run evolution analysis and print before/after table.</td>
+            </tr>
+            <tr>
+                <td><strong>evaluate_format</strong></td>
+                <td>16</td>
+                <td>16-way dispatch</td>
+            </tr>
+            <tr>
+                <td><strong>StreamingAnalyzer.analyze_streaming</strong></td>
+                <td>16</td>
+                <td>Analysis pipeline, 16 stages</td>
             </tr></tbody>
 </table>
 </div></div>
 </div>
 
 <div>
-<h2>Refactoring Priorities (15)</h2>
+<h2>Refactoring Priorities (13)</h2>
 <div class="card"><div class="table-wrap">
 <table>
   <thead><tr><th>#</th><th>Action</th><th>Impact</th><th>Effort</th></tr></thead>
   <tbody>
             <tr>
                 <td>1</td>
-                <td>Split god module code2llm/cli.py (750L, 0 classes)</td>
+                <td>Split god module code2llm/cli.py (511L, 0 classes)</td>
                 <td><span class="badge high">high</span></td>
                 <td>high</td>
             </tr>
             <tr>
                 <td>2</td>
-                <td>Split god module code2llm/cli_exports.py (633L, 0 classes)</td>
-                <td><span class="badge high">high</span></td>
-                <td>high</td>
-            </tr>
-            <tr>
-                <td>3</td>
                 <td>Split god module code2llm/exporters/readme_exporter.py (501L, 1 classes)</td>
                 <td><span class="badge high">high</span></td>
                 <td>high</td>
             </tr>
             <tr>
-                <td>4</td>
+                <td>3</td>
                 <td>Split god module code2llm/exporters/toon/metrics.py (501L, 1 classes)</td>
                 <td><span class="badge high">high</span></td>
                 <td>high</td>
             </tr>
             <tr>
-                <td>5</td>
+                <td>4</td>
                 <td>Split god module code2llm/core/large_repo.py (596L, 2 classes)</td>
                 <td><span class="badge high">high</span></td>
                 <td>high</td>
             </tr>
             <tr>
-                <td>6</td>
+                <td>5</td>
                 <td>Split main (CC=17 → target CC<10)</td>
                 <td><span class="badge medium">medium</span></td>
                 <td>low</td>
             </tr>
             <tr>
-                <td>7</td>
-                <td>Split _export_prompt_txt (CC=15 → target CC<10)</td>
-                <td><span class="badge medium">medium</span></td>
-                <td>low</td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td>Split _export_chunked_results (CC=17 → target CC<10)</td>
-                <td><span class="badge medium">medium</span></td>
-                <td>low</td>
-            </tr>
-            <tr>
-                <td>9</td>
+                <td>6</td>
                 <td>Split _validate_chunked_output (CC=15 → target CC<10)</td>
                 <td><span class="badge medium">medium</span></td>
                 <td>low</td>
             </tr>
             <tr>
+                <td>7</td>
+                <td>Split DataAnalyzer._find_data_pipelines (CC=17 → target CC<10)</td>
+                <td><span class="badge medium">medium</span></td>
+                <td>low</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Split PipelineDetector._resolve_callee (CC=18 → target CC<10)</td>
+                <td><span class="badge medium">medium</span></td>
+                <td>low</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Split TypeInferenceEngine._infer_from_name (CC=17 → target CC<10)</td>
+                <td><span class="badge medium">medium</span></td>
+                <td>low</td>
+            </tr>
+            <tr>
                 <td>10</td>
-                <td>Split _run_chunked_analysis (CC=18 → target CC<10)</td>
+                <td>Split _export_chunked_results (CC=17 → target CC<10)</td>
                 <td><span class="badge medium">medium</span></td>
                 <td>low</td>
             </tr></tbody>
@@ -334,7 +331,7 @@ Strategy:
 </div>
 </div>
 
-<footer>Generated by code2llm on 2026-03-05 08:39</footer>
+<footer>Generated by code2llm on 2026-03-05 10:43</footer>
 
 <script>
 // Evolution chart disabled — fewer than 3 data points
@@ -343,9 +340,9 @@ const modCtx = document.getElementById('modChart').getContext('2d');
 new Chart(modCtx, {
   type: 'bar',
   data: {
-    labels: ['pipeline_detector.py', 'cli.py', 'project_yaml_exporter.py', 'data_analysis.py', 'type_inference.py', 'cli_exports.py', 'validate_toon.py', 'side_effects.py', 'analyzer.py', 'scanner.py', 'flow_renderer.py', 'llm_flow.py', 'llm_task.py', 'benchmark_evolution.py', 'map_exporter.py'],
-    datasets: [{ label: 'Max CC', data: [18, 18, 18, 17, 17, 17, 17, 14, 14, 14, 14, 14, 14, 13, 13],
-      backgroundColor: [18, 18, 18, 17, 17, 17, 17, 14, 14, 14, 14, 14, 14, 13, 13].map(v => v >= 15 ? '#ef4444' : v >= 10 ? '#eab308' : '#22c55e')
+    labels: ['pipeline_detector.py', 'data_analysis.py', 'type_inference.py', 'orchestrator.py', 'validate_toon.py', 'cli.py', 'side_effects.py', 'formats.py', 'analyzer.py', 'scanner.py', 'flow_renderer.py', 'llm_flow.py', 'llm_task.py', 'benchmark_evolution.py', 'map_exporter.py'],
+    datasets: [{ label: 'Max CC', data: [18, 17, 17, 17, 17, 15, 14, 14, 14, 14, 14, 14, 14, 13, 13],
+      backgroundColor: [18, 17, 17, 17, 17, 15, 14, 14, 14, 14, 14, 14, 14, 13, 13].map(v => v >= 15 ? '#ef4444' : v >= 10 ? '#eab308' : '#22c55e')
     }]
   },
   options: {

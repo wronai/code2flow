@@ -4,11 +4,17 @@ Use the attached/generated files as the authoritative context.
 we are in project path: .
 
 Files for analysis:
-- project/analysis.toon  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities)
-- project/context.md  (LLM narrative - architecture summary, key entry points, process flows, public API surface)
-- project/evolution.toon  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history)
-- project/project.toon  (Project logic - compact module view from code2logic, file sizes, dependencies overview)
-- project/README.md  (Documentation - complete guide to all generated files, usage examples, interpretation)
+- test_prompt/analysis.toon  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities)
+- test_prompt/context.md  (LLM narrative - architecture summary, key entry points, process flows, public API surface)
+- test_prompt/evolution.toon  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history)
+- test_prompt/project.toon  (Project logic - compact module view from code2logic, file sizes, dependencies overview)
+
+Subproject Analysis Files (hierarchical chunking for large repository):
+- test_prompt/root/  [root] ~2KB - Contains: analysis.toon, context.md, evolution.toon
+- test_prompt/batch_1/  [L1] ~99KB - Contains: analysis.toon, context.md, evolution.toon
+
+Missing files (not generated in this run):
+- test_prompt/README.md
 
 Task:
 - Summarize the architecture and main flows.
@@ -39,3 +45,7 @@ Constraints:
 - Maintain full backward compatibility.
 - Use existing README generation approach as model for comprehensive metrics.
 - If uncertain, ask clarifying questions.
+
+Note: This repository was analyzed using hierarchical chunking due to its size.
+      Start with the main files (analysis.toon, context.md) for overview,
+      then examine specific subproject directories as needed.

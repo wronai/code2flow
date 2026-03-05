@@ -21,7 +21,9 @@ def _export_prompt_txt(args, output_dir: Path, formats: list[str], source_path: 
         for name in missing:
             lines.append(f"- {output_rel_path}/{name}")
 
-    lines.extend(_build_prompt_footer(chunked=False))
+    # Analyze generated files and build dynamic footer
+    file_analysis = _analyze_generated_files(output_dir)
+    lines.extend(_build_prompt_footer(chunked=False, file_analysis=file_analysis))
 
     prompt_path = output_dir / 'prompt.txt'
     prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
@@ -42,7 +44,10 @@ def _export_chunked_prompt_txt(args, output_dir: Path, formats: list[str], sourc
         lines.extend(_build_subprojects_section(subprojects, output_dir, output_rel_path))
 
     lines.extend(_build_missing_files_section(output_dir, output_rel_path))
-    lines.extend(_build_prompt_footer(chunked=True))
+    
+    # Analyze generated files and build dynamic footer
+    file_analysis = _analyze_generated_files(output_dir, subprojects=subprojects)
+    lines.extend(_build_prompt_footer(chunked=True, file_analysis=file_analysis))
 
     prompt_path = output_dir / 'prompt.txt'
     prompt_path.write_text("\n".join(lines) + "\n", encoding='utf-8')
@@ -148,8 +153,29 @@ def _build_prompt_footer(chunked: bool = False) -> List[str]:
         "- Identify the highest-risk areas and propose a refactoring plan.",
         "- If you suggest changes, keep behavior backward compatible and provide concrete steps.",
         "",
+        "Focus Areas for Analysis:",
+        "1. **CLI Architecture** - Check for monolithic parser complexity (target: <50 lines per function)",
+        "2. **Analysis Orchestration** - Identify chunking/streaming bottlenecks and failure points", 
+        "3. **Metrics System** - Evaluate hardcoded thresholds vs configurable metrics (CC>12, fan-out>10)",
+        "4. **README Generation** - Assess template brittleness and file parsing complexity",
+        "",
+        "Refactoring Priorities (Metrics-Driven):",
+        "- **Phase 1**: CLI decomposition - reduce cyclomatic complexity, improve test coverage",
+        "- **Phase 2**: Configuration-driven metrics - replace magic numbers with MetricsConfig",
+        "- **Phase 3**: Analysis pipeline refactoring - implement plugin architecture with stages",
+        "- **Phase 4**: Dynamic README generation - template-based, metrics-aware documentation",
+        "",
+        "Success Metrics to Track:",
+        "- Code complexity: Reduce average function CC by 30%",
+        "- Test coverage: Maintain >95% coverage", 
+        "- Performance: No regression in analysis speed",
+        "- Memory: Reduce peak memory usage by 20%",
+        "- False positive rate: <5% for smell detection",
+        "",
         "Constraints:",
         "- Prefer minimal, incremental changes.",
+        "- Maintain full backward compatibility.",
+        "- Use existing README generation approach as model for comprehensive metrics.",
         "- If uncertain, ask clarifying questions.",
     ]
     if chunked:

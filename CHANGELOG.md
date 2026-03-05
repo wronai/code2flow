@@ -1,3 +1,39 @@
+## [Unreleased]
+
+## [0.5.39] - 2026-03-05
+
+### Docs
+- Update README.md
+- Update context.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update test_prompt/README.md
+- Update test_prompt/analysis.toon
+- Update test_prompt/batch_1/analysis.toon
+- Update test_prompt/batch_1/context.md
+- Update test_prompt/batch_1/evolution.toon
+- Update test_prompt/context.md
+- Update test_prompt/evolution.toon
+- Update test_prompt/project.toon
+- Update test_prompt/prompt.txt
+- Update test_prompt/root/analysis.toon
+- ... and 2 more files
+
+### Other
+- Update analysis.toon
+- Update batch_1/analysis.toon
+- Update code2llm/cli_exports/prompt.py
+- Update project.sh
+- Update project/analysis.toon
+- Update project/dashboard.html
+- Update project/evolution.toon
+- Update project/project.toon
+- Update project/project.yaml
+- Update project/prompt.txt
+- ... and 1 more files
+
 ## [0.5.38] - 2026-03-05
 
 ### Summary
