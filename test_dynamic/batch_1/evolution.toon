@@ -1,0 +1,42 @@
+# code2llm/evolution | 823 func | 84f | 2026-03-05
+
+NEXT[6] (ranked by impact):
+  [1] !! SPLIT           code2llm/cli.py
+      WHY: 511L, 0 classes, max CC=15
+      EFFORT: ~4h  IMPACT: 7665
+
+  [2] !! SPLIT           code2llm/core/large_repo.py
+      WHY: 596L, 2 classes, max CC=9
+      EFFORT: ~4h  IMPACT: 5364
+
+  [3] !! SPLIT           examples/functional_refactoring_example.py
+      WHY: 644L, 15 classes, max CC=6
+      EFFORT: ~4h  IMPACT: 3864
+
+  [4] !  SPLIT-FUNC      _export_chunked_results  CC=17  fan=15
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 255
+
+  [5] !  SPLIT-FUNC      main  CC=17  fan=14
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 238
+
+  [6] !  SPLIT-FUNC      _validate_chunked_output  CC=15  fan=14
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 210
+
+
+RISKS[3]:
+  ⚠ Splitting examples/functional_refactoring_example.py may break 50 import paths
+  ⚠ Splitting code2llm/core/large_repo.py may break 20 import paths
+  ⚠ Splitting code2llm/cli.py may break 8 import paths
+
+METRICS-TARGET:
+  CC̄:          4.2 → ≤2.9
+  max-CC:      18 → ≤9
+  god-modules: 5 → 0
+  high-CC(≥15): 6 → ≤3
+  hub-types:   0 → ≤0
+
+HISTORY:
+  (first run — no previous data)

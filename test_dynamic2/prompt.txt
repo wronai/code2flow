@@ -1,0 +1,46 @@
+You are an AI assistant helping me understand and improve a codebase.
+Use the attached/generated files as the authoritative context.
+
+we are in project path: .
+
+Files for analysis:
+- test_dynamic2/analysis.toon  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities)
+- test_dynamic2/context.md  (LLM narrative - architecture summary, key entry points, process flows, public API surface)
+- test_dynamic2/evolution.toon  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history)
+- test_dynamic2/project.toon  (Project logic - compact module view from code2logic, file sizes, dependencies overview)
+
+Subproject Analysis Files (hierarchical chunking for large repository):
+- test_dynamic2/root/  [root] ~2KB - Contains: analysis.toon, context.md, evolution.toon
+- test_dynamic2/batch_1/  [L1] ~99KB - Contains: analysis.toon, context.md, evolution.toon
+
+Missing files (not generated in this run):
+- test_dynamic2/README.md
+
+Task:
+- Summarize the architecture and main flows.
+- Identify the highest-risk areas and propose a refactoring plan.
+- If you suggest changes, keep behavior backward compatible and provide concrete steps.
+- Highlight critical functions (CC ≥ 10) and god modules from analysis.toon.
+- Prioritize refactoring actions by impact/effort ratio from evolution.toon.
+- Validate entry points and public API surface match the architecture described.
+- Analyze cross-chunk dependencies and suggest consolidation strategies.
+
+Focus Areas for Analysis:
+1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon
+2. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon
+3. **Architecture Overview** - Understand main flows, entry points, and public API from context.md
+4. **Project Structure** - Analyze module organization and dependencies from project.toon
+7. **Large Repository Patterns** - Identify cross-chunk dependencies and consolidation opportunities
+
+Analysis Strategy:
+- Start with analysis.toon for health metrics, then evolution.toon for action priorities
+
+Constraints:
+- Prefer minimal, incremental changes.
+- Maintain full backward compatibility.
+- Base recommendations on concrete metrics from the provided files.
+- If uncertain, ask clarifying questions.
+
+Note: This repository was analyzed using hierarchical chunking due to its size.
+      Start with the main files (analysis.toon, context.md) for overview,
+      then examine specific subproject directories as needed.

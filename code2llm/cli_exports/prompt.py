@@ -98,12 +98,25 @@ def _build_prompt_header(project_path: str) -> List[str]:
 
 
 def _build_main_files_section(output_dir: Path, output_rel_path: str) -> List[str]:
-    """Build main files section."""
+    """Build main files section with size metrics."""
     lines = []
     for name, desc in _MAIN_FILES:
-        if (output_dir / name).exists():
-            lines.append(f"- {output_rel_path}/{name}  ({desc})")
+        file_path = output_dir / name
+        if file_path.exists():
+            size_bytes = file_path.stat().st_size
+            size_str = _format_size(size_bytes)
+            lines.append(f"- {output_rel_path}/{name}  ({desc}) [{size_str}]")
     return lines
+
+
+def _format_size(size_bytes: int) -> str:
+    """Format file size in human readable format."""
+    if size_bytes < 1024:
+        return f"{size_bytes}B"
+    elif size_bytes < 1024 * 1024:
+        return f"{size_bytes // 1024}KB"
+    else:
+        return f"{size_bytes // (1024 * 1024)}MB"
 
 
 def _get_missing_files(output_dir: Path) -> List[str]:
@@ -112,7 +125,7 @@ def _get_missing_files(output_dir: Path) -> List[str]:
 
 
 def _build_subprojects_section(subprojects: list, output_dir: Path, output_rel_path: str) -> List[str]:
-    """Build subprojects section."""
+    """Build subprojects section with detailed file info."""
     lines = [
         "",
         "Subproject Analysis Files (hierarchical chunking for large repository):",
@@ -124,11 +137,19 @@ def _build_subprojects_section(subprojects: list, output_dir: Path, output_rel_p
             continue
 
         level_name = {0: 'root', 1: 'L1', 2: 'L2', 3: 'chunk'}.get(sp.level, f'L{sp.level}')
-        sp_files = [f for f in ['analysis.toon', 'context.md', 'evolution.toon'] if (sp_dir / f).exists()]
+        sp_files = []
+        total_size = 0
+        for f in ['analysis.toon', 'context.md', 'evolution.toon']:
+            f_path = sp_dir / f
+            if f_path.exists():
+                size = f_path.stat().st_size
+                total_size += size
+                sp_files.append(f"{f} [{_format_size(size)}]")
 
         if sp_files:
+            size_str = _format_size(total_size)
             file_list = ', '.join(sp_files)
-            lines.append(f"- {output_rel_path}/{sp.name.replace('.', '_')}/  [{level_name}] ~{sp.estimated_size_kb}KB - Contains: {file_list}")
+            lines.append(f"- {output_rel_path}/{sp.name.replace('.', '_')}/  [{level_name}] Total: {size_str} - Contains: {file_list}")
 
     return lines
 
@@ -144,40 +165,126 @@ def _build_missing_files_section(output_dir: Path, output_rel_path: str) -> List
     return lines
 
 
-def _build_prompt_footer(chunked: bool = False) -> List[str]:
-    """Build footer section of prompt."""
-    lines = [
-        "",
-        "Task:",
+def _analyze_generated_files(output_dir: Path, subprojects: list = None) -> dict:
+    """Analyze which files were generated and determine appropriate focus areas."""
+    analysis = {
+        'has_analysis_toon': (output_dir / 'analysis.toon').exists(),
+        'has_context_md': (output_dir / 'context.md').exists(),
+        'has_evolution_toon': (output_dir / 'evolution.toon').exists(),
+        'has_project_toon': (output_dir / 'project.toon').exists(),
+        'has_readme': (output_dir / 'README.md').exists(),
+        'has_yaml': (output_dir / 'analysis.yaml').exists(),
+        'has_json': (output_dir / 'analysis.json').exists(),
+        'has_mermaid': (output_dir / 'flow.mmd').exists() or (output_dir / 'calls.mmd').exists(),
+        'is_chunked': subprojects is not None and len(subprojects) > 0,
+        'file_count': 0,
+    }
+    
+    # Count total files
+    for key, exists in analysis.items():
+        if key.startswith('has_') and exists:
+            analysis['file_count'] += 1
+    
+    return analysis
+
+
+def _build_dynamic_focus_areas(file_analysis: dict) -> List[str]:
+    """Build focus areas based on generated files."""
+    focus_areas = []
+    
+    if file_analysis['has_analysis_toon']:
+        focus_areas.append("1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon")
+    
+    if file_analysis['has_evolution_toon']:
+        focus_areas.append("2. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon")
+    
+    if file_analysis['has_context_md']:
+        focus_areas.append("3. **Architecture Overview** - Understand main flows, entry points, and public API from context.md")
+    
+    if file_analysis['has_project_toon']:
+        focus_areas.append("4. **Project Structure** - Analyze module organization and dependencies from project.toon")
+    
+    if file_analysis['has_yaml'] or file_analysis['has_json']:
+        focus_areas.append("5. **Structured Data** - Use machine-readable formats for automated analysis and metrics extraction")
+    
+    if file_analysis['has_mermaid']:
+        focus_areas.append("6. **Visual Flow** - Review control flow diagrams and call graphs for architectural insights")
+    
+    if file_analysis['is_chunked']:
+        focus_areas.append("7. **Large Repository Patterns** - Identify cross-chunk dependencies and consolidation opportunities")
+    
+    if not focus_areas:
+        focus_areas.append("1. **General Code Review** - Provide overall architecture assessment and improvement recommendations")
+    
+    return focus_areas
+
+
+def _build_dynamic_tasks(file_analysis: dict) -> List[str]:
+    """Build tasks based on available files."""
+    tasks = [
         "- Summarize the architecture and main flows.",
         "- Identify the highest-risk areas and propose a refactoring plan.",
         "- If you suggest changes, keep behavior backward compatible and provide concrete steps.",
-        "",
-        "Focus Areas for Analysis:",
-        "1. **CLI Architecture** - Check for monolithic parser complexity (target: <50 lines per function)",
-        "2. **Analysis Orchestration** - Identify chunking/streaming bottlenecks and failure points", 
-        "3. **Metrics System** - Evaluate hardcoded thresholds vs configurable metrics (CC>12, fan-out>10)",
-        "4. **README Generation** - Assess template brittleness and file parsing complexity",
-        "",
-        "Refactoring Priorities (Metrics-Driven):",
-        "- **Phase 1**: CLI decomposition - reduce cyclomatic complexity, improve test coverage",
-        "- **Phase 2**: Configuration-driven metrics - replace magic numbers with MetricsConfig",
-        "- **Phase 3**: Analysis pipeline refactoring - implement plugin architecture with stages",
-        "- **Phase 4**: Dynamic README generation - template-based, metrics-aware documentation",
-        "",
-        "Success Metrics to Track:",
-        "- Code complexity: Reduce average function CC by 30%",
-        "- Test coverage: Maintain >95% coverage", 
-        "- Performance: No regression in analysis speed",
-        "- Memory: Reduce peak memory usage by 20%",
-        "- False positive rate: <5% for smell detection",
-        "",
-        "Constraints:",
-        "- Prefer minimal, incremental changes.",
-        "- Maintain full backward compatibility.",
-        "- Use existing README generation approach as model for comprehensive metrics.",
-        "- If uncertain, ask clarifying questions.",
     ]
+    
+    if file_analysis['has_analysis_toon']:
+        tasks.append("- Highlight critical functions (CC ≥ 10) and god modules from analysis.toon.")
+    
+    if file_analysis['has_evolution_toon']:
+        tasks.append("- Prioritize refactoring actions by impact/effort ratio from evolution.toon.")
+    
+    if file_analysis['has_context_md']:
+        tasks.append("- Validate entry points and public API surface match the architecture described.")
+    
+    if file_analysis['is_chunked']:
+        tasks.append("- Analyze cross-chunk dependencies and suggest consolidation strategies.")
+    
+    return tasks
+
+
+def _build_prompt_footer(chunked: bool = False, file_analysis: dict = None) -> List[str]:
+    """Build dynamic footer section of prompt based on generated files."""
+    if file_analysis is None:
+        file_analysis = {}
+    
+    lines = [""]
+    
+    # Dynamic tasks
+    lines.append("Task:")
+    tasks = _build_dynamic_tasks(file_analysis)
+    for task in tasks:
+        lines.append(task)
+    
+    # Dynamic focus areas
+    focus_areas = _build_dynamic_focus_areas(file_analysis)
+    if focus_areas:
+        lines.append("")
+        lines.append("Focus Areas for Analysis:")
+        for area in focus_areas:
+            lines.append(area)
+    
+    # File-specific recommendations
+    if file_analysis['file_count'] > 0:
+        lines.append("")
+        lines.append("Analysis Strategy:")
+        if file_analysis['has_analysis_toon'] and file_analysis['has_evolution_toon']:
+            lines.append("- Start with analysis.toon for health metrics, then evolution.toon for action priorities")
+        elif file_analysis['has_context_md']:
+            lines.append("- Use context.md as the primary reference for architectural understanding")
+        elif file_analysis['has_project_toon']:
+            lines.append("- Begin with project.toon for structural overview")
+        
+        if file_analysis['has_yaml']:
+            lines.append("- Reference analysis.yaml for precise metrics and programmatic data")
+    
+    # Constraints
+    lines.append("")
+    lines.append("Constraints:")
+    lines.append("- Prefer minimal, incremental changes.")
+    lines.append("- Maintain full backward compatibility.")
+    lines.append("- Base recommendations on concrete metrics from the provided files.")
+    lines.append("- If uncertain, ask clarifying questions.")
+    
     if chunked:
         lines.extend([
             "",
@@ -185,4 +292,5 @@ def _build_prompt_footer(chunked: bool = False) -> List[str]:
             "      Start with the main files (analysis.toon, context.md) for overview,",
             "      then examine specific subproject directories as needed.",
         ])
+    
     return lines

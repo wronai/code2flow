@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+## [0.5.40] - 2026-03-05
+
+### Test
+- Update test_dynamic/README.md
+- Update test_dynamic/analysis.toon
+- Update test_dynamic/batch_1/analysis.toon
+- Update test_dynamic/batch_1/context.md
+- Update test_dynamic/batch_1/evolution.toon
+- Update test_dynamic/context.md
+- Update test_dynamic/evolution.toon
+- Update test_dynamic/root/analysis.toon
+- Update test_dynamic/root/context.md
+- Update test_dynamic/root/evolution.toon
+- ... and 24 more files
+
+### Other
+- Update code2llm/cli_exports/prompt.py
+
 ## [0.5.39] - 2026-03-05
 
 ### Docs
