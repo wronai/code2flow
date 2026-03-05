@@ -3,40 +3,100 @@ project:
   name: code2llm
   repo: /home/tom/github/wronai/code2llm
   language: python
-  analyzed_at: '2026-03-05T08:24:15Z'
+  analyzed_at: '2026-03-05T08:39:57Z'
   tool: code2llm
   stats:
-    files: 67
-    lines: 3431616
-    functions: 673
+    files: 71
+    lines: 20430
+    functions: 702
     classes: 84
 health:
-  cc_avg: 4.6
-  critical_count: 56
+  cc_avg: 4.5
+  critical_count: 53
   critical_limit: 10
   duplicates: 1
   cycles: 0
   alerts:
-  - type: cc_exceeded
-    target: ContextViewGenerator._render
-    value: 23
-    limit: 15
-    severity: warning
   - type: high_fan_out
     target: ProjectYAMLExporter._build_modules
     value: 23
     limit: 10
-    severity: warning
+    severity: critical
   - type: high_fan_out
     target: _summarize_functions
     value: 21
     limit: 10
-    severity: warning
+    severity: critical
   - type: high_fan_out
-    target: ContextViewGenerator._render
-    value: 20
+    target: run_benchmark
+    value: 18
     limit: 10
-    severity: warning
+    severity: error
+  - type: high_fan_out
+    target: ProjectAnalyzer.analyze_project
+    value: 18
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: ToonExporter.export
+    value: 18
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: _run_chunked_analysis
+    value: 17
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: NLPPipeline.process
+    value: 17
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: MermaidExporter.export_call_graph
+    value: 17
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: ProjectYAMLExporter._build_project_yaml
+    value: 17
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: run_benchmark
+    value: 16
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: evaluate_format
+    value: 16
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: StreamingAnalyzer.analyze_streaming
+    value: 16
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: ContextExporter.export
+    value: 16
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: main
+    value: 15
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: _export_chunked_results
+    value: 15
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: ProjectYAMLExporter._build_refactoring
+    value: 15
+    limit: 10
+    severity: error
   - type: cc_exceeded
     target: _run_chunked_analysis
     value: 18
@@ -53,112 +113,11 @@ health:
     limit: 15
     severity: warning
   - type: cc_exceeded
-    target: ArticleViewGenerator._render
-    value: 18
-    limit: 15
-    severity: warning
-  - type: high_fan_out
-    target: run_benchmark
-    value: 18
-    limit: 10
-    severity: warning
-  - type: high_fan_out
-    target: ProjectAnalyzer.analyze_project
-    value: 18
-    limit: 10
-    severity: warning
-  - type: high_fan_out
-    target: ArticleViewGenerator._render
-    value: 18
-    limit: 10
-    severity: warning
-  - type: high_fan_out
-    target: ToonExporter.export
-    value: 18
-    limit: 10
-    severity: warning
-  - type: cc_exceeded
     target: main
     value: 17
     limit: 15
     severity: warning
-  - type: cc_exceeded
-    target: _export_chunked_results
-    value: 17
-    limit: 15
-    severity: warning
-  - type: cc_exceeded
-    target: DataAnalyzer._find_data_pipelines
-    value: 17
-    limit: 15
-    severity: warning
-  - type: cc_exceeded
-    target: TypeInferenceEngine._infer_from_name
-    value: 17
-    limit: 15
-    severity: warning
-  - type: high_fan_out
-    target: _run_chunked_analysis
-    value: 17
-    limit: 10
-    severity: warning
-  - type: high_fan_out
-    target: NLPPipeline.process
-    value: 17
-    limit: 10
-    severity: warning
-  - type: high_fan_out
-    target: MermaidExporter.export_call_graph
-    value: 17
-    limit: 10
-    severity: warning
-  - type: cc_exceeded
-    target: ProjectYAMLExporter._build_modules
-    value: 16
-    limit: 15
-    severity: warning
 modules:
-- path: code2llm/exporters/report_generators.py
-  lines: 601
-  classes: 4
-  methods: 9
-  cc_max: 23
-  inbound_deps: 1
-  exports:
-  - name: ToonViewGenerator
-    type: class
-    cc_avg: 7.0
-    methods:
-    - name: _render
-      cc: 13
-      fan_out: 14
-  - name: ContextViewGenerator
-    type: class
-    cc_avg: 12.0
-    methods:
-    - name: _render
-      cc: 23
-      flag: split
-      fan_out: 20
-  - name: ArticleViewGenerator
-    type: class
-    cc_avg: 9.5
-    methods:
-    - name: _render
-      cc: 18
-      flag: split
-      fan_out: 18
-  - name: HTMLDashboardGenerator
-    type: class
-    cc_avg: 8.0
-    methods:
-    - name: _render
-      cc: 15
-      flag: split
-      fan_out: 16
-  - name: load_project_yaml
-    type: function
-    cc: 3
 - path: code2llm/analysis/pipeline_detector.py
   lines: 486
   classes: 3
@@ -203,7 +162,7 @@ modules:
     cc: 3
     fan_out: 12
 - path: code2llm/exporters/project_yaml_exporter.py
-  lines: 453
+  lines: 470
   classes: 1
   methods: 12
   cc_max: 18
@@ -211,16 +170,16 @@ modules:
   exports:
   - name: ProjectYAMLExporter
     type: class
-    cc_avg: 8.4
+    cc_avg: 8.8
     methods:
     - name: _build_project_yaml
-      cc: 10
-      fan_out: 16
+      cc: 12
+      fan_out: 17
     - name: _build_health
       cc: 7
       fan_out: 11
     - name: _build_alerts
-      cc: 10
+      cc: 13
     - name: _build_modules
       cc: 16
       flag: split
@@ -672,6 +631,22 @@ modules:
     - name: _get_source_context
       cc: 5
       fan_out: 10
+- path: code2llm/exporters/context_view.py
+  lines: 140
+  classes: 1
+  methods: 8
+  cc_max: 11
+  inbound_deps: 0
+  exports:
+  - name: ContextViewGenerator
+    type: class
+    cc_avg: 3.8
+    methods:
+    - name: _render_architecture
+      cc: 9
+      fan_out: 10
+    - name: _render_exports
+      cc: 11
 - path: code2llm/exporters/toon/renderer.py
   lines: 357
   classes: 1
@@ -1008,6 +983,16 @@ modules:
     - name: _detect_feature_envy
       cc: 7
       fan_out: 10
+- path: code2llm/exporters/article_view.py
+  lines: 163
+  classes: 1
+  methods: 9
+  cc_max: 7
+  inbound_deps: 0
+  exports:
+  - name: ArticleViewGenerator
+    type: class
+    cc_avg: 2.8
 - path: code2llm/exporters/toon/module_detail.py
   lines: 162
   classes: 1
@@ -1080,6 +1065,20 @@ modules:
   - name: save_report
     type: function
     cc: 2
+- path: code2llm/exporters/html_dashboard.py
+  lines: 351
+  classes: 1
+  methods: 11
+  cc_max: 6
+  inbound_deps: 0
+  exports:
+  - name: HTMLDashboardGenerator
+    type: class
+    cc_avg: 2.8
+    methods:
+    - name: _render
+      cc: 1
+      fan_out: 10
 - path: code2llm/nlp/normalization.py
   lines: 122
   classes: 2
@@ -1127,6 +1126,16 @@ modules:
   - name: IncrementalAnalyzer
     type: class
     cc_avg: 2.8
+- path: code2llm/exporters/toon_view.py
+  lines: 125
+  classes: 1
+  methods: 9
+  cc_max: 5
+  inbound_deps: 0
+  exports:
+  - name: ToonViewGenerator
+    type: class
+    cc_avg: 2.4
 - path: badges/server.py
   lines: 110
   classes: 0
@@ -1224,6 +1233,16 @@ modules:
   - name: JSONExporter
     type: class
     cc_avg: 3.0
+- path: code2llm/exporters/report_generators.py
+  lines: 34
+  classes: 0
+  methods: 1
+  cc_max: 3
+  inbound_deps: 1
+  exports:
+  - name: load_project_yaml
+    type: function
+    cc: 3
 - path: demo_langs/valid/sample.py
   lines: 40
   classes: 2
@@ -1435,18 +1454,12 @@ hotspots:
 - name: _summarize_functions
   fan_out: 21
   note: Orchestrates 21 calls
-- name: ContextViewGenerator._render
-  fan_out: 20
-  note: Orchestrates 20 calls
 - name: run_benchmark
   fan_out: 18
   note: Run the full format quality benchmark.
 - name: ProjectAnalyzer.analyze_project
   fan_out: 18
   note: Analysis pipeline, 18 stages
-- name: ArticleViewGenerator._render
-  fan_out: 18
-  note: Orchestrates 18 calls
 - name: ToonExporter.export
   fan_out: 18
   note: Export with 18 outputs
@@ -1464,11 +1477,14 @@ hotspots:
 - name: MermaidExporter.export_call_graph
   fan_out: 17
   note: Export with 17 outputs
+- name: ProjectYAMLExporter._build_project_yaml
+  fan_out: 17
+  note: Orchestrates 17 calls
+- name: run_benchmark
+  fan_out: 16
+  note: Run evolution analysis and print before/after table.
 refactoring:
   priorities:
-  - action: Split god module code2llm/exporters/report_generators.py (601L, 4 classes)
-    impact: high
-    effort: high
   - action: Split god module code2llm/cli.py (750L, 0 classes)
     impact: high
     effort: high
@@ -1504,6 +1520,10 @@ refactoring:
     impact: medium
     effort: low
     module: cli.py
+  - action: Split TypeInferenceEngine._infer_from_name (CC=17 → target CC<10)
+    impact: medium
+    effort: low
+    module: type_inference.py
   - action: Split DataAnalyzer._find_data_pipelines (CC=17 → target CC<10)
     impact: medium
     effort: low
@@ -1512,17 +1532,17 @@ refactoring:
     impact: medium
     effort: low
     module: pipeline_detector.py
-  - action: Split TypeInferenceEngine._infer_from_name (CC=17 → target CC<10)
+  - action: Split ProjectYAMLExporter._build_modules (CC=16 → target CC<10)
     impact: medium
     effort: low
-    module: type_inference.py
-  - action: Split ProjectYAMLExporter._build_modules (CC=16 → target CC<10)
+    module: project_yaml_exporter.py
+  - action: Split ProjectYAMLExporter._build_exports (CC=18 → target CC<10)
     impact: medium
     effort: low
     module: project_yaml_exporter.py
 evolution:
 - date: '2026-03-05'
-  cc_avg: 4.6
-  critical: 56
-  lines: 3431616
+  cc_avg: 4.5
+  critical: 53
+  lines: 20430
   note: Automated analysis

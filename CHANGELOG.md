@@ -1,3 +1,33 @@
+## [0.5.37] - 2026-03-05
+
+### Summary
+
+refactor(docs): code analysis engine
+
+### Docs
+
+- docs: update README
+- docs: update context.md
+- docs: update README
+- docs: update context.md
+- docs: update README
+- docs: update context.md
+
+### Other
+
+- update code2llm/exporters/article_view.py
+- update code2llm/exporters/context_view.py
+- update code2llm/exporters/html_dashboard.py
+- update code2llm/exporters/project_yaml_exporter.py
+- update code2llm/exporters/report_generators.py
+- update code2llm/exporters/toon_view.py
+- update project/analysis.json
+- update project/analysis.toon
+- config: update analysis.yaml
+- update project/calls.mmd
+- ... and 17 more
+
+
 ## [0.5.36] - 2026-03-05
 
 ### Summary

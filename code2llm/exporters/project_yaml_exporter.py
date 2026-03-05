@@ -23,7 +23,11 @@ from .toon.helpers import _is_excluded, _rel_path, _scan_line_counts
 # Thresholds
 CC_CRITICAL = 10
 CC_WARNING = 15
+CC_ERROR = 20
+CC_SEVERE = 25
 FAN_OUT_THRESHOLD = 10
+FAN_OUT_ERROR = 15
+FAN_OUT_SEVERE = 20
 GOD_MODULE_LINES = 500
 
 
@@ -57,13 +61,18 @@ class ProjectYAMLExporter(Exporter):
         self, result: AnalysisResult, prev_evolution: List[Dict]
     ) -> Dict[str, Any]:
         line_counts = _scan_line_counts(result.project_path)
-        total_lines = sum(line_counts.values()) // 2  # keys are stored twice (abs + rel)
+        # Filter out venv/site-packages/etc — only count lines of non-excluded files
+        filtered_lines = {
+            k: v for k, v in line_counts.items()
+            if not _is_excluded(k)
+        }
+        total_lines = sum(filtered_lines.values()) // 2  # keys stored twice (abs + rel)
 
         modules = self._build_modules(result, line_counts)
         health = self._build_health(result, modules)
         hotspots = self._build_hotspots(result)
         refactoring = self._build_refactoring(result, modules, hotspots)
-        evolution = self._build_evolution(result, health, prev_evolution)
+        evolution = self._build_evolution(health, total_lines, prev_evolution)
 
         return {
             "version": "1",
@@ -140,12 +149,18 @@ class ProjectYAMLExporter(Exporter):
                 display = fi.name
                 if fi.class_name:
                     display = f"{fi.class_name}.{fi.name}"
+                if cc >= CC_SEVERE:
+                    severity = "critical"
+                elif cc >= CC_ERROR:
+                    severity = "error"
+                else:
+                    severity = "warning"
                 alerts.append({
                     "type": "cc_exceeded",
                     "target": display,
                     "value": cc,
                     "limit": CC_WARNING,
-                    "severity": "critical" if cc >= 25 else "warning",
+                    "severity": severity,
                 })
 
         fan_alerts = []
@@ -157,16 +172,22 @@ class ProjectYAMLExporter(Exporter):
                 display = fi.name
                 if fi.class_name:
                     display = f"{fi.class_name}.{fi.name}"
+                if fan_out >= FAN_OUT_SEVERE:
+                    severity = "critical"
+                elif fan_out >= FAN_OUT_ERROR:
+                    severity = "error"
+                else:
+                    severity = "warning"
                 fan_alerts.append({
                     "type": "high_fan_out",
                     "target": display,
                     "value": fan_out,
                     "limit": FAN_OUT_THRESHOLD,
-                    "severity": "warning",
+                    "severity": severity,
                 })
 
         # Sort alerts by severity (critical first), then by value desc
-        sev_order = {"critical": 0, "warning": 1, "info": 2}
+        sev_order = {"critical": 0, "error": 1, "warning": 2, "info": 3}
         all_alerts = alerts + fan_alerts
         all_alerts.sort(key=lambda a: (sev_order.get(a["severity"], 9), -a["value"]))
         return all_alerts[:20]
@@ -414,15 +435,11 @@ class ProjectYAMLExporter(Exporter):
     # ------------------------------------------------------------------
     def _build_evolution(
         self,
-        result: AnalysisResult,
         health: Dict[str, Any],
+        total_lines: int,
         prev_evolution: List[Dict],
     ) -> List[Dict[str, Any]]:
         today = datetime.now().strftime("%Y-%m-%d")
-
-        # Count lines
-        line_counts = _scan_line_counts(result.project_path)
-        total_lines = sum(line_counts.values()) // 2
 
         new_entry = {
             "date": today,
