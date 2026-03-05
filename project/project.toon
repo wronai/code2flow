@@ -1,4 +1,4 @@
-# code2llm | 137f 22951L | python:121/go:4/java:4/php:4/rust:4/typescript:4
+# code2llm | 137f 23064L | python:121/go:4/java:4/php:4/rust:4/typescript:4
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[137]:
   badges/server.py,91
@@ -28,7 +28,7 @@ M[137]:
   code2llm/cli_exports/code2logic.py,102
   code2llm/cli_exports/formats.py,187
   code2llm/cli_exports/orchestrator.py,71
-  code2llm/cli_exports/prompt.py,147
+  code2llm/cli_exports/prompt.py,220
   code2llm/core/__init__.py,38
   code2llm/core/analyzer.py,227
   code2llm/core/config.py,137
@@ -303,9 +303,9 @@ D:
     _get_prompt_paths(source_path:Optional[Path];output_dir:Path)->Tuple[str, str]
     _build_prompt_header(project_path:str)->List[str]
     _build_main_files_section(output_dir:Path;output_rel_path:str)->List[str]
+    _format_size(size_bytes:int)->str
     _get_missing_files(output_dir:Path)->List[str]
     _build_subprojects_section(subprojects:list;output_dir:Path;output_rel_path:str)->List[str]
-    _build_missing_files_section(output_dir:Path;output_rel_path:str)->List[str]
   code2llm/core/__init__.py:
     i: config.{Config,FAST_CONFIG,FilterConfig,PerformanceConfig},models
     __getattr__(name)
@@ -587,7 +587,7 @@ D:
     new(id: u32 name: &str)->Self
     main()
   demo_langs/invalid/sample_bad.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1)
   demo_langs/valid/sample.go:
     i: fmt
@@ -626,7 +626,7 @@ D:
     process_users(&self)
     main()
   demo_langs/valid/sample.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1),processUsers(0)
   examples/functional_refactoring_example.py:
     i: json,re,abc.{ABC,abstractmethod},dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,Optional,Protocol}
@@ -728,7 +728,7 @@ D:
     new(id: u32 name: &str)->Self
     main()
   test_langs/invalid/sample_bad.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1)
   test_langs/valid/sample.go:
     i: fmt
@@ -767,7 +767,7 @@ D:
     process_users(&self)
     main()
   test_langs/valid/sample.ts:
-    e: UserService,User
+    e: User,UserService
     UserService: addUser(1),getUser(1),processUsers(0)
   test_python_only/valid/sample.py:
     i: dataclasses.dataclass,typing.{List,Optional}

@@ -4,7 +4,7 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Analysis Mode**: static
-- **Total Functions**: 820
+- **Total Functions**: 824
 - **Total Classes**: 104
 - **Modules**: 99
 - **Entry Points**: 631
@@ -426,13 +426,13 @@ Keys: M=modules, D=details,
 
 Key functions that process and transform data:
 
-### validate_toon.validate_toon_completeness
-> Validate toon format structure.
-- **Output to**: print, print, bool, bool, bool
-
 ### benchmarks.benchmark_evolution.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
+
+### validate_toon.validate_toon_completeness
+> Validate toon format structure.
+- **Output to**: print, print, bool, bool, bool
 
 ### benchmarks.format_evaluator.evaluate_format
 > Oceń pojedynczy format względem ground truth.
@@ -486,16 +486,6 @@ Checks:
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
-
-### code2llm.core.toon_size_manager._parse_modules
-> Parse module sections from TOON content.
-
-Returns list of (module_name, start_line, end_line).
-- **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
-
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
 - **Output to**: self._chunk_by_files, chunks.extend
@@ -503,6 +493,16 @@ Returns list of (module_name, start_line, end_line).
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
 > Process Python files directly in level1 directory.
 - **Output to**: len, chunks.append, self._chunk_by_files, chunks.extend, str
+
+### code2llm.core.toon_size_manager._parse_modules
+> Parse module sections from TOON content.
+
+Returns list of (module_name, start_line, end_line).
+- **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
+
+### code2llm.analysis.cfg.CFGExtractor._format_except
+> Format except handler.
+- **Output to**: self._expr_to_str
 
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).

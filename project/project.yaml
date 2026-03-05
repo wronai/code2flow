@@ -3,16 +3,16 @@ project:
   name: code2llm
   repo: /home/tom/github/wronai/code2llm
   language: python
-  analyzed_at: '2026-03-05T10:43:20Z'
+  analyzed_at: '2026-03-05T13:17:37Z'
   tool: code2llm
   stats:
     files: 76
-    lines: 20655
-    functions: 716
+    lines: 20768
+    functions: 720
     classes: 84
 health:
   cc_avg: 4.4
-  critical_count: 52
+  critical_count: 54
   critical_limit: 10
   duplicates: 1
   cycles: 0
@@ -566,6 +566,12 @@ modules:
     type: function
     cc: 5
     fan_out: 15
+- path: code2llm/cli_exports/prompt.py
+  lines: 296
+  classes: 0
+  methods: 13
+  cc_max: 12
+  inbound_deps: 1
 - path: code2llm/core/core/file_analyzer.py
   lines: 365
   classes: 1
@@ -1091,12 +1097,6 @@ modules:
   methods: 8
   cc_max: 6
   inbound_deps: 1
-- path: code2llm/cli_exports/prompt.py
-  lines: 183
-  classes: 0
-  methods: 9
-  cc_max: 6
-  inbound_deps: 1
 - path: code2llm/exporters/html_dashboard.py
   lines: 351
   classes: 1
@@ -1566,6 +1566,6 @@ refactoring:
 evolution:
 - date: '2026-03-05'
   cc_avg: 4.4
-  critical: 52
-  lines: 20655
+  critical: 54
+  lines: 20768
   note: Automated analysis

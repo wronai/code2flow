@@ -4,38 +4,34 @@ Use the attached/generated files as the authoritative context.
 we are in project path: .
 
 Files for analysis:
-- project/analysis.toon  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities)
-- project/context.md  (LLM narrative - architecture summary, key entry points, process flows, public API surface)
-- project/evolution.toon  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history)
-- project/project.toon  (Project logic - compact module view from code2logic, file sizes, dependencies overview)
-- project/README.md  (Documentation - complete guide to all generated files, usage examples, interpretation)
+- project/analysis.toon  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities) [51KB]
+- project/context.md  (LLM narrative - architecture summary, key entry points, process flows, public API surface) [36KB]
+- project/evolution.toon  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history) [1KB]
+- project/project.toon  (Project logic - compact module view from code2logic, file sizes, dependencies overview) [51KB]
+- project/README.md  (Documentation - complete guide to all generated files, usage examples, interpretation) [9KB]
 
 Task:
 - Summarize the architecture and main flows.
 - Identify the highest-risk areas and propose a refactoring plan.
 - If you suggest changes, keep behavior backward compatible and provide concrete steps.
+- Highlight critical functions (CC ≥ 10) and god modules from analysis.toon.
+- Prioritize refactoring actions by impact/effort ratio from evolution.toon.
+- Validate entry points and public API surface match the architecture described.
 
 Focus Areas for Analysis:
-1. **CLI Architecture** - Check for monolithic parser complexity (target: <50 lines per function)
-2. **Analysis Orchestration** - Identify chunking/streaming bottlenecks and failure points
-3. **Metrics System** - Evaluate hardcoded thresholds vs configurable metrics (CC>12, fan-out>10)
-4. **README Generation** - Assess template brittleness and file parsing complexity
+1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon
+2. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon
+3. **Architecture Overview** - Understand main flows, entry points, and public API from context.md
+4. **Project Structure** - Analyze module organization and dependencies from project.toon
+5. **Structured Data** - Use machine-readable formats for automated analysis and metrics extraction
+6. **Visual Flow** - Review control flow diagrams and call graphs for architectural insights
 
-Refactoring Priorities (Metrics-Driven):
-- **Phase 1**: CLI decomposition - reduce cyclomatic complexity, improve test coverage
-- **Phase 2**: Configuration-driven metrics - replace magic numbers with MetricsConfig
-- **Phase 3**: Analysis pipeline refactoring - implement plugin architecture with stages
-- **Phase 4**: Dynamic README generation - template-based, metrics-aware documentation
-
-Success Metrics to Track:
-- Code complexity: Reduce average function CC by 30%
-- Test coverage: Maintain >95% coverage
-- Performance: No regression in analysis speed
-- Memory: Reduce peak memory usage by 20%
-- False positive rate: <5% for smell detection
+Analysis Strategy:
+- Start with analysis.toon for health metrics, then evolution.toon for action priorities
+- Reference analysis.yaml for precise metrics and programmatic data
 
 Constraints:
 - Prefer minimal, incremental changes.
 - Maintain full backward compatibility.
-- Use existing README generation approach as model for comprehensive metrics.
+- Base recommendations on concrete metrics from the provided files.
 - If uncertain, ask clarifying questions.
