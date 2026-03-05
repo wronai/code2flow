@@ -4,9 +4,9 @@
 
 - **Project**: .
 - **Analysis Mode**: static
-- **Total Functions**: 774
+- **Total Functions**: 820
 - **Total Classes**: 104
-- **Modules**: 92
+- **Modules**: 102
 - **Entry Points**: 0
 
 ## Architecture by Module
@@ -15,10 +15,6 @@
 - **Functions**: 50
 - **Classes**: 15
 - **File**: `functional_refactoring_example.py`
-
-### code2llm.cli_exports
-- **Functions**: 28
-- **File**: `cli_exports.py`
 
 ### code2llm.exporters.toon.metrics
 - **Functions**: 27
@@ -59,6 +55,11 @@
 - **Functions**: 17
 - **Classes**: 1
 - **File**: `cfg.py`
+
+### code2llm.exporters.project_yaml_exporter
+- **Functions**: 17
+- **Classes**: 1
+- **File**: `project_yaml_exporter.py`
 
 ### code2llm.analysis.data_analysis
 - **Functions**: 16
@@ -148,6 +149,14 @@ Strategy:
 - **Key Methods**: code2llm.analysis.cfg.CFGExtractor.__init__, code2llm.analysis.cfg.CFGExtractor.extract, code2llm.analysis.cfg.CFGExtractor.new_node, code2llm.analysis.cfg.CFGExtractor.connect, code2llm.analysis.cfg.CFGExtractor.visit_FunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_AsyncFunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_If, code2llm.analysis.cfg.CFGExtractor.visit_For, code2llm.analysis.cfg.CFGExtractor.visit_While, code2llm.analysis.cfg.CFGExtractor.visit_Try
 - **Inherits**: ast.NodeVisitor
 
+### code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter
+> Export unified project.yaml — single source of truth for diagnostics.
+
+Combines data from analysis.t
+- **Methods**: 17
+- **Key Methods**: code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter.export, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_project_yaml, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_health, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_alerts, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._count_duplicates, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_modules, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._group_by_file, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._compute_module_entry, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._compute_inbound_deps, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_exports
+- **Inherits**: Exporter
+
 ### code2llm.analysis.data_analysis.DataAnalyzer
 > Analyze data flows, structures, and optimization opportunities.
 - **Methods**: 16
@@ -233,12 +242,6 @@ Keys: M=modules, D=details,
 - **Methods**: 13
 - **Key Methods**: examples.streaming-analyzer.sample_project.database.DatabaseConnection.__init__, examples.streaming-analyzer.sample_project.database.DatabaseConnection._load_data, examples.streaming-analyzer.sample_project.database.DatabaseConnection._save_data, examples.streaming-analyzer.sample_project.database.DatabaseConnection.get_user, examples.streaming-analyzer.sample_project.database.DatabaseConnection.get_user_settings, examples.streaming-analyzer.sample_project.database.DatabaseConnection.get_user_logs, examples.streaming-analyzer.sample_project.database.DatabaseConnection.update_user_settings, examples.streaming-analyzer.sample_project.database.DatabaseConnection.update_user_profile, examples.streaming-analyzer.sample_project.database.DatabaseConnection.delete_user, examples.streaming-analyzer.sample_project.database.DatabaseConnection.clear_user_data
 
-### code2llm.analysis.dfg.DFGExtractor
-> Extract Data Flow Graph from AST.
-- **Methods**: 12
-- **Key Methods**: code2llm.analysis.dfg.DFGExtractor.__init__, code2llm.analysis.dfg.DFGExtractor.extract, code2llm.analysis.dfg.DFGExtractor.visit_FunctionDef, code2llm.analysis.dfg.DFGExtractor.visit_Assign, code2llm.analysis.dfg.DFGExtractor.visit_AugAssign, code2llm.analysis.dfg.DFGExtractor.visit_For, code2llm.analysis.dfg.DFGExtractor.visit_Call, code2llm.analysis.dfg.DFGExtractor._extract_targets, code2llm.analysis.dfg.DFGExtractor._get_names, code2llm.analysis.dfg.DFGExtractor._extract_names
-- **Inherits**: ast.NodeVisitor
-
 ## Data Transformation Functions
 
 Key functions that process and transform data:
@@ -293,10 +296,6 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### code2llm.cli_exports._export_simple_formats
-> Export toon, map, flow, context, yaml, json formats.
-- **Output to**: format_map.items, code2llm.cli_exports._export_yaml, JSONExporter, exporter.export, exporter_cls
-
 ### demo_langs.valid.sample.UserService.process_users
 - **Output to**: print
 
@@ -306,6 +305,10 @@ Checks:
 ### benchmarks.benchmark_format_quality._generate_format_outputs
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
+
+### code2llm.analysis.cfg.CFGExtractor._format_except
+> Format except handler.
+- **Output to**: self._expr_to_str
 
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
@@ -320,10 +323,6 @@ Checks:
 
 Returns list of (module_name, start_line, end_line).
 - **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
-
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
 
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).
@@ -341,9 +340,14 @@ Returns list of (module_name, start_line, end_line).
 > Step 4e: Output formatting.
 - **Output to**: self._format_response
 
-### code2llm.exporters.flow_renderer.FlowRenderer.render_transforms
-> Renderuj sekcję TRANSFORMS.
-- **Output to**: lines.append
+### code2llm.exporters.validate_project.validate_project_yaml
+> Validate project.yaml against generated views in output_dir.
+
+Returns (is_valid, list_of_issues).
+- **Output to**: issues.extend, toon_path.exists, yaml_path.exists, issues.append, code2llm.exporters.validate_project._check_required_keys
+
+### code2llm.exporters.context_exporter.ContextExporter._get_process_flows
+- **Output to**: set, set, seen_base_names.add, self._trace_flow, ep_name.split
 
 ## Public API Surface
 
@@ -357,7 +361,7 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 38 calls
 - `code2llm.exporters.toon.ToonExporter.export` - 35 calls
 - `benchmarks.benchmark_evolution.run_benchmark` - 34 calls
-- `code2llm.cli.create_parser` - 31 calls
+- `code2llm.cli.create_parser` - 32 calls
 - `benchmarks.benchmark_performance.create_test_project` - 29 calls
 - `code2llm.nlp.pipeline.NLPPipeline.process` - 29 calls
 - `validate_toon.compare_modules` - 26 calls
@@ -378,17 +382,17 @@ Functions exposed as public API (no underscore prefix):
 - `validate_toon.compare_classes` - 19 calls
 - `scripts.benchmark_badges.parse_evolution_metrics` - 19 calls
 - `code2llm.exporters.yaml_exporter.YAMLExporter.export_grouped` - 19 calls
-- `code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file` - 19 calls
 - `code2llm.core.streaming.prioritizer.SmartPrioritizer.prioritize_files` - 19 calls
+- `code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file` - 19 calls
 - `examples.streaming-analyzer.demo.demo_incremental_analysis` - 19 calls
 - `code2llm.exporters.flow_renderer.FlowRenderer.render_pipelines` - 18 calls
 - `code2llm.generators.llm_flow.main` - 18 calls
 - `validate_toon.validate_toon_completeness` - 17 calls
+- `code2llm.exporters.validate_project.validate_project_yaml` - 17 calls
 - `examples.litellm.run.main` - 17 calls
 - `examples.streaming-analyzer.demo.main` - 17 calls
 - `examples.functional_refactoring_example.generate` - 16 calls
 - `examples.streaming-analyzer.demo.demo_custom_progress` - 16 calls
-- `scripts.benchmark_badges.generate_performance_badges` - 15 calls
 
 ## System Interactions
 

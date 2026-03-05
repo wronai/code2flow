@@ -1,3 +1,35 @@
+## [0.5.38] - 2026-03-05
+
+### Summary
+
+refactor(goal): code analysis engine
+
+### Docs
+
+- docs: update README
+- docs: update context.md
+- docs: update README
+- docs: update context.md
+
+### Test
+
+- update tests/test_prompt_txt.py
+
+### Other
+
+- update analysis.toon
+- update batch_1/analysis.toon
+- update code2llm/cli.py
+- update code2llm/cli_analysis.py
+- update code2llm/cli_exports.py
+- update code2llm/cli_exports/__init__.py
+- update code2llm/cli_exports/code2logic.py
+- update code2llm/cli_exports/formats.py
+- update code2llm/cli_exports/orchestrator.py
+- update code2llm/cli_exports/prompt.py
+- ... and 6 more
+
+
 ## [0.5.37] - 2026-03-05
 
 ### Summary

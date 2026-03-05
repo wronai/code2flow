@@ -3,10 +3,10 @@
 
 HEALTH[6]:
   🟡 CC    main CC=17 (limit:15)
-  🟡 CC    _validate_chunked_output CC=15 (limit:15)
-  🟡 CC    _resolve_callee CC=18 (limit:15)
   🟡 CC    _find_data_pipelines CC=17 (limit:15)
+  🟡 CC    _resolve_callee CC=18 (limit:15)
   🟡 CC    _infer_from_name CC=17 (limit:15)
+  🟡 CC    _validate_chunked_output CC=15 (limit:15)
   🟡 CC    _export_chunked_results CC=17 (limit:15)
 
 REFACTOR[1]:
@@ -156,16 +156,16 @@ FUNCTIONS (CC≥10, 52 of 716):
    13.0  EntityResolver.resolve                     18n   2exit  loops+cond+ret
    13.0  READMEExporter._extract_insights            7n   2exit  cond+ret
    13.0  MapExporter._render_map_module             18n   1exit  loops+cond
-   13.0  MermaidExporter.export_call_graph          16n   1exit  loops+cond
-   13.0  MermaidExporter.export_compact             14n   1exit  loops+cond
    13.0  ProjectYAMLExporter._build_alerts          25n   2exit  loops+cond+ret
    13.0  ProjectYAMLExporter._build_refactoring     17n   2exit  loops+cond+ret
+   13.0  MermaidExporter.export_call_graph          16n   1exit  loops+cond
+   13.0  MermaidExporter.export_compact             14n   1exit  loops+cond
    13.0  generate_single_png                         2n   1exit  
    12.0  DataAnalyzer._find_state_patterns           9n   2exit  loops+cond+ret
    12.0  StreamingAnalyzer.analyze_streaming        16n   1exit  loops+cond
    12.0  ProjectYAMLExporter._build_project_yaml     3n   2exit  ret
-   12.0  _check_node_ids                            15n   1exit  loops+cond
    12.0  _export_mermaid                             8n   1exit  cond
+   12.0  _check_node_ids                            15n   1exit  loops+cond
    12.0  PromptEngine._build_context_for_smell       5n   2exit  cond+ret
    12.0  MetricsComputer._compute_file_metrics      21n   2exit  loops+cond+ret
    12.0  FileAnalyzer._process_function             14n   2exit  loops+cond+ret
@@ -179,8 +179,8 @@ FUNCTIONS (CC≥10, 52 of 716):
    10.0  NLPPipeline._format_action                 29n  10exit  cond+ret
    10.0  EvolutionExporter._build_context            3n   2exit  ret
    10.0  EvolutionExporter._render_next             16n   3exit  loops+cond+ret
-   10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
    10.0  ContextExporter._trace_flow                14n   3exit  loops+cond+ret
+   10.0  FlowRenderer.render_pipelines               9n   3exit  loops+cond+ret
    10.0  FlowExporter._infer_invariant              21n   8exit  cond+ret
    10.0  _scan_brackets                             11n   1exit  loops+cond
 
@@ -193,9 +193,9 @@ HOTSPOTS:
   #2  run_benchmark                        fan=18   "calls 18 functions"
   #3  ProjectAnalyzer.analyze_project      fan=18   "analysis pipeline, 18 stages"
   #4  ToonExporter.export                  fan=18   "export with 18 outputs"
-  #5  NLPPipeline.process                  fan=17   "analysis pipeline, 17 stages"
+  #5  ProjectYAMLExporter._build_project_yaml  fan=17   "ProjectYAMLExporter method, fan-out=17"
   #6  MermaidExporter.export_call_graph    fan=17   "export with 17 outputs"
-  #7  ProjectYAMLExporter._build_project_yaml  fan=17   "ProjectYAMLExporter method, fan-out=17"
+  #7  NLPPipeline.process                  fan=17   "analysis pipeline, 17 stages"
   #8  run_benchmark                        fan=16   "calls 16 functions"
   #9  evaluate_format                      fan=16   "16-way dispatch"
   #10 StreamingAnalyzer.analyze_streaming  fan=16   "analysis pipeline, 16 stages"
@@ -280,8 +280,8 @@ CLASSES:
   Mutation                                                  0m  CC̄=0.0   max=0.0 
   DataFlow                                                  0m  CC̄=0.0   max=0.0 
   Entity                                                    0m  CC̄=0.0   max=0.0 
-  PipelineStage                                             0m  CC̄=0.0   max=0.0 
   NormalizationResult                                       0m  CC̄=0.0   max=0.0 
+  PipelineStage                                             0m  CC̄=0.0   max=0.0 
   FuncSummary                                               0m  CC̄=0.0   max=0.0 
   ScanStrategy                                              0m  CC̄=0.0   max=0.0 
   FilePriority                                              0m  CC̄=0.0   max=0.0 
@@ -464,19 +464,6 @@ S...
         → _render_map_module(3)  CC=13.0
         → _render_map_class(3)  CC=7.0
         → _function_signature(1)  CC=5.0
-  code2llm/exporters/mermaid_exporter.py:
-    e: MermaidExporter
-    MermaidExporter  # Export call graph to Mermaid format....
-      export(2)  CC=1.0
-        → _render_subgraphs(2)  CC=6.0
-        → _module_of(1)  CC=4.0
-        → _safe_module(1)  CC=1.0
-        → _readable_id(1)  CC=3.0
-        → _get_cc(0)  CC=3.0
-        → _render_edges(3)  CC=8.0
-        → _resolve(2)  CC=5.0
-        → _render_cc_styles(2)  CC=6.0
-        → _write(2)  CC=1.0
   code2llm/exporters/project_yaml_exporter.py:
     e: ProjectYAMLExporter
     ProjectYAMLExporter  # Export unified project.yaml — single source of truth for dia...
@@ -495,6 +482,19 @@ S...
         → _hotspot_note(1)  CC=7.0
         → _build_refactoring(3)  CC=13.0
         → _build_evolution(3)  CC=3.0
+  code2llm/exporters/mermaid_exporter.py:
+    e: MermaidExporter
+    MermaidExporter  # Export call graph to Mermaid format....
+      export(2)  CC=1.0
+        → _render_subgraphs(2)  CC=6.0
+        → _module_of(1)  CC=4.0
+        → _safe_module(1)  CC=1.0
+        → _readable_id(1)  CC=3.0
+        → _get_cc(0)  CC=3.0
+        → _render_edges(3)  CC=8.0
+        → _resolve(2)  CC=5.0
+        → _render_cc_styles(2)  CC=6.0
+        → _write(2)  CC=1.0
   code2llm/generators/mermaid.py:
     e: validate_mermaid_file,_strip_label_segments,_is_balanced_node_line,_check_bracket_balance,_scan_brackets,_check_node_ids,_sanitize_label_text,_sanitize_node_id,fix_mermaid_file,_fix_edge_line,_fix_edge_label_pipes,_fix_subgraph_line,_fix_class_line,generate_pngs,generate_single_png,generate_with_puppeteer
     validate_mermaid_file(mmd_path)
@@ -624,15 +624,15 @@ Stra...
     e: PatternDetector
     PatternDetector  # Detect behavioral patterns in code....
       __init__(1)  CC=1.0
-  code2llm/core/core/refactoring.py:
-    e: RefactoringAnalyzer
-    RefactoringAnalyzer  # Performs refactoring analysis on code....
-      __init__(2)  CC=1.0
   code2llm/core/streaming/prioritizer.py:
     e: FilePriority,SmartPrioritizer
     FilePriority  # Priority scoring for file analysis order....
     SmartPrioritizer  # Smart file prioritization for optimal analysis order....
       __init__(1)  CC=1.0
+  code2llm/core/core/refactoring.py:
+    e: RefactoringAnalyzer
+    RefactoringAnalyzer  # Performs refactoring analysis on code....
+      __init__(2)  CC=1.0
   code2llm/core/models.py:
     e: BaseModel,FlowNode,FlowEdge,FunctionInfo,ClassInfo,ModuleInfo,Pattern,CodeSmell,Mutation,DataFlow,AnalysisResult
     BaseModel  # Base class for models with automated serialization....
@@ -687,6 +687,10 @@ Stra...
     e: SmellDetector
     SmellDetector  # Detect code smells from analysis results....
       __init__(1)  CC=1.0
+  code2llm/analysis/dfg.py:
+    e: DFGExtractor
+    DFGExtractor  # Extract Data Flow Graph from AST....
+      __init__(1)  CC=1.0
   code2llm/nlp/intent_matching.py:
     e: IntentMatch,IntentMatchingResult,IntentMatcher
     IntentMatch  # Single intent match result....
@@ -694,10 +698,6 @@ Stra...
       get_best_intent(0)  CC=2.0
     IntentMatcher  # Match queries to intents using fuzzy and keyword matching....
       __init__(2)  CC=3.0
-  code2llm/analysis/dfg.py:
-    e: DFGExtractor
-    DFGExtractor  # Extract Data Flow Graph from AST....
-      __init__(1)  CC=1.0
   code2llm/exporters/article_view.py:
     e: ArticleViewGenerator
     ArticleViewGenerator  # Generate status.md — publishable project health article....
@@ -861,6 +861,11 @@ Unlike simple L...
     e: APIHandler
     APIHandler  # Handles API requests and responses....
       __init__(0)  CC=1.0
+  examples/streaming-analyzer/sample_project/database.py:
+    e: DatabaseConnection
+    DatabaseConnection  # Simple database connection simulator....
+      __init__(1)  CC=2.0
+        → _load_data(0)  CC=3.0
   examples/streaming-analyzer/demo.py:
     e: demo_quick_strategy,demo_standard_strategy,demo_deep_strategy,demo_incremental_analysis,demo_memory_limited,demo_custom_progress,main
     demo_quick_strategy()
@@ -870,11 +875,6 @@ Unlike simple L...
     demo_memory_limited()
     demo_custom_progress()
     main()
-  examples/streaming-analyzer/sample_project/database.py:
-    e: DatabaseConnection
-    DatabaseConnection  # Simple database connection simulator....
-      __init__(1)  CC=2.0
-        → _load_data(0)  CC=3.0
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()

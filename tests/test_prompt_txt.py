@@ -173,8 +173,9 @@ class TestCode2logicExport:
         completed.stdout = ""
         completed.stderr = ""
 
-        with patch('code2llm.cli.shutil.which', return_value='/usr/bin/code2logic'), \
-             patch('code2llm.cli.subprocess.run', return_value=completed) as run_mock, \
+        with patch('code2llm.cli_exports.code2logic.shutil.which', return_value='/usr/bin/code2logic'), \
+             patch('code2llm.cli_exports.code2logic.subprocess.run', return_value=completed) as run_mock, \
+             patch('code2llm.core.toon_size_manager.manage_toon_size', return_value=[temp_output_dir / 'project.toon']), \
              patch('pathlib.Path.exists', return_value=True):
             _export_code2logic(args, source_path, temp_output_dir, formats)
 
@@ -193,8 +194,9 @@ class TestCode2logicExport:
         completed.stdout = ""
         completed.stderr = ""
 
-        with patch('code2llm.cli.shutil.which', return_value='/usr/bin/code2logic'), \
-             patch('code2llm.cli.subprocess.run', return_value=completed) as run_mock, \
+        with patch('code2llm.cli_exports.code2logic.shutil.which', return_value='/usr/bin/code2logic'), \
+             patch('code2llm.cli_exports.code2logic.subprocess.run', return_value=completed) as run_mock, \
+             patch('code2llm.core.toon_size_manager.manage_toon_size', return_value=[temp_output_dir / 'project.toon']), \
              patch('pathlib.Path.exists', return_value=True):
             _export_code2logic(args, source_path, temp_output_dir, formats)
 
