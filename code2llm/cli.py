@@ -205,6 +205,12 @@ Strategy Options (--strategy):
         action='store_true',
         help='Automatically split large repositories into smaller subprojects'
     )
+
+    parser.add_argument(
+        '--no-chunk',
+        action='store_true',
+        help='Disable chunked analysis even for large repositories'
+    )
     
     parser.add_argument(
         '--chunk-size',
@@ -465,9 +471,10 @@ def _run_analysis(args, source_path: Path, output_dir: Path):
     
     # Check if we should use chunked analysis
     # Auto-chunk when estimated output > chunk_size (default 256KB = ~85 files)
+    # --no-chunk explicitly disables chunking
     use_chunking = (
-        args.chunk or 
-        should_use_chunking(source_path, args.chunk_size)
+        not args.no_chunk and
+        (args.chunk or should_use_chunking(source_path, args.chunk_size))
     )
     
     if use_chunking:

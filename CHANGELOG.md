@@ -1,3 +1,14 @@
+## [0.5.35] - 2026-03-05
+
+### Summary
+
+feat(goal): CLI interface improvements
+
+### Other
+
+- update code2llm/cli.py
+
+
 ## [0.5.34] - 2026-03-05
 
 ### Summary
