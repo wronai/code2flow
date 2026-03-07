@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.5.44] - 2026-03-07
+
+### Other
+- Update code2llm/api.py
+
 ## [0.5.43] - 2026-03-07
 
 ### Docs
