@@ -587,7 +587,7 @@ D:
     new(id: u32 name: &str)->Self
     main()
   demo_langs/invalid/sample_bad.ts:
-    e: User,UserService
+    e: UserService,User
     UserService: addUser(1),getUser(1)
   demo_langs/valid/sample.go:
     i: fmt
@@ -626,7 +626,7 @@ D:
     process_users(&self)
     main()
   demo_langs/valid/sample.ts:
-    e: User,UserService
+    e: UserService,User
     UserService: addUser(1),getUser(1),processUsers(0)
   examples/functional_refactoring_example.py:
     i: json,re,abc.{ABC,abstractmethod},dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,Optional,Protocol}
@@ -728,7 +728,7 @@ D:
     new(id: u32 name: &str)->Self
     main()
   test_langs/invalid/sample_bad.ts:
-    e: User,UserService
+    e: UserService,User
     UserService: addUser(1),getUser(1)
   test_langs/valid/sample.go:
     i: fmt
@@ -767,7 +767,7 @@ D:
     process_users(&self)
     main()
   test_langs/valid/sample.ts:
-    e: User,UserService
+    e: UserService,User
     UserService: addUser(1),getUser(1),processUsers(0)
   test_python_only/valid/sample.py:
     i: dataclasses.dataclass,typing.{List,Optional}

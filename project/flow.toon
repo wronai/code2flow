@@ -1,4 +1,4 @@
-# code2llm/flow | 824 func | 12 pipelines | 13 hub-types | 2026-03-05
+# code2llm/flow | 824 func | 12 pipelines | 13 hub-types | 2026-03-07
 
 PIPELINES[12] (Analysis:7, Core:1, Export:4):
   Cli_exports [Export]: ? → Path
@@ -479,11 +479,11 @@ DATA_TYPES (by cross-function usage) [749 annotated, 0 inferred / 824 functions]
   ast.AST              consumed:18  produced:0    !! HUB-TYPE → split interface
   float                consumed:1   produced:13   output-heavy
   str, FunctionInfo    consumed:13  produced:0    !! HUB-TYPE → split interface
-  CodeSmell            consumed:3   produced:8  
   NLPPipelineResult    consumed:7   produced:4  
-  ast.FunctionDef      consumed:8   produced:2  
+  CodeSmell            consumed:3   produced:8  
   SideEffectInfo       consumed:9   produced:1    input-heavy (read-only flow)
-  SubProject           consumed:0   produced:9    output-heavy
+  ast.FunctionDef      consumed:8   produced:2  
+  IntentMatch          consumed:4   produced:5  
 
   HUB TYPES (consumed ≥10):
     str → 328 consumers → split into:
@@ -516,10 +516,10 @@ DATA_TYPES (by cross-function usage) [749 annotated, 0 inferred / 824 functions]
       - (analyze consumers to suggest sub-interfaces)
 
 SIDE_EFFECTS:
-  IO:        read_readme, load_previous, save_current, run_benchmark, _print_header, _print_scores_table, _print_problems_detail, _print_pipelines_detail, _print_structural_features, _print_gap_analysis
+  IO:        load_yaml, analyze_class_differences, compare_basic_stats, compare_functions, compare_classes, compare_modules, validate_toon_completeness, main, load_previous, save_current
   Cache:     EvolutionaryCache.put, generate, SideEffectDetector._check_calls, SideEffectDetector._heuristic_classify, ProjectAnalyzer.__init__, StreamingAnalyzer.__init__, FlowExporter._classify_side_effects, StreamingFileCache.put
-  Mutation:  extract_functions_from_yaml, extract_functions_from_toon, extract_classes_from_yaml, extract_classes_from_toon, extract_modules_from_yaml, extract_modules_from_toon, ShellEntityPreparer._apply_find_flags, EntityPreparationPipeline.__init__, TemplateLoader.__init__, EvolutionaryCache.__init__
-  Pure:      parse_evolution_metrics, print_results, build_report, load_file, _detect_problems, _detect_pipelines, _detect_hub_types, _check_structural_features, evaluate_format, TemplateGenerator.__init__
+  Mutation:  extract_functions_from_yaml, extract_functions_from_toon, extract_classes_from_yaml, extract_classes_from_toon, extract_modules_from_yaml, extract_modules_from_toon, generate_badges, generate_format_quality_badges, generate_performance_badges, ShellEntityPreparer._apply_find_flags
+  Pure:      load_file, parse_evolution_metrics, print_results, build_report, _create_offline_scores, get_shield_url, parse_evolution_metrics, create_html, parse_version, format_version
 
   PIPELINE PURITY:
     Cli_exports     ░░░░ 11% pure

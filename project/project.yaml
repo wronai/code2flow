@@ -3,7 +3,7 @@ project:
   name: code2llm
   repo: /home/tom/github/wronai/code2llm
   language: python
-  analyzed_at: '2026-03-05T13:17:37Z'
+  analyzed_at: '2026-03-07T18:48:14Z'
   tool: code2llm
   stats:
     files: 76
@@ -1565,6 +1565,11 @@ refactoring:
     effort: medium
 evolution:
 - date: '2026-03-05'
+  cc_avg: 4.4
+  critical: 54
+  lines: 20768
+  note: Automated analysis
+- date: '2026-03-07'
   cc_avg: 4.4
   critical: 54
   lines: 20768

@@ -426,17 +426,17 @@ Keys: M=modules, D=details,
 
 Key functions that process and transform data:
 
-### benchmarks.benchmark_evolution.parse_evolution_metrics
-> Extract metrics from evolution.toon content.
-- **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
-
 ### validate_toon.validate_toon_completeness
 > Validate toon format structure.
 - **Output to**: print, print, bool, bool, bool
 
-### benchmarks.format_evaluator.evaluate_format
-> Oceń pojedynczy format względem ground truth.
-- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+### benchmarks.benchmark_evolution.parse_evolution_metrics
+> Extract metrics from evolution.toon content.
+- **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
+
+### benchmarks.benchmark_format_quality._generate_format_outputs
+> Generate all format outputs and evaluate them.
+- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
@@ -461,6 +461,13 @@ Key functions that process and transform data:
 ### scripts.bump_version.format_version
 > Format version tuple as string
 
+### benchmarks.format_evaluator.evaluate_format
+> Oceń pojedynczy format względem ground truth.
+- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
+
 ### code2llm.cli.create_parser
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
@@ -476,15 +483,8 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### demo_langs.valid.sample.UserService.process_users
-- **Output to**: print
-
 ### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
 - **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
-### benchmarks.benchmark_format_quality._generate_format_outputs
-> Generate all format outputs and evaluate them.
-- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
@@ -526,8 +526,9 @@ Returns list of (module_name, start_line, end_line).
 Returns (is_valid, list_of_issues).
 - **Output to**: issues.extend, toon_path.exists, yaml_path.exists, issues.append, code2llm.exporters.validate_project._check_required_keys
 
-### code2llm.exporters.context_exporter.ContextExporter._get_process_flows
-- **Output to**: set, set, seen_base_names.add, self._trace_flow, ep_name.split
+### code2llm.exporters.flow_renderer.FlowRenderer.render_transforms
+> Renderuj sekcję TRANSFORMS.
+- **Output to**: lines.append
 
 ## Behavioral Patterns
 
@@ -571,8 +572,8 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.generators.mermaid.generate_single_png` - 24 calls
 - `scripts.benchmark_badges.main` - 23 calls
 - `code2llm.exporters.flow_exporter.FlowExporter.export` - 23 calls
-- `benchmarks.format_evaluator.evaluate_format` - 22 calls
 - `benchmarks.benchmark_format_quality.run_benchmark` - 22 calls
+- `benchmarks.format_evaluator.evaluate_format` - 22 calls
 - `code2llm.cli.generate_llm_context` - 21 calls
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_files` - 20 calls
 - `code2llm.exporters.evolution_exporter.EvolutionExporter.export` - 20 calls

@@ -270,9 +270,6 @@ S...
   code2llm/core/streaming_analyzer.py:
     e: StreamingAnalyzer
     StreamingAnalyzer: __init__(2),set_progress_callback(1),cancel(0),analyze_streaming(2),_estimate_eta(3),_report_progress(4)  # Memory-efficient streaming analyzer with progress tracking...
-  code2llm/refactor/prompt_engine.py:
-    e: PromptEngine
-    PromptEngine: __init__(2),generate_prompts(0),_generate_prompt_for_smell(1),_get_template_for_type(1),_build_context_for_smell(1),_get_source_context(3),_get_instruction_for_smell(1)  # Generate refactoring prompts from analysis results and detec...
   code2llm/cli_exports/prompt.py:
     e: _export_prompt_txt,_export_chunked_prompt_txt,_get_prompt_paths,_build_prompt_header,_build_main_files_section,_format_size,_get_missing_files,_build_subprojects_section,_build_missing_files_section,_analyze_generated_files,_build_dynamic_focus_areas,_build_dynamic_tasks,_build_prompt_footer
     _export_prompt_txt(args;output_dir;formats;source_path)
@@ -288,6 +285,9 @@ S...
     _build_dynamic_focus_areas(file_analysis)
     _build_dynamic_tasks(file_analysis)
     _build_prompt_footer(chunked;file_analysis)
+  code2llm/refactor/prompt_engine.py:
+    e: PromptEngine
+    PromptEngine: __init__(2),generate_prompts(0),_generate_prompt_for_smell(1),_get_template_for_type(1),_build_context_for_smell(1),_get_source_context(3),_get_instruction_for_smell(1)  # Generate refactoring prompts from analysis results and detec...
   code2llm/exporters/toon/metrics.py:
     e: MetricsComputer
     MetricsComputer: __init__(0),compute_all_metrics(1),_compute_file_metrics(1),_new_file_record(1),_compute_fan_in(1),_process_function_calls(2),_process_called_by(3),_process_callee_calls(3),_handle_suffix_match(3),_compute_package_metrics(2),_compute_function_metrics(1),_compute_class_metrics(1),_compute_coupling_matrix(1),_build_function_to_module_map(1),_build_coupling_matrix(2),_resolve_callee_module(3),_compute_package_fan(1),_detect_duplicates(1),_check_class_for_duplicates(5),_calculate_duplicate_info(7),_compute_health(1),_check_duplicates_health(2),_check_god_modules_health(2),_check_smells_health(2),_check_high_cc_health(2),_compute_hotspots(1),_get_cycles(1)  # Computes all metrics for TOON export...
@@ -528,6 +528,13 @@ Unlike simple L...
   examples/streaming-analyzer/sample_project/database.py:
     e: DatabaseConnection
     DatabaseConnection: __init__(1),_load_data(0),_save_data(0),get_user(1),get_user_settings(1),get_user_logs(1),update_user_settings(2),update_user_profile(2),delete_user(1),clear_user_data(1),create_user(1),_log_action(3),get_stats(0)  # Simple database connection simulator...
+  benchmarks/benchmark_format_quality.py:
+    e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
+    _print_benchmark_header()
+    _print_ground_truth_info(project_path)
+    _generate_format_outputs(result;output_dir)
+    _create_offline_scores()
+    run_benchmark()
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()
@@ -542,13 +549,6 @@ Unlike simple L...
     index()
     generate_badges()
     get_badges()
-  benchmarks/benchmark_format_quality.py:
-    e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
-    _print_benchmark_header()
-    _print_ground_truth_info(project_path)
-    _generate_format_outputs(result;output_dir)
-    _create_offline_scores()
-    run_benchmark()
   code2llm/core/core/file_cache.py:
     e: FileCache
     FileCache: __init__(2),_get_cache_key(2),_get_cache_path(1),get(2),put(3),clear(0)  # Cache for parsed AST files...
@@ -626,8 +626,8 @@ Unlike simple L...
   code2llm/refactor/__init__.py:
   code2llm/patterns/__init__.py:
   code2llm/core/core/__init__.py:
+  code2llm/core/streaming/__init__.py:
   code2llm/core/streaming/strategies.py:
     e: ScanStrategy
     ScanStrategy:  # Scanning methodology configuration...
-  code2llm/core/streaming/__init__.py:
   examples/streaming-analyzer/sample_project/__init__.py:
