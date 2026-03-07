@@ -287,6 +287,44 @@ echo "## Architecture" >> README.md
 cat docs/context.md >> README.md
 ```
 
+## 📖 Słownik terminów
+
+### 🛡️ God Function (God Method)
+Funkcja, która robi zbyt wiele rzeczy naraz i staje się "wszechmocna" w danym module. Jest to antywzorzec w inżynierii oprogramowania (ang. anti-pattern).
+
+### 📊 Cyclomatic Complexity
+Metryka mierząca, jak skomplikowana jest funkcja lub metoda na podstawie liczby możliwych ścieżek wykonania kodu.
+
+### 📄 TOON Format
+Specjalny format plików używany przez code2llm do przechowywania analizy kodu w strukturze YAML.
+
+### 🔄 Tiered LLM
+System automatycznego przełączania między modelami AI (free → local → paid) w celu optymalizacji kosztów i wydajności.
+
+### 🎯 Skill
+Moduł lub zdolność w systemie CoreSkill, który może być tworzony, naprawiany i ewoluowany automatycznie.
+
+### 🧬 Evolution Engine
+Silnik odpowiedzialny za automatyczną ewolucję i rozwój skillów w systemie CoreSkill.
+
+### 👃 Code Smell
+Wskaźnik problemów w kodzie, który może prowadzić do trudności w utrzymaniu lub rozszerzeniu systemu.
+
+### 🔗 Coupling
+Poziom powiązań i zależności między modułami w systemie.
+
+### 📡 Fan-out/Fan-in
+Metryki zależności modułów: fan-out - liczba modułów wywoływanych, fan-in - liczba modułów wywołujących dany moduł.
+
+### 🔄 Pipeline
+Sekwencja kroków przetwarzania danych przepływających przez system.
+
+### ⚡ Side Effect
+Efekt uboczny funkcji - zmiana stanu systemu poza jej bezpośrednim zakresem.
+
+### 📋 Contract
+Kontrakt wejścia/wyjścia funkcji - określa oczekiwane parametry i zwracane wartości.
+
 ## 📚 Next Steps
 
 1. **Review `analysis.toon`** - Identify critical issues
