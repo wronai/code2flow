@@ -4,10 +4,12 @@ Rename from llm_exporter.py → context_exporter.py (Sprint 4, v0.3.3).
 Produces LLM-ready architecture summary with flows, patterns, and API surface.
 """
 
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 from .base import Exporter
 from ..core.models import AnalysisResult, FunctionInfo
+from ..core.config import LANGUAGE_EXTENSIONS
 
 
 class ContextExporter(Exporter):
@@ -54,10 +56,15 @@ class ContextExporter(Exporter):
             f.write('\n'.join(lines))
 
     def _get_overview(self, result: AnalysisResult) -> List[str]:
+        lang_info = self._detect_languages(result)
+        primary = lang_info[0][0] if lang_info else 'unknown'
+        lang_summary = ', '.join(f'{l}: {c}' for l, c in lang_info[:5])
         return [
             "## Overview",
             "",
             f"- **Project**: {result.project_path}",
+            f"- **Primary Language**: {primary}",
+            f"- **Languages**: {lang_summary}",
             f"- **Analysis Mode**: {result.analysis_mode}",
             f"- **Total Functions**: {len(result.functions)}",
             f"- **Total Classes**: {len(result.classes)}",
@@ -65,6 +72,23 @@ class ContextExporter(Exporter):
             f"- **Entry Points**: {len(result.entry_points)}",
             "",
         ]
+
+    @staticmethod
+    def _detect_languages(result: AnalysisResult) -> List[tuple]:
+        """Detect languages from module file extensions."""
+        lang_counts: Dict[str, int] = defaultdict(int)
+        for mi in result.modules.values():
+            detected = False
+            for lang, extensions in LANGUAGE_EXTENSIONS.items():
+                if any(mi.file.endswith(ext) for ext in extensions):
+                    lang_counts[lang] += 1
+                    detected = True
+                    break
+            if not detected:
+                ext = Path(mi.file).suffix.lower()
+                if ext:
+                    lang_counts[ext.lstrip('.')] += 1
+        return sorted(lang_counts.items(), key=lambda x: -x[1])
 
     def _get_architecture_by_module(self, result: AnalysisResult) -> List[str]:
         lines = ["## Architecture by Module", ""]

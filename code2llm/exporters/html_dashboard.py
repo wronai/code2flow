@@ -1,13 +1,37 @@
 """HTML Dashboard Generator — web visualization with trend charts.
 
 Generates dashboard.html from project.yaml data.
-Includes: metric cards, evolution chart, module CC bar chart,
-alerts table, hotspots table, refactoring priorities.
+Includes: metric cards, language breakdown, evolution chart,
+module size/function charts, alerts, hotspots, refactoring priorities.
 """
 
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
+
+# Language detection from file extensions
+_LANG_EXT_MAP = {
+    '.py': 'Python', '.ts': 'TypeScript', '.tsx': 'TypeScript',
+    '.js': 'JavaScript', '.jsx': 'JavaScript', '.mjs': 'JavaScript', '.cjs': 'JavaScript',
+    '.go': 'Go', '.rs': 'Rust', '.java': 'Java',
+    '.cpp': 'C++', '.cc': 'C++', '.cxx': 'C++', '.hpp': 'C++', '.h': 'C/C++',
+    '.c': 'C', '.cs': 'C#', '.rb': 'Ruby', '.php': 'PHP',
+    '.swift': 'Swift', '.kt': 'Kotlin', '.kts': 'Kotlin',
+    '.scala': 'Scala', '.sh': 'Shell', '.bash': 'Shell', '.zsh': 'Shell',
+    '.dart': 'Dart', '.ex': 'Elixir', '.exs': 'Elixir',
+    '.hs': 'Haskell', '.lua': 'Lua', '.pl': 'Perl', '.r': 'R', '.R': 'R',
+}
+
+_LANG_COLORS = {
+    'TypeScript': '#3178c6', 'JavaScript': '#f7df1e', 'Python': '#3572A5',
+    'Go': '#00ADD8', 'Rust': '#dea584', 'Java': '#b07219',
+    'C++': '#f34b7d', 'C': '#555555', 'C/C++': '#555555', 'C#': '#178600',
+    'Ruby': '#701516', 'PHP': '#4F5D95', 'Swift': '#F05138',
+    'Kotlin': '#A97BFF', 'Scala': '#c22d40', 'Shell': '#89e051',
+    'Dart': '#00B4AB', 'Elixir': '#6e4a7e', 'Haskell': '#5e5086',
+    'Lua': '#000080', 'Perl': '#0298c3', 'R': '#198CE7',
+}
 
 
 class HTMLDashboardGenerator:
@@ -30,20 +54,25 @@ class HTMLDashboardGenerator:
 
         health_color, health_label = self._health_verdict(health)
         evo_chart = self._build_evolution_section(evolution)
-        mod_chart = self._build_module_chart_data(modules)
+        lang_data = self._build_language_breakdown(modules)
+        mod_lines_chart = self._build_module_lines_chart(modules)
+        mod_funcs_chart = self._build_module_funcs_chart(modules)
         alerts_html = self._build_alerts_html(health)
         hotspots_html = self._build_hotspots_html(hotspots)
         refactor_html = self._build_refactoring_html(refactoring)
+        top_modules_html = self._build_top_modules_html(modules)
 
         cc_avg = health.get("cc_avg", 0)
 
         return self._assemble_html(
             proj=proj, stats=stats, health=health,
             cc_avg=cc_avg, health_color=health_color, health_label=health_label,
-            evo_chart=evo_chart, mod_chart=mod_chart,
+            evo_chart=evo_chart, lang_data=lang_data,
+            mod_lines_chart=mod_lines_chart, mod_funcs_chart=mod_funcs_chart,
             alerts_html=alerts_html, hotspots_html=hotspots_html,
             hotspots=hotspots, refactor_html=refactor_html,
-            refactoring=refactoring,
+            refactoring=refactoring, top_modules_html=top_modules_html,
+            modules=modules,
         )
 
     # ------------------------------------------------------------------
@@ -71,12 +100,65 @@ class HTMLDashboardGenerator:
         }
 
     @staticmethod
-    def _build_module_chart_data(modules: List[Dict]) -> Dict[str, Any]:
-        top = sorted(modules, key=lambda m: m.get("cc_max", 0), reverse=True)[:15]
+    def _build_language_breakdown(modules: List[Dict]) -> Dict[str, Any]:
+        """Detect languages from module paths and build pie chart data."""
+        lang_files: Dict[str, int] = defaultdict(int)
+        lang_lines: Dict[str, int] = defaultdict(int)
+        for m in modules:
+            ext = Path(m.get("path", "")).suffix.lower()
+            lang = _LANG_EXT_MAP.get(ext, ext.lstrip('.').capitalize() if ext else "Other")
+            lang_files[lang] += 1
+            lang_lines[lang] += m.get("lines", 0)
+
+        sorted_langs = sorted(lang_files.items(), key=lambda x: -x[1])
+        names = [l[0] for l in sorted_langs]
+        files = [l[1] for l in sorted_langs]
+        lines = [lang_lines[l[0]] for l in sorted_langs]
+        colors = [_LANG_COLORS.get(n, '#6b7280') for n in names]
+        return {"names": names, "files": files, "lines": lines, "colors": colors}
+
+    @staticmethod
+    def _build_module_lines_chart(modules: List[Dict]) -> Dict[str, Any]:
+        """Top 15 modules by line count."""
+        top = sorted(modules, key=lambda m: m.get("lines", 0), reverse=True)[:15]
         return {
             "names": [Path(m.get("path", "")).name for m in top],
-            "cc": [m.get("cc_max", 0) for m in top],
+            "lines": [m.get("lines", 0) for m in top],
         }
+
+    @staticmethod
+    def _build_module_funcs_chart(modules: List[Dict]) -> Dict[str, Any]:
+        """Top 15 modules by function/method count."""
+        top = sorted(modules, key=lambda m: m.get("methods", 0), reverse=True)[:15]
+        return {
+            "names": [Path(m.get("path", "")).name for m in top],
+            "funcs": [m.get("methods", 0) for m in top],
+        }
+
+    @staticmethod
+    def _build_top_modules_html(modules: List[Dict]) -> str:
+        """Build top modules table sorted by lines."""
+        top = sorted(modules, key=lambda m: m.get("lines", 0), reverse=True)[:20]
+        html = ""
+        for m in top:
+            path = m.get("path", "?")
+            lines = m.get("lines", 0)
+            methods = m.get("methods", 0)
+            classes = m.get("classes", 0)
+            cc_max = m.get("cc_max", 0)
+            ext = Path(path).suffix.lower()
+            lang = _LANG_EXT_MAP.get(ext, ext.lstrip('.'))
+            color = _LANG_COLORS.get(lang, '#6b7280')
+            html += f"""
+            <tr>
+                <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{color};margin-right:6px"></span>{Path(path).name}</td>
+                <td style="color:var(--muted);font-size:.75rem">{'/'.join(Path(path).parts[:-1]) or '.'}</td>
+                <td style="text-align:right">{lines:,}</td>
+                <td style="text-align:right">{methods}</td>
+                <td style="text-align:right">{classes}</td>
+                <td style="text-align:right">{cc_max}</td>
+            </tr>"""
+        return html
 
     @staticmethod
     def _build_alerts_html(health: Dict) -> str:
@@ -109,7 +191,7 @@ class HTMLDashboardGenerator:
     @staticmethod
     def _build_refactoring_html(refactoring: Dict) -> str:
         html = ""
-        for i, p in enumerate(refactoring.get("priorities", [])[:10], 1):
+        for i, p in enumerate(refactoring.get("priorities", [])[:15], 1):
             impact_class = p.get("impact", "low")
             html += f"""
             <tr>
@@ -131,15 +213,20 @@ class HTMLDashboardGenerator:
         health_color = ctx["health_color"]
         health_label = ctx["health_label"]
         evo = ctx["evo_chart"]
-        mod = ctx["mod_chart"]
+        lang = ctx["lang_data"]
+        mod_lines = ctx["mod_lines_chart"]
+        mod_funcs = ctx["mod_funcs_chart"]
         alerts_html = ctx["alerts_html"]
         hotspots_html = ctx["hotspots_html"]
         hotspots = ctx["hotspots"]
         refactor_html = ctx["refactor_html"]
         refactoring = ctx["refactoring"]
+        top_modules_html = ctx["top_modules_html"]
+        modules = ctx["modules"]
 
         evo_section = self._render_evolution_section(evo)
         evo_script = self._render_evolution_script(evo)
+        lang_summary = ', '.join(f'{n}: {c}' for n, c in zip(lang['names'], lang['files']))
 
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -165,7 +252,7 @@ class HTMLDashboardGenerator:
   body {{ font-family: 'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); padding:2rem; }}
   h1 {{ font-size:1.5rem; margin-bottom:.5rem; }}
   h2 {{ font-size:1.1rem; color:var(--muted); margin:1.5rem 0 .75rem; border-bottom:1px solid var(--border); padding-bottom:.25rem; }}
-  .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin:1rem 0; }}
+  .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin:1rem 0; }}
   .card {{ background:var(--surface); border:1px solid var(--border); border-radius:.5rem; padding:1rem; }}
   .card .value {{ font-size:1.8rem; font-weight:700; }}
   .card .label {{ color:var(--muted); font-size:.8rem; text-transform:uppercase; }}
@@ -186,10 +273,12 @@ class HTMLDashboardGenerator:
   tr.warning td {{ background:rgba(234,179,8,.05); }}
   .health-indicator {{ display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:.5rem; }}
   .two-col {{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }}
+  .three-col {{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }}
   .evo-cards {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:.75rem; }}
   .evo-cards .card {{ text-align:center; }}
   .trend {{ font-size:.75rem; color:var(--muted); }}
-  @media (max-width:768px) {{ .two-col {{ grid-template-columns:1fr; }} }}
+  .lang-tag {{ display:inline-block; padding:.1rem .4rem; border-radius:.2rem; font-size:.7rem; font-weight:600; margin-right:.25rem; color:#fff; }}
+  @media (max-width:768px) {{ .two-col,.three-col {{ grid-template-columns:1fr; }} }}
   footer {{ margin-top:2rem; color:var(--muted); font-size:.75rem; text-align:center; }}
 </style>
 </head>
@@ -200,24 +289,47 @@ class HTMLDashboardGenerator:
 </h1>
 <p style="color:var(--muted);font-size:.85rem;">
   Analyzed {proj.get('analyzed_at', '?')[:10]} by code2llm
+  &nbsp;·&nbsp; Primary language: <strong>{proj.get('language', 'unknown')}</strong>
+  &nbsp;·&nbsp; {lang_summary}
 </p>
 
 <div class="grid">
+  <div class="card"><div class="value">{stats.get('functions', 0):,}</div><div class="label">Functions</div></div>
+  <div class="card"><div class="value">{stats.get('classes', 0):,}</div><div class="label">Classes</div></div>
+  <div class="card"><div class="value">{stats.get('files', 0):,}</div><div class="label">Files</div></div>
+  <div class="card"><div class="value">{stats.get('lines', 0):,}</div><div class="label">Lines</div></div>
+  <div class="card"><div class="value">{len(lang['names'])}</div><div class="label">Languages</div></div>
   <div class="card"><div class="value">{cc_avg}</div><div class="label">Avg CC</div></div>
   <div class="card"><div class="value">{health.get('critical_count', 0)}</div><div class="label">Critical (CC≥{health.get('critical_limit', 10)})</div></div>
-  <div class="card"><div class="value">{stats.get('functions', 0)}</div><div class="label">Functions</div></div>
-  <div class="card"><div class="value">{stats.get('classes', 0)}</div><div class="label">Classes</div></div>
-  <div class="card"><div class="value">{stats.get('files', 0)}</div><div class="label">Files</div></div>
-  <div class="card"><div class="value">{stats.get('lines', 0)}</div><div class="label">Lines</div></div>
   <div class="card"><div class="value">{health.get('duplicates', 0)}</div><div class="label">Duplicates</div></div>
   <div class="card"><div class="value">{health.get('cycles', 0)}</div><div class="label">Cycles</div></div>
 </div>
 
+<div class="three-col">
+  <div class="chart-container">
+    <h2 style="border:none;margin:0 0 .5rem;">Language Distribution</h2>
+    <canvas id="langChart" height="200"></canvas>
+  </div>
+  <div class="chart-container">
+    <h2 style="border:none;margin:0 0 .5rem;">Largest Modules (lines)</h2>
+    <canvas id="modLinesChart" height="200"></canvas>
+  </div>
+  <div class="chart-container">
+    <h2 style="border:none;margin:0 0 .5rem;">Most Complex Modules (functions)</h2>
+    <canvas id="modFuncsChart" height="200"></canvas>
+  </div>
+</div>
+
 <div class="two-col">
   {evo_section}
-  <div class="chart-container">
-    <h2 style="border:none;margin:0 0 .5rem;">Module CC (top 15)</h2>
-    <canvas id="modChart" height="200"></canvas>
+  <div>
+    <h2>Top Modules ({len(modules)})</h2>
+    <div class="card"><div class="table-wrap">
+    <table>
+      <thead><tr><th>Module</th><th>Path</th><th style="text-align:right">Lines</th><th style="text-align:right">Funcs</th><th style="text-align:right">Classes</th><th style="text-align:right">CC max</th></tr></thead>
+      <tbody>{top_modules_html if top_modules_html else '<tr><td colspan="6" style="color:var(--muted)">No modules</td></tr>'}</tbody>
+    </table>
+    </div></div>
   </div>
 </div>
 
@@ -256,13 +368,54 @@ class HTMLDashboardGenerator:
 <script>
 {evo_script}
 
-const modCtx = document.getElementById('modChart').getContext('2d');
-new Chart(modCtx, {{
+// Language distribution pie chart
+const langCtx = document.getElementById('langChart').getContext('2d');
+new Chart(langCtx, {{
+  type: 'doughnut',
+  data: {{
+    labels: {lang['names']},
+    datasets: [{{
+      data: {lang['files']},
+      backgroundColor: {lang['colors']},
+      borderColor: 'var(--border)', borderWidth: 1
+    }}]
+  }},
+  options: {{
+    responsive: true,
+    plugins: {{
+      legend: {{ position: 'right', labels: {{ color: '#e2e8f0', font: {{size: 11}} }} }}
+    }}
+  }}
+}});
+
+// Module lines bar chart
+const modLinesCtx = document.getElementById('modLinesChart').getContext('2d');
+new Chart(modLinesCtx, {{
   type: 'bar',
   data: {{
-    labels: {mod["names"]},
-    datasets: [{{ label: 'Max CC', data: {mod["cc"]},
-      backgroundColor: {mod["cc"]}.map(v => v >= 15 ? '#ef4444' : v >= 10 ? '#eab308' : '#22c55e')
+    labels: {mod_lines['names']},
+    datasets: [{{ label: 'Lines', data: {mod_lines['lines']},
+      backgroundColor: '#3b82f6'
+    }}]
+  }},
+  options: {{
+    responsive: true, indexAxis: 'y',
+    scales: {{
+      x: {{ grid:{{color:'#334155'}}, ticks:{{color:'#94a3b8'}} }},
+      y: {{ grid:{{color:'#334155'}}, ticks:{{color:'#94a3b8',font:{{size:10}}}} }}
+    }},
+    plugins: {{ legend: {{ display:false }} }}
+  }}
+}});
+
+// Module functions bar chart
+const modFuncsCtx = document.getElementById('modFuncsChart').getContext('2d');
+new Chart(modFuncsCtx, {{
+  type: 'bar',
+  data: {{
+    labels: {mod_funcs['names']},
+    datasets: [{{ label: 'Functions', data: {mod_funcs['funcs']},
+      backgroundColor: '#22c55e'
     }}]
   }},
   options: {{

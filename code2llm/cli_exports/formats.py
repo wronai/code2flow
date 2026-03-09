@@ -121,6 +121,7 @@ def _export_simple_formats(args, result, output_dir: Path, formats):
         data = load_project_yaml(str(yaml_path))
         view_map = {
             'project.toon': ToonViewGenerator(),
+            'context.md': ContextViewGenerator(),
             'dashboard.html': HTMLDashboardGenerator(),
         }
         for filename, generator in view_map.items():

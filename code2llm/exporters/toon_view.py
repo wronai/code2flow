@@ -3,8 +3,22 @@
 Generates project.toon from project.yaml data.
 """
 
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
+
+# Language detection from file extensions
+_LANG_EXT_MAP = {
+    '.py': 'python', '.ts': 'typescript', '.tsx': 'typescript',
+    '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript', '.cjs': 'javascript',
+    '.go': 'go', '.rs': 'rust', '.java': 'java',
+    '.cpp': 'cpp', '.cc': 'cpp', '.cxx': 'cpp', '.hpp': 'cpp', '.h': 'c',
+    '.c': 'c', '.cs': 'csharp', '.rb': 'ruby', '.php': 'php',
+    '.swift': 'swift', '.kt': 'kotlin', '.kts': 'kotlin',
+    '.scala': 'scala', '.sh': 'shell', '.bash': 'shell', '.zsh': 'shell',
+    '.dart': 'dart', '.ex': 'elixir', '.exs': 'elixir',
+    '.hs': 'haskell', '.lua': 'lua', '.pl': 'perl', '.r': 'r', '.R': 'r',
+}
 
 
 class ToonViewGenerator:
@@ -37,11 +51,13 @@ class ToonViewGenerator:
     @staticmethod
     def _render_header(proj: Dict) -> List[str]:
         stats = proj.get("stats", {})
+        lang = proj.get('language', 'unknown')
         return [
             f"# {proj.get('name', '?')} | "
             f"{stats.get('functions', 0)} func | "
             f"{stats.get('files', 0)}f | "
             f"{stats.get('lines', 0)}L | "
+            f"{lang} | "
             f"{proj.get('analyzed_at', '?')[:10]}",
             "",
         ]
@@ -73,17 +89,33 @@ class ToonViewGenerator:
 
     @staticmethod
     def _render_modules(modules: List[Dict]) -> List[str]:
-        top_mods = [m for m in modules if m.get("cc_max", 0) > 0][:10]
-        lines = ["", f"MODULES[{len(modules)}] (top by CC):"]
-        for m in top_mods:
+        # Show top modules by size (lines) - works for all languages
+        top_by_lines = sorted(modules, key=lambda m: m.get("lines", 0), reverse=True)[:15]
+        lines = ["", f"MODULES[{len(modules)}] (top by size):"]
+        for m in top_by_lines:
+            path = m.get('path', '?')
+            ext = Path(path).suffix.lower()
+            lang = _LANG_EXT_MAP.get(ext, ext.lstrip('.'))
             lines.append(
-                f"  M[{m.get('path', '?')}] "
+                f"  M[{path}] "
                 f"{m.get('lines', 0)}L "
                 f"C:{m.get('classes', 0)} "
-                f"M:{m.get('methods', 0)} "
+                f"F:{m.get('methods', 0)} "
                 f"CC↑{m.get('cc_max', 0)} "
-                f"D:{m.get('inbound_deps', 0)}"
+                f"D:{m.get('inbound_deps', 0)} "
+                f"({lang})"
             )
+
+        # Language breakdown
+        lang_counts: Dict[str, int] = defaultdict(int)
+        for m in modules:
+            ext = Path(m.get('path', '')).suffix.lower()
+            lang = _LANG_EXT_MAP.get(ext, ext.lstrip('.') if ext else 'other')
+            lang_counts[lang] += 1
+        if lang_counts:
+            sorted_langs = sorted(lang_counts.items(), key=lambda x: -x[1])
+            lang_str = '/'.join(f"{l}:{c}" for l, c in sorted_langs)
+            lines.append(f"  LANGS: {lang_str}")
         return lines
 
     @staticmethod

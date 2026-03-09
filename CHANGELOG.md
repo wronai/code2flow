@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.5.48] - 2026-03-09
+
+### Other
+- Update code2llm/cli_exports/formats.py
+- Update code2llm/exporters/context_exporter.py
+- Update code2llm/exporters/html_dashboard.py
+- Update code2llm/exporters/toon_view.py
+
 ## [0.5.47] - 2026-03-09
 
 ### Docs
