@@ -310,3 +310,333 @@ public class UserService {
         # At least some calls should be detected
         total_calls = sum(len(fi.calls) for fi in result.functions.values())
         assert total_calls > 0, "Java should have some call edges detected"
+
+
+class TestCppComplexityAndCalls:
+    """Verify C/C++ files get CC > 0."""
+
+    CPP_CODE = """\
+#include <iostream>
+#include <vector>
+#include <string>
+
+namespace Utils {
+    class StringHelper {
+    public:
+        static bool isValid(const std::string& s) {
+            if (s.empty()) {
+                return false;
+            }
+            for (size_t i = 0; i < s.length(); i++) {
+                if (!std::isalnum(s[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        static std::string transform(const std::string& s, bool upper) {
+            if (upper) {
+                return toUpper(s);
+            } else {
+                return toLower(s);
+            }
+        }
+        
+    private:
+        static std::string toUpper(const std::string& s) {
+            std::string result;
+            for (auto c : s) {
+                result += std::toupper(c);
+            }
+            return result;
+        }
+        
+        static std::string toLower(const std::string& s) {
+            return s;  // simplified
+        }
+    };
+}
+
+int main() {
+    std::string input = "Hello";
+    if (Utils::StringHelper::isValid(input)) {
+        auto result = Utils::StringHelper::transform(input, true);
+        std::cout << result << std::endl;
+    }
+    return 0;
+}
+"""
+
+    def _analyze(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cpp_file = Path(tmpdir) / "helper.cpp"
+            cpp_file.write_text(self.CPP_CODE)
+            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            return analyzer.analyze_project(tmpdir)
+
+    def test_cpp_classes_detected(self):
+        result = self._analyze()
+        class_names = {c.name for c in result.classes.values()}
+        assert 'StringHelper' in class_names, f"StringHelper not found in {class_names}"
+
+    def test_cpp_complexity_not_zero(self):
+        result = self._analyze()
+        ccs = {fi.name: fi.complexity.get('cyclomatic_complexity', 0)
+               for fi in result.functions.values()}
+        # isValid has if/for/if → CC > 1
+        assert ccs.get('isValid', 0) > 1, f"isValid CC should be > 1, got {ccs.get('isValid')}"
+        # transform has if/else → CC > 1
+        assert ccs.get('transform', 0) > 1, f"transform CC should be > 1, got {ccs.get('transform')}"
+        # main has if → CC > 1
+        assert ccs.get('main', 0) > 1, f"main CC should be > 1, got {ccs.get('main')}"
+
+    def test_cpp_includes_extracted(self):
+        result = self._analyze()
+        imports = list(result.modules.values())[0].imports if result.modules else []
+        assert any('iostream' in imp for imp in imports), "iostream should be in includes"
+
+
+class TestCSharpComplexityAndCalls:
+    """Verify C# files get CC > 0."""
+
+    CS_CODE = """\
+using System;
+using System.Collections.Generic;
+
+namespace MyApp.Services
+{
+    public class UserService
+    {
+        private List<string> _users = new List<string>();
+        
+        public void AddUser(string name)
+        {
+            if (!string.IsNullOrEmpty(name) && !_users.Contains(name))
+            {
+                _users.Add(name);
+            }
+        }
+        
+        public string FindUser(string prefix)
+        {
+            foreach (var user in _users)
+            {
+                if (user.StartsWith(prefix))
+                {
+                    return user;
+                }
+            }
+            return null;
+        }
+        
+        public int CountUsers(bool includeInactive)
+        {
+            int count = 0;
+            foreach (var user in _users)
+            {
+                if (user.StartsWith("active") || (includeInactive && user.StartsWith("inactive")))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        
+        public string Status => _users.Count > 0 ? "Active" : "Empty";
+    }
+}
+"""
+
+    def _analyze(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cs_file = Path(tmpdir) / "UserService.cs"
+            cs_file.write_text(self.CS_CODE)
+            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            return analyzer.analyze_project(tmpdir)
+
+    def test_cs_classes_detected(self):
+        result = self._analyze()
+        class_names = {c.name for c in result.classes.values()}
+        assert 'UserService' in class_names, f"UserService not found in {class_names}"
+
+    def test_cs_complexity_not_zero(self):
+        result = self._analyze()
+        ccs = {fi.name: fi.complexity.get('cyclomatic_complexity', 0)
+               for fi in result.functions.values()}
+        # AddUser has if/&&/! → CC > 1
+        assert ccs.get('AddUser', 0) > 1, f"AddUser CC should be > 1, got {ccs.get('AddUser')}"
+        # FindUser has foreach/if → CC > 1
+        assert ccs.get('FindUser', 0) > 1, f"FindUser CC should be > 1, got {ccs.get('FindUser')}"
+        # CountUsers has foreach/if/||/&& → CC > 1
+        assert ccs.get('CountUsers', 0) > 1, f"CountUsers CC should be > 1, got {ccs.get('CountUsers')}"
+
+    def test_cs_usings_extracted(self):
+        result = self._analyze()
+        imports = list(result.modules.values())[0].imports if result.modules else []
+        assert any('System' in imp for imp in imports), "System should be in usings"
+
+
+class TestPhpComplexityAndCalls:
+    """Verify PHP files get CC > 0."""
+
+    PHP_CODE = """\
+<?php
+
+require_once 'Database.php';
+
+namespace MyApp;
+
+use PDO;
+use Exception;
+
+class UserRepository {
+    private $db;
+    
+    public function __construct(PDO $db) {
+        $this->db = $db;
+    }
+    
+    public function findById($id) {
+        if (!is_numeric($id) || $id <= 0) {
+            throw new Exception("Invalid ID");
+        }
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+    
+    public function findAllActive($includeDeleted = false) {
+        $users = [];
+        $sql = "SELECT * FROM users";
+        if (!$includeDeleted) {
+            $sql .= " WHERE deleted = 0";
+        }
+        $stmt = $this->db->query($sql);
+        while ($row = $stmt->fetch()) {
+            if ($row['active'] || $includeDeleted) {
+                $users[] = $row;
+            }
+        }
+        return $users;
+    }
+    
+    private function validate($data) {
+        return is_array($data) && !empty($data['name']);
+    }
+}
+
+function helper($x) {
+    return $x * 2;
+}
+"""
+
+    def _analyze(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            php_file = Path(tmpdir) / "UserRepository.php"
+            php_file.write_text(self.PHP_CODE)
+            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            return analyzer.analyze_project(tmpdir)
+
+    def test_php_classes_detected(self):
+        result = self._analyze()
+        class_names = {c.name for c in result.classes.values()}
+        assert 'UserRepository' in class_names, f"UserRepository not found in {class_names}"
+
+    def test_php_complexity_not_zero(self):
+        result = self._analyze()
+        ccs = {fi.name: fi.complexity.get('cyclomatic_complexity', 0)
+               for fi in result.functions.values()}
+        # findById has if/||/throw → CC > 1
+        assert ccs.get('findById', 0) > 1, f"findById CC should be > 1, got {ccs.get('findById')}"
+        # findAllActive has if/while/if/|| → CC > 1
+        assert ccs.get('findAllActive', 0) > 1, f"findAllActive CC should be > 1, got {ccs.get('findAllActive')}"
+        # validate has && → CC > 1
+        assert ccs.get('validate', 0) > 1, f"validate CC should be > 1, got {ccs.get('validate')}"
+
+    def test_php_namespace_extracted(self):
+        result = self._analyze()
+        # Should detect namespaced classes
+        qualified_names = list(result.classes.keys())
+        assert any('MyApp' in qn for qn in qualified_names), "Namespace MyApp should be in qualified names"
+
+
+class TestRubyComplexityAndCalls:
+    """Verify Ruby files get CC > 0."""
+
+    RUBY_CODE = """\
+require 'json'
+
+module Utils
+  class StringProcessor
+    def initialize(text)
+      @text = text
+    end
+    
+    def valid?
+      return false if @text.nil? || @text.empty?
+      @text.length > 3
+    end
+    
+    def transform(options = {})
+      result = @text.dup
+      if options[:upcase]
+        result = result.upcase
+      elsif options[:downcase]
+        result = result.downcase
+      end
+      
+      if options[:reverse]
+        result = result.reverse
+      end
+      
+      result
+    end
+    
+    def self.batch_process(items)
+      results = []
+      items.each do |item|
+        if item.is_a?(String)
+          processor = new(item)
+          results << processor.transform(upcase: true) if processor.valid?
+        end
+      end
+      results
+    end
+  end
+end
+
+def global_helper(x)
+  x > 0 ? x * 2 : 0
+end
+"""
+
+    def _analyze(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            rb_file = Path(tmpdir) / "processor.rb"
+            rb_file.write_text(self.RUBY_CODE)
+            analyzer = ProjectAnalyzer(FAST_CONFIG)
+            return analyzer.analyze_project(tmpdir)
+
+    def test_ruby_classes_detected(self):
+        result = self._analyze()
+        class_names = {c.name for c in result.classes.values()}
+        assert 'StringProcessor' in class_names, f"StringProcessor not found in {class_names}"
+
+    def test_ruby_complexity_not_zero(self):
+        result = self._analyze()
+        ccs = {fi.name: fi.complexity.get('cyclomatic_complexity', 0)
+               for fi in result.functions.values()}
+        # Note: Ruby uses 'def...end' not braces, so body extraction is limited
+        # Functions with obvious control flow should have CC > 1
+        # transform has if/elsif/if
+        assert ccs.get('transform', 0) > 1, f"transform CC should be > 1, got {ccs.get('transform')}"
+        # batch_process has if/if
+        assert ccs.get('batch_process', 0) > 1, f"batch_process CC should be > 1, got {ccs.get('batch_process')}"
+        # global_helper uses ternary
+        assert ccs.get('global_helper', 0) > 1, f"global_helper CC should be > 1, got {ccs.get('global_helper')}"
+
+    def test_ruby_requires_extracted(self):
+        result = self._analyze()
+        imports = list(result.modules.values())[0].imports if result.modules else []
+        assert any('json' in imp for imp in imports), "json should be in requires"

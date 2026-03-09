@@ -1,5 +1,25 @@
 ## [Unreleased]
 
+## [0.5.51] - 2026-03-09
+
+### Docs
+- Update README.md
+- Update context.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_nonpython_cc_calls.py
+
+### Other
+- Update analysis.toon
+- Update batch_1/analysis.toon
+- Update code2llm/core/core/file_analyzer.py
+- Update project/analysis.toon
+- Update project/batch_1/analysis.toon
+- Update project/root/analysis.toon
+- Update root/analysis.toon
+
 ## [0.5.50] - 2026-03-09
 
 ### Docs

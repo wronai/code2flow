@@ -6,7 +6,7 @@
 - **Primary Language**: python
 - **Languages**: python: 102, shell: 2, php: 1
 - **Analysis Mode**: static
-- **Total Functions**: 857
+- **Total Functions**: 861
 - **Total Classes**: 104
 - **Modules**: 105
 - **Entry Points**: 0
@@ -18,15 +18,15 @@
 - **Classes**: 15
 - **File**: `functional_refactoring_example.py`
 
+### code2llm.core.core.file_analyzer
+- **Functions**: 29
+- **Classes**: 1
+- **File**: `file_analyzer.py`
+
 ### code2llm.exporters.toon.metrics
 - **Functions**: 27
 - **Classes**: 1
 - **File**: `metrics.py`
-
-### code2llm.core.core.file_analyzer
-- **Functions**: 25
-- **Classes**: 1
-- **File**: `file_analyzer.py`
 
 ### code2llm.generators.llm_flow
 - **Functions**: 24
@@ -119,15 +119,15 @@ Key execution flows identified:
 
 ## Key Classes
 
+### code2llm.core.core.file_analyzer.FileAnalyzer
+> Analyzes a single file.
+- **Methods**: 28
+- **Key Methods**: code2llm.core.core.file_analyzer.FileAnalyzer.__init__, code2llm.core.core.file_analyzer.FileAnalyzer.analyze_file, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_python, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_ast, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity, code2llm.core.core.file_analyzer.FileAnalyzer._extract_function_body, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity_regex, code2llm.core.core.file_analyzer.FileAnalyzer._extract_calls_regex, code2llm.core.core.file_analyzer.FileAnalyzer._perform_deep_analysis, code2llm.core.core.file_analyzer.FileAnalyzer._process_class
+
 ### code2llm.exporters.toon.metrics.MetricsComputer
 > Computes all metrics for TOON export.
 - **Methods**: 27
 - **Key Methods**: code2llm.exporters.toon.metrics.MetricsComputer.__init__, code2llm.exporters.toon.metrics.MetricsComputer.compute_all_metrics, code2llm.exporters.toon.metrics.MetricsComputer._compute_file_metrics, code2llm.exporters.toon.metrics.MetricsComputer._new_file_record, code2llm.exporters.toon.metrics.MetricsComputer._compute_fan_in, code2llm.exporters.toon.metrics.MetricsComputer._process_function_calls, code2llm.exporters.toon.metrics.MetricsComputer._process_called_by, code2llm.exporters.toon.metrics.MetricsComputer._process_callee_calls, code2llm.exporters.toon.metrics.MetricsComputer._handle_suffix_match, code2llm.exporters.toon.metrics.MetricsComputer._compute_package_metrics
-
-### code2llm.core.core.file_analyzer.FileAnalyzer
-> Analyzes a single file.
-- **Methods**: 24
-- **Key Methods**: code2llm.core.core.file_analyzer.FileAnalyzer.__init__, code2llm.core.core.file_analyzer.FileAnalyzer.analyze_file, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_python, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_ast, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity, code2llm.core.core.file_analyzer.FileAnalyzer._extract_function_body, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity_regex, code2llm.core.core.file_analyzer.FileAnalyzer._extract_calls_regex, code2llm.core.core.file_analyzer.FileAnalyzer._perform_deep_analysis, code2llm.core.core.file_analyzer.FileAnalyzer._process_class
 
 ### code2llm.exporters.toon.renderer.ToonRenderer
 > Renders all sections for TOON export.
@@ -283,6 +283,9 @@ Key functions that process and transform data:
 ### scripts.bump_version.format_version
 > Format version tuple as string
 
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
+
 ### code2llm.cli.create_parser
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
@@ -297,9 +300,6 @@ Key functions that process and transform data:
 Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
-
-### demo_langs.valid.sample.UserService.process_users
-- **Output to**: print
 
 ### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
 - **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
@@ -316,15 +316,15 @@ Checks:
 > Process Python files directly in level1 directory.
 - **Output to**: len, chunks.append, self._chunk_by_files, chunks.extend, str
 
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
-
 ### code2llm.core.toon_size_manager._parse_modules
 > Parse module sections from TOON content.
 
 Returns list of (module_name, start_line, end_line).
 - **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
+
+### code2llm.analysis.cfg.CFGExtractor._format_except
+> Format except handler.
+- **Output to**: self._expr_to_str
 
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).
