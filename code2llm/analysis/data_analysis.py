@@ -4,6 +4,35 @@ from typing import Any, Dict, List
 from ..core.models import AnalysisResult
 
 
+_INPUT_INDICATORS = ['parse', 'load', 'read', 'fetch', 'get', 'input', 'receive', 'extract']
+_TRANSFORM_INDICATORS = ['transform', 'convert', 'process', 'validate', 'filter', 'map', 'reduce', 'compute']
+_OUTPUT_INDICATORS = ['serialize', 'format', 'write', 'save', 'send', 'output', 'render', 'encode']
+_MAX_PIPELINES = 15
+
+
+def _categorize_functions(result: 'AnalysisResult'):
+    """Categorize functions into input/transform/output based on name patterns."""
+    input_funcs, transform_funcs, output_funcs = [], [], []
+    for func_name, func in result.functions.items():
+        name_lower = func.name.lower()
+        if any(ind in name_lower for ind in _INPUT_INDICATORS):
+            input_funcs.append((func_name, func))
+        elif any(ind in name_lower for ind in _TRANSFORM_INDICATORS):
+            transform_funcs.append((func_name, func))
+        elif any(ind in name_lower for ind in _OUTPUT_INDICATORS):
+            output_funcs.append((func_name, func))
+    return input_funcs, transform_funcs, output_funcs
+
+
+def _make_stage(label: str, func_name: str, func) -> Dict[str, str]:
+    """Build a single pipeline stage dict."""
+    return {
+        'stage': label,
+        'function': func_name,
+        'description': func.docstring[:100] if func.docstring else 'N/A',
+    }
+
+
 class DataAnalyzer:
     """Analyze data flows, structures, and optimization opportunities."""
     
@@ -32,40 +61,27 @@ class DataAnalyzer:
 
     def _find_data_pipelines(self, result: AnalysisResult) -> list:
         """Find data transformation pipelines in the codebase."""
+        input_funcs, transform_funcs, output_funcs = _categorize_functions(result)
+
         pipelines = []
-        input_indicators = ['parse', 'load', 'read', 'fetch', 'get', 'input', 'receive', 'extract']
-        transform_indicators = ['transform', 'convert', 'process', 'validate', 'filter', 'map', 'reduce', 'compute']
-        output_indicators = ['serialize', 'format', 'write', 'save', 'send', 'output', 'render', 'encode']
-        
-        input_funcs = []
-        transform_funcs = []
-        output_funcs = []
-        
-        for func_name, func in result.functions.items():
-            name_lower = func.name.lower()
-            if any(ind in name_lower for ind in input_indicators):
-                input_funcs.append((func_name, func))
-            elif any(ind in name_lower for ind in transform_indicators):
-                transform_funcs.append((func_name, func))
-            elif any(ind in name_lower for ind in output_indicators):
-                output_funcs.append((func_name, func))
-        
         for in_name, in_func in input_funcs[:20]:
             for t_name, t_func in transform_funcs[:30]:
-                if t_name in in_func.calls:
-                    for out_name, out_func in output_funcs[:20]:
-                        if out_name in t_func.calls:
-                            pipelines.append({
-                                'pipeline_id': f"pipeline_{len(pipelines)+1}",
-                                'stages': [
-                                    {'stage': 'input', 'function': in_name, 'description': in_func.docstring[:100] if in_func.docstring else 'N/A'},
-                                    {'stage': 'transform', 'function': t_name, 'description': t_func.docstring[:100] if t_func.docstring else 'N/A'},
-                                    {'stage': 'output', 'function': out_name, 'description': out_func.docstring[:100] if out_func.docstring else 'N/A'},
-                                ],
-                                'data_flow': f"{in_name} → {t_name} → {out_name}",
-                            })
-                            if len(pipelines) >= 15:
-                                return pipelines
+                if t_name not in in_func.calls:
+                    continue
+                for out_name, out_func in output_funcs[:20]:
+                    if out_name not in t_func.calls:
+                        continue
+                    pipelines.append({
+                        'pipeline_id': f"pipeline_{len(pipelines)+1}",
+                        'stages': [
+                            _make_stage('input', in_name, in_func),
+                            _make_stage('transform', t_name, t_func),
+                            _make_stage('output', out_name, out_func),
+                        ],
+                        'data_flow': f"{in_name} → {t_name} → {out_name}",
+                    })
+                    if len(pipelines) >= _MAX_PIPELINES:
+                        return pipelines
         return pipelines
 
     def _find_state_patterns(self, result: AnalysisResult) -> list:

@@ -17,6 +17,15 @@ from ..core.models import FunctionInfo
 
 logger = logging.getLogger(__name__)
 
+# Arg name substring -> inferred type (checked in order)
+ARG_NAME_TYPE_MAP = [
+    ("path", "Path"),
+    ("name", "str"),
+    ("text", "str"),
+    ("config", "Config"),
+    ("result", "AnalysisResult"),
+]
+
 # Name pattern -> (consumed types, produced types)
 NAME_PATTERNS: List[Tuple[List[str], List[str], List[str]]] = [
     # (name_contains, consumed, produced)
@@ -282,26 +291,10 @@ class TypeInferenceEngine:
                 break
 
         # Build arg list with inferred types
-        args = []
-        for arg_name in fi.args:
-            inferred_type = None
-            if arg_name == "self":
-                inferred_type = None
-            elif consumed:
-                inferred_type = consumed[0] if consumed else None
-            elif "path" in arg_name.lower():
-                inferred_type = "Path"
-            elif "name" in arg_name.lower() or "text" in arg_name.lower():
-                inferred_type = "str"
-            elif "config" in arg_name.lower():
-                inferred_type = "Config"
-            elif "result" in arg_name.lower():
-                inferred_type = "AnalysisResult"
-            args.append({
-                "name": arg_name,
-                "type": inferred_type,
-                "has_default": False,
-            })
+        args = [
+            {"name": a, "type": self._infer_arg_type(a, consumed), "has_default": False}
+            for a in fi.args
+        ]
 
         ret = produced[0] if produced else None
         has_any = ret is not None or any(a["type"] for a in args)
@@ -313,3 +306,16 @@ class TypeInferenceEngine:
             "name": fi.name,
             "qualified_name": fi.qualified_name,
         }
+
+    @staticmethod
+    def _infer_arg_type(arg_name: str, consumed: List[str]) -> Optional[str]:
+        """Infer type for a single argument from consumed types or name patterns."""
+        if arg_name == "self":
+            return None
+        if consumed:
+            return consumed[0]
+        arg_lower = arg_name.lower()
+        for pattern, typ in ARG_NAME_TYPE_MAP:
+            if pattern in arg_lower:
+                return typ
+        return None

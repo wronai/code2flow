@@ -1,5 +1,20 @@
 ## [Unreleased]
 
+## [0.5.52] - 2026-03-09
+
+### Other
+- Update code2llm/analysis/data_analysis.py
+- Update code2llm/analysis/type_inference.py
+- Update code2llm/cli.py
+- Update code2llm/cli_commands.py
+- Update code2llm/cli_parser.py
+- Update code2llm/core/core/file_analyzer.py
+- Update code2llm/core/core/lang/__init__.py
+- Update code2llm/core/core/lang/base.py
+- Update code2llm/core/core/lang/cpp.py
+- Update code2llm/core/core/lang/csharp.py
+- ... and 11 more files
+
 ## [0.5.51] - 2026-03-09
 
 ### Docs

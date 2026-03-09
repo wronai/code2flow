@@ -7,10 +7,15 @@ Splitting strategy:
 4. If still too big, use file count chunking
 """
 
-import os
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
+
+from .repo_files import (
+    should_skip_file, collect_files_in_dir, collect_root_files,
+    count_py_files, contains_python_files, get_level1_dirs,
+    calculate_priority,
+)
 
 
 @dataclass
@@ -64,12 +69,12 @@ class HierarchicalRepoSplitter:
         Returns list of subprojects respecting size limits.
         """
         # First, check total project
-        total_files = self._count_py_files(project_path)
+        total_files = count_py_files(project_path)
         total_estimated_kb = total_files * 3
         
         if total_estimated_kb <= self.size_limit_kb:
             # Small project - analyze as single unit
-            files = self._collect_files_recursive(project_path, project_path)
+            files = collect_files_in_dir(project_path, project_path)
             return [SubProject(
                 name='root',
                 path=project_path,
@@ -87,13 +92,13 @@ class HierarchicalRepoSplitter:
         subprojects = []
         
         # Get level 1 directories
-        level1_dirs = self._get_level1_dirs(project_path)
+        level1_dirs = get_level1_dirs(project_path)
         
         # Calculate total size
         total_kb = 0
         dir_sizes = {}
         for dir_path in level1_dirs:
-            files = self._collect_files_in_dir(dir_path, project_path)
+            files = collect_files_in_dir(dir_path, project_path)
             estimated_kb = len(files) * 3
             dir_sizes[dir_path] = (files, estimated_kb)
             total_kb += estimated_kb
@@ -125,7 +130,7 @@ class HierarchicalRepoSplitter:
             subprojects.extend(level2_chunks)
         
         # Add root-level files
-        root_files = self._collect_root_files(project_path)
+        root_files = collect_root_files(project_path)
         if root_files:
             subprojects.append(SubProject(
                 name='root',
@@ -152,7 +157,7 @@ class HierarchicalRepoSplitter:
         # Sort by priority (highest first)
         sorted_dirs = sorted(
             small_l1_dirs, 
-            key=lambda x: self._calculate_priority(x[0].name, 1), 
+            key=lambda x: calculate_priority(x[0].name, 1), 
             reverse=True
         )
         
@@ -202,45 +207,12 @@ class HierarchicalRepoSplitter:
         
         return chunks
     
-    def _get_level1_dirs(self, project_path: Path) -> List[Path]:
-        """Get all level 1 directories (excluding hidden/cache)."""
-        dirs = []
-        
-        for entry in project_path.iterdir():
-            if not entry.is_dir():
-                continue
-            
-            dir_name = entry.name.lower()
-            
-            # Skip hidden and cache directories
-            skip_dirs = {
-                '.git', '.github', '.vscode', '.idea',
-                '__pycache__', 'node_modules', '.venv', 'venv', 'fresh_env', 'test-env',
-                '.tox', '.pytest_cache', '.mypy_cache',
-                'build', 'dist', 'egg-info', '.eggs',
-                'htmlcov', '.coverage', '.cache',
-                'lib', 'lib64', 'site-packages', 'include', 'bin', 'share',  # venv internals
-            }
-            
-            # Skip wheel packages (e.g., networkx-3.6.1-py3-none-any)
-            if '-py3-none-any' in dir_name or dir_name.endswith('.dist-info'):
-                continue
-            
-            if dir_name.startswith('.') or dir_name in skip_dirs:
-                continue
-            
-            # Check if directory contains Python files
-            if self._contains_python_files(entry):
-                dirs.append(entry)
-        
-        return sorted(dirs, key=lambda d: d.name.lower())
-    
     def _split_level2_consolidated(self, level1_path: Path, project_path: Path, target_chunk_kb: int) -> List[SubProject]:
         """Split level 1 directory with aggressive consolidation.
         
         Strategy: Create chunks of ~target_chunk_kb size (up to 384KB with margin).
         """
-        all_files = self._collect_files_in_dir(level1_path, project_path)
+        all_files = collect_files_in_dir(level1_path, project_path)
         if not all_files:
             return []
         
@@ -254,7 +226,7 @@ class HierarchicalRepoSplitter:
                 relative_path=str(level1_path.relative_to(project_path)),
                 files=all_files,
                 level=1,
-                priority=self._calculate_priority(level1_path.name, 1)
+                priority=calculate_priority(level1_path.name, 1)
             )]
         
         # Need to split - aim for chunks of target size (up to 320KB)
@@ -281,7 +253,7 @@ class HierarchicalRepoSplitter:
                     relative_path=str(level1_path.relative_to(project_path)),
                     files=current_files.copy(),
                     level=2,
-                    priority=self._calculate_priority(level1_path.name, 1) - chunk_num
+                    priority=calculate_priority(level1_path.name, 1) - chunk_num
                 ))
                 chunk_num += 1
                 current_files = []
@@ -299,7 +271,7 @@ class HierarchicalRepoSplitter:
                 relative_path=str(level1_path.relative_to(project_path)),
                 files=current_files,
                 level=2,
-                priority=self._calculate_priority(level1_path.name, 1) - chunk_num
+                priority=calculate_priority(level1_path.name, 1) - chunk_num
             ))
         
         return chunks
@@ -310,18 +282,18 @@ class HierarchicalRepoSplitter:
         """Categorize subdirectories into small and large based on size."""
         level2_dirs = [d for d in level1_path.iterdir() 
                       if d.is_dir() and not d.name.startswith('.')]
-        level2_dirs.sort(key=lambda d: self._calculate_priority(d.name, 2), reverse=True)
+        level2_dirs.sort(key=lambda d: calculate_priority(d.name, 2), reverse=True)
         
         small_dirs = []
         large_dirs = []
         
         for dir_path in level2_dirs:
-            files = self._collect_files_in_dir(dir_path, project_path)
+            files = collect_files_in_dir(dir_path, project_path)
             if not files:
                 continue
             
             estimated_kb = len(files) * 3
-            priority = self._calculate_priority(dir_path.name, 2)
+            priority = calculate_priority(dir_path.name, 2)
             
             if estimated_kb > self.size_limit_kb:
                 large_dirs.append((dir_path, files, estimated_kb, priority))
@@ -350,7 +322,7 @@ class HierarchicalRepoSplitter:
         level1_direct_files = [
             (str(f), f"{level1_path.name}.{f.stem}")
             for f in level1_path.glob("*.py")
-            if not self._should_skip_file(str(f))
+            if not should_skip_file(str(f))
         ]
         
         if not level1_direct_files:
@@ -365,7 +337,7 @@ class HierarchicalRepoSplitter:
                 relative_path=str(level1_path.relative_to(project_path)),
                 files=level1_direct_files,
                 level=2,
-                priority=self._calculate_priority(level1_path.name, 2) - 10
+                priority=calculate_priority(level1_path.name, 2) - 10
             ))
         else:
             file_chunks = self._chunk_by_files(
@@ -465,114 +437,31 @@ class HierarchicalRepoSplitter:
             chunk_num += 1
         
         return chunks
-    
-    def _collect_files_in_dir(
-        self,
-        dir_path: Path,
-        project_path: Path
-    ) -> List[Tuple[str, str]]:
-        """Collect Python files recursively in a directory."""
-        files = []
-        
-        for py_file in dir_path.rglob("*.py"):
-            file_str = str(py_file)
-            
-            if self._should_skip_file(file_str):
-                continue
-            
-            # Calculate module name
-            try:
-                rel_path = py_file.relative_to(project_path)
-                parts = list(rel_path.parts)[:-1]
-                
-                if py_file.name == '__init__.py':
-                    module_name = '.'.join(parts) if parts else dir_path.name
-                else:
-                    module_name = '.'.join(parts + [py_file.stem])
-                
-                files.append((file_str, module_name))
-            except ValueError:
-                # File not relative to project_path
-                files.append((file_str, py_file.stem))
-        
-        return files
-    
-    def _collect_files_recursive(
-        self,
-        dir_path: Path,
-        project_path: Path
-    ) -> List[Tuple[str, str]]:
-        """Collect all Python files recursively."""
-        return self._collect_files_in_dir(dir_path, project_path)
-    
-    def _collect_root_files(self, project_path: Path) -> List[Tuple[str, str]]:
-        """Collect Python files at root level."""
-        files = []
-        
-        for py_file in project_path.glob("*.py"):
-            file_str = str(py_file)
-            
-            if self._should_skip_file(file_str):
-                continue
-            
-            module_name = py_file.stem
-            files.append((file_str, module_name))
-        
-        return files
-    
-    def _count_py_files(self, path: Path) -> int:
-        """Count Python files (excluding tests/cache)."""
-        count = 0
-        for py_file in path.rglob("*.py"):
-            if not self._should_skip_file(str(py_file)):
-                count += 1
-        return count
-    
-    def _contains_python_files(self, dir_path: Path) -> bool:
-        """Check if directory contains any Python files."""
-        for py_file in dir_path.rglob("*.py"):
-            if not self._should_skip_file(str(py_file)):
-                return True
-        return False
-    
-    def _should_skip_file(self, file_str: str) -> bool:
-        """Check if file should be skipped."""
-        lower_path = file_str.lower()
-        skip_patterns = [
-            'test', '_test', 'conftest',
-            '__pycache__', '.venv', 'venv', 'fresh_env', 'test-env',
-            'node_modules', '.git',
-            '/lib/', '/lib64/', '/site-packages/',  # venv internals
-            '/include/', '/bin/python', '/share/',
-        ]
-        return any(pattern in lower_path for pattern in skip_patterns)
-    
-    def _calculate_priority(self, name: str, level: int) -> int:
-        """Calculate priority based on name and nesting level.
-        
-        Higher priority = analyzed first
-        """
-        name_lower = name.lower()
-        base_priority = 50
-        
-        # Core code
-        if name_lower in {'src', 'source', 'lib', 'core', 'app', 'application'}:
-            base_priority = 100
-        elif name_lower in {'api', 'cli', 'cmd', 'commands', 'server', 'backend'}:
-            base_priority = 80
-        elif name_lower in {'utils', 'util', 'tools', 'scripts'}:
-            base_priority = 60
-        elif name_lower in {'docs', 'doc', 'documentation'}:
-            base_priority = 40
-        elif name_lower in {'examples', 'example', 'demo', 'demos', 'samples'}:
-            base_priority = 30
-        elif name_lower in {'tests', 'test', 'testing'}:
-            base_priority = 20
-        
-        # Deeper nesting = slightly lower priority
-        level_penalty = level * 5
-        
-        return base_priority - level_penalty
+
+    # Backward compatibility: delegate to module-level functions
+    def _collect_files_in_dir(self, dir_path, project_path):
+        return collect_files_in_dir(dir_path, project_path)
+
+    def _collect_files_recursive(self, dir_path, project_path):
+        return collect_files_in_dir(dir_path, project_path)
+
+    def _collect_root_files(self, project_path):
+        return collect_root_files(project_path)
+
+    def _count_py_files(self, path):
+        return count_py_files(path)
+
+    def _contains_python_files(self, dir_path):
+        return contains_python_files(dir_path)
+
+    def _should_skip_file(self, file_str):
+        return should_skip_file(file_str)
+
+    def _calculate_priority(self, name, level):
+        return calculate_priority(name, level)
+
+    def _get_level1_dirs(self, project_path):
+        return get_level1_dirs(project_path)
 
 
 def should_use_chunking(project_path: Path, size_threshold_kb: int = 256) -> bool:
@@ -580,8 +469,7 @@ def should_use_chunking(project_path: Path, size_threshold_kb: int = 256) -> boo
     
     Estimates size based on file count.
     """
-    splitter = HierarchicalRepoSplitter(size_limit_kb=size_threshold_kb)
-    total_files = splitter._count_py_files(project_path)
+    total_files = count_py_files(project_path)
     estimated_kb = total_files * 3
     return estimated_kb > size_threshold_kb
 
