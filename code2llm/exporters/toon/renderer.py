@@ -1,8 +1,11 @@
 """Rendering functions for TOON exporter."""
 
+from collections import defaultdict
+from pathlib import Path
 from typing import Any, Dict, List
 
 from ...core.models import AnalysisResult, FunctionInfo
+from ...core.config import LANGUAGE_EXTENSIONS
 
 from .helpers import _dup_file_set, _package_of
 
@@ -32,11 +35,36 @@ class ToonRenderer:
         ndups = len(ctx["duplicates"])
         ncycles = len(ctx["cycles"])
 
+        lang_label = self._detect_language_label(result)
+
         lines = [
-            f"# code2llm | {nfiles}f {total_lines}L | py:{nfiles} | {ctx['timestamp']}",
+            f"# code2llm | {nfiles}f {total_lines}L | {lang_label} | {ctx['timestamp']}",
             f"# CC̄={avg_cc} | critical:{critical}/{nfuncs} | dups:{ndups} | cycles:{ncycles}",
         ]
         return lines
+
+    @staticmethod
+    def _detect_language_label(result: AnalysisResult) -> str:
+        """Build language breakdown label like 'typescript:463,javascript:10,rust:1'."""
+        from .helpers import _is_excluded
+        langs: Dict[str, int] = defaultdict(int)
+        for mi in result.modules.values():
+            if _is_excluded(mi.file):
+                continue
+            detected = False
+            for lang, extensions in LANGUAGE_EXTENSIONS.items():
+                if any(mi.file.endswith(ext) for ext in extensions):
+                    langs[lang] += 1
+                    detected = True
+                    break
+            if not detected:
+                ext = Path(mi.file).suffix.lower()
+                if ext:
+                    langs[ext.lstrip('.')] += 1
+        if not langs:
+            return "unknown"
+        sorted_langs = sorted(langs.items(), key=lambda x: -x[1])
+        return ",".join(f"{lang}:{count}" for lang, count in sorted_langs)
 
     def render_health(self, ctx: Dict[str, Any]) -> List[str]:
         """Render health section."""

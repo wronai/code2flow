@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+## [0.5.47] - 2026-03-09
+
+### Docs
+- Update README.md
+- Update context.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update analysis.toon
+- Update batch_1/analysis.toon
+- Update code2llm/exporters/readme_exporter.py
+- Update code2llm/exporters/toon/renderer.py
+- Update project/analysis.toon
+- Update project/batch_1/analysis.toon
+- Update project/root/analysis.toon
+- Update root/analysis.toon
+
 ## [0.5.46] - 2026-03-09
 
 ### Test
