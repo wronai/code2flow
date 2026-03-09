@@ -4,9 +4,9 @@
 
 - **Project**: .
 - **Primary Language**: python
-- **Languages**: python: 102, shell: 2, java: 1
+- **Languages**: python: 102, shell: 2, php: 1
 - **Analysis Mode**: static
-- **Total Functions**: 854
+- **Total Functions**: 857
 - **Total Classes**: 104
 - **Modules**: 105
 - **Entry Points**: 0
@@ -23,6 +23,11 @@
 - **Classes**: 1
 - **File**: `metrics.py`
 
+### code2llm.core.core.file_analyzer
+- **Functions**: 25
+- **Classes**: 1
+- **File**: `file_analyzer.py`
+
 ### code2llm.generators.llm_flow
 - **Functions**: 24
 - **Classes**: 1
@@ -32,11 +37,6 @@
 - **Functions**: 22
 - **Classes**: 1
 - **File**: `renderer.py`
-
-### code2llm.core.core.file_analyzer
-- **Functions**: 22
-- **Classes**: 1
-- **File**: `file_analyzer.py`
 
 ### code2llm.core.large_repo
 - **Functions**: 20
@@ -91,15 +91,15 @@
 - **Classes**: 3
 - **File**: `intent_matching.py`
 
-### code2llm.exporters.evolution_exporter
-- **Functions**: 15
-- **Classes**: 1
-- **File**: `evolution_exporter.py`
-
 ### code2llm.exporters.context_exporter
 - **Functions**: 15
 - **Classes**: 1
 - **File**: `context_exporter.py`
+
+### code2llm.exporters.evolution_exporter
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `evolution_exporter.py`
 
 ### code2llm.generators.llm_task
 - **Functions**: 15
@@ -124,15 +124,15 @@ Key execution flows identified:
 - **Methods**: 27
 - **Key Methods**: code2llm.exporters.toon.metrics.MetricsComputer.__init__, code2llm.exporters.toon.metrics.MetricsComputer.compute_all_metrics, code2llm.exporters.toon.metrics.MetricsComputer._compute_file_metrics, code2llm.exporters.toon.metrics.MetricsComputer._new_file_record, code2llm.exporters.toon.metrics.MetricsComputer._compute_fan_in, code2llm.exporters.toon.metrics.MetricsComputer._process_function_calls, code2llm.exporters.toon.metrics.MetricsComputer._process_called_by, code2llm.exporters.toon.metrics.MetricsComputer._process_callee_calls, code2llm.exporters.toon.metrics.MetricsComputer._handle_suffix_match, code2llm.exporters.toon.metrics.MetricsComputer._compute_package_metrics
 
+### code2llm.core.core.file_analyzer.FileAnalyzer
+> Analyzes a single file.
+- **Methods**: 24
+- **Key Methods**: code2llm.core.core.file_analyzer.FileAnalyzer.__init__, code2llm.core.core.file_analyzer.FileAnalyzer.analyze_file, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_python, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_ast, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity, code2llm.core.core.file_analyzer.FileAnalyzer._extract_function_body, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity_regex, code2llm.core.core.file_analyzer.FileAnalyzer._extract_calls_regex, code2llm.core.core.file_analyzer.FileAnalyzer._perform_deep_analysis, code2llm.core.core.file_analyzer.FileAnalyzer._process_class
+
 ### code2llm.exporters.toon.renderer.ToonRenderer
 > Renders all sections for TOON export.
 - **Methods**: 22
 - **Key Methods**: code2llm.exporters.toon.renderer.ToonRenderer.render_header, code2llm.exporters.toon.renderer.ToonRenderer._detect_language_label, code2llm.exporters.toon.renderer.ToonRenderer.render_health, code2llm.exporters.toon.renderer.ToonRenderer.render_refactor, code2llm.exporters.toon.renderer.ToonRenderer.render_coupling, code2llm.exporters.toon.renderer.ToonRenderer._select_top_packages, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_header, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_rows, code2llm.exporters.toon.renderer.ToonRenderer._build_coupling_row, code2llm.exporters.toon.renderer.ToonRenderer._coupling_row_tag
-
-### code2llm.core.core.file_analyzer.FileAnalyzer
-> Analyzes a single file.
-- **Methods**: 21
-- **Key Methods**: code2llm.core.core.file_analyzer.FileAnalyzer.__init__, code2llm.core.core.file_analyzer.FileAnalyzer.analyze_file, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_python, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_ast, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity, code2llm.core.core.file_analyzer.FileAnalyzer._perform_deep_analysis, code2llm.core.core.file_analyzer.FileAnalyzer._process_class, code2llm.core.core.file_analyzer.FileAnalyzer._process_function, code2llm.core.core.file_analyzer.FileAnalyzer._build_cfg, code2llm.core.core.file_analyzer.FileAnalyzer._process_cfg_block
 
 ### code2llm.analysis.type_inference.TypeInferenceEngine
 > Extract and infer type information from Python source files.
@@ -181,18 +181,18 @@ Scans function bodies for IO operations,
 - **Methods**: 15
 - **Key Methods**: code2llm.analysis.side_effects.SideEffectDetector.__init__, code2llm.analysis.side_effects.SideEffectDetector.analyze_function, code2llm.analysis.side_effects.SideEffectDetector.analyze_all, code2llm.analysis.side_effects.SideEffectDetector.get_purity_score, code2llm.analysis.side_effects.SideEffectDetector._scan_node, code2llm.analysis.side_effects.SideEffectDetector._check_calls, code2llm.analysis.side_effects.SideEffectDetector._check_assignments, code2llm.analysis.side_effects.SideEffectDetector._check_globals, code2llm.analysis.side_effects.SideEffectDetector._check_yield, code2llm.analysis.side_effects.SideEffectDetector._check_delete
 
-### code2llm.exporters.evolution_exporter.EvolutionExporter
-> Export evolution.toon — prioritized refactoring queue.
-- **Methods**: 15
-- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
-- **Inherits**: Exporter
-
 ### code2llm.exporters.context_exporter.ContextExporter
 > Export LLM-ready analysis summary with architecture and flows.
 
 Output: context.md — architecture na
 - **Methods**: 15
 - **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._detect_languages, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns
+- **Inherits**: Exporter
+
+### code2llm.exporters.evolution_exporter.EvolutionExporter
+> Export evolution.toon — prioritized refactoring queue.
+- **Methods**: 15
+- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
 - **Inherits**: Exporter
 
 ### code2llm.nlp.entity_resolution.EntityResolver
@@ -256,6 +256,10 @@ Key functions that process and transform data:
 > Validate toon format structure.
 - **Output to**: print, print, bool, bool, bool
 
+### benchmarks.format_evaluator.evaluate_format
+> Oceń pojedynczy format względem ground truth.
+- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, m.group
@@ -279,9 +283,15 @@ Key functions that process and transform data:
 ### scripts.bump_version.format_version
 > Format version tuple as string
 
-### benchmarks.format_evaluator.evaluate_format
-> Oceń pojedynczy format względem ground truth.
-- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
+
+### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
+- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
+
+### benchmarks.benchmark_format_quality._generate_format_outputs
+> Generate all format outputs and evaluate them.
+- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
 ### code2llm.cli.create_parser
 > Create CLI argument parser.
@@ -298,21 +308,9 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### demo_langs.valid.sample.UserService.process_users
-- **Output to**: print
-
-### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
-- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
-### benchmarks.benchmark_format_quality._generate_format_outputs
-> Generate all format outputs and evaluate them.
-- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
-
-### code2llm.core.toon_size_manager._parse_modules
-> Parse module sections from TOON content.
-
-Returns list of (module_name, start_line, end_line).
-- **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
+### code2llm.analysis.cfg.CFGExtractor._format_except
+> Format except handler.
+- **Output to**: self._expr_to_str
 
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
@@ -321,6 +319,12 @@ Returns list of (module_name, start_line, end_line).
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
 > Process Python files directly in level1 directory.
 - **Output to**: len, chunks.append, self._chunk_by_files, chunks.extend, str
+
+### code2llm.core.toon_size_manager._parse_modules
+> Parse module sections from TOON content.
+
+Returns list of (module_name, start_line, end_line).
+- **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
 
 ### code2llm.nlp.pipeline.NLPPipeline.process
 > Process query through full pipeline (4a-4e).
@@ -338,19 +342,14 @@ Returns list of (module_name, start_line, end_line).
 > Step 4e: Output formatting.
 - **Output to**: self._format_response
 
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
-
 ### code2llm.exporters.validate_project.validate_project_yaml
 > Validate project.yaml against generated views in output_dir.
 
 Returns (is_valid, list_of_issues).
 - **Output to**: issues.extend, toon_path.exists, yaml_path.exists, issues.append, code2llm.exporters.validate_project._check_required_keys
 
-### code2llm.exporters.flow_renderer.FlowRenderer.render_transforms
-> Renderuj sekcję TRANSFORMS.
-- **Output to**: lines.append
+### code2llm.exporters.context_exporter.ContextExporter._get_process_flows
+- **Output to**: set, set, seen_base_names.add, self._trace_flow, ep_name.split
 
 ## Public API Surface
 
