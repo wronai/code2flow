@@ -31,6 +31,7 @@ from .report_generators import (
     ArticleViewGenerator, HTMLDashboardGenerator,
     load_project_yaml,
 )
+from .index_generator import IndexHTMLGenerator
 
 __all__ = [
     'Exporter',
@@ -49,5 +50,6 @@ __all__ = [
     'ContextViewGenerator',
     'ArticleViewGenerator',
     'HTMLDashboardGenerator',
+    'IndexHTMLGenerator',
     'load_project_yaml',
 ]

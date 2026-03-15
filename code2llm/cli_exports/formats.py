@@ -11,7 +11,7 @@ from ..exporters import (
     EvolutionExporter, READMEExporter, ProjectYAMLExporter,
     ToonViewGenerator, ContextViewGenerator,
     ArticleViewGenerator, HTMLDashboardGenerator,
-    load_project_yaml,
+    load_project_yaml, IndexHTMLGenerator,
 )
 
 
@@ -224,3 +224,19 @@ def _export_refactor_prompts(args, result, output_dir: Path):
     else:
         if args.verbose:
             print("  - Refactoring: No code smells detected.")
+
+
+def _export_index_html(args, output_dir: Path) -> None:
+    """Generate index.html for browsing all generated files."""
+    # Only generate index.html when 'all' formats is used
+    if 'all' not in args.format:
+        return
+    
+    try:
+        generator = IndexHTMLGenerator(output_dir)
+        index_path = generator.generate()
+        if args.verbose:
+            print(f"  - INDEX (file browser): {index_path}")
+    except Exception as e:
+        if args.verbose:
+            print(f"  - INDEX generation failed: {e}", file=sys.stderr)

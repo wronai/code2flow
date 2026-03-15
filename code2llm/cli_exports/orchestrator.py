@@ -12,6 +12,7 @@ from .formats import (
     _export_context_fallback,
     _export_readme,
     _export_refactor_prompts,
+    _export_index_html,
 )
 from .code2logic import _export_code2logic
 from .prompt import _export_prompt_txt, _export_chunked_prompt_txt
@@ -57,6 +58,9 @@ def _export_single_project(args, result, output_dir: Path, formats: list, source
         _export_refactor_prompts(args, result, output_dir)
 
     _export_readme(args, result, output_dir)
+    
+    # Generate index.html for browsing all files (only when 'all' formats used)
+    _export_index_html(args, output_dir)
 
 
 def _export_chunked_results(args, result, output_dir: Path, source_path: Path, formats: list):
@@ -94,3 +98,6 @@ def _export_chunked_results(args, result, output_dir: Path, source_path: Path, f
         _export_chunked_prompt_txt(args, output_dir, formats, source_path, subprojects)
 
     _export_readme(args, result, output_dir)
+    
+    # Generate index.html for browsing all files (only when 'all' formats used)
+    _export_index_html(args, output_dir)
