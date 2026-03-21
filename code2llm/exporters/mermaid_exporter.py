@@ -212,7 +212,9 @@ class MermaidExporter(Exporter):
         safe = safe.replace(' ', '_')
         if len(safe) > 50:
             # Keep module prefix + function name
-            parts = name.split('.')
+            # Use sanitized parts (replace dashes first)
+            sanitized = name.replace('-', '_').replace(':', '_')
+            parts = sanitized.split('.')
             if len(parts) >= 2:
                 safe = f"{parts[0]}__{parts[-1]}"
             safe = safe[:50]

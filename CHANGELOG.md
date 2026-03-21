@@ -1,5 +1,22 @@
 ## [Unreleased]
 
+## [0.5.55] - 2026-03-21
+
+### Docs
+- Update README.md
+- Update context.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update analysis.toon
+- Update batch_1/analysis.toon
+- Update code2llm/exporters/mermaid_exporter.py
+- Update project/analysis.toon
+- Update project/batch_1/analysis.toon
+- Update project/root/analysis.toon
+- Update root/analysis.toon
+
 ## [0.5.54] - 2026-03-20
 
 ### Other
