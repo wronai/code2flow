@@ -1,13 +1,13 @@
-# code2llm/evolution | 891 func | 105f | 2026-03-25
+# code2llm/evolution | 895 func | 105f | 2026-03-25
 
 NEXT[10] (ranked by impact):
-  [1] !! SPLIT           examples/functional_refactoring_example.py
+  [1] !! SPLIT           code2llm/exporters/index_generator.py
+      WHY: 777L, 1 classes, max CC=5
+      EFFORT: ~4h  IMPACT: 3885
+
+  [2] !! SPLIT           examples/functional_refactoring_example.py
       WHY: 644L, 15 classes, max CC=6
       EFFORT: ~4h  IMPACT: 3864
-
-  [2] !! SPLIT           code2llm/exporters/index_generator.py
-      WHY: 752L, 1 classes, max CC=5
-      EFFORT: ~4h  IMPACT: 3760
 
   [3] !! SPLIT-FUNC      analyze_typescript_js  CC=41  fan=41
       WHY: CC=41 exceeds 15
@@ -48,11 +48,11 @@ RISKS[3]:
   ⚠ Splitting tests/test_nonpython_cc_calls.py may break 0 import paths
 
 METRICS-TARGET:
-  CC̄:          4.3 → ≤3.0
+  CC̄:          4.4 → ≤3.1
   max-CC:      41 → ≤20
   god-modules: 6 → 0
   high-CC(≥15): 12 → ≤6
   hub-types:   0 → ≤0
 
 HISTORY:
-  prev CC̄=4.3 → now CC̄=4.3
+  prev CC̄=4.3 → now CC̄=4.4

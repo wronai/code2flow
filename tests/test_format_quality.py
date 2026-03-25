@@ -188,7 +188,7 @@ class TestAnalysisToon:
         assert "HEALTH[" in toon_content
 
     def test_has_refactor_section(self, toon_content):
-        assert "REFACTOR[" not in toon_content
+        assert "REFACTOR[" in toon_content
 
     def test_has_coupling_section(self, toon_content):
         assert "COUPLING" in toon_content
@@ -340,7 +340,9 @@ class TestCrossFormat:
         assert "HEALTH[" in toon
         assert "LAYERS" in toon
         assert "COUPLING" in toon
-        assert "REFACTOR[" not in toon
+        assert "REFACTOR[" in toon
+        assert "PIPELINES" in toon
+        assert "EXTERNAL" in toon
 
     def test_project_map_has_unique_structure_info(self, all_formats):
         """map.toon should have the structural import/signature map."""
