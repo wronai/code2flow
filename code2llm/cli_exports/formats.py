@@ -100,7 +100,7 @@ def _run_report(args, project_yaml_path: str, output_dir: Path) -> None:
 def _export_simple_formats(args, result, output_dir: Path, formats):
     """Export toon, map, flow, context, yaml, json, project-yaml formats."""
     format_map = {
-        'toon': (ToonExporter, 'toon.toon.yaml', 'TOON (diagnostics)'),
+        'toon': (ToonExporter, 'analysis.toon.yaml', 'TOON (diagnostics)'),
         'map': (MapExporter, 'map.toon.yaml', 'MAP (structure)'),
         'flow': (FlowExporter, 'flow.toon.yaml', 'FLOW (data-flow)'),
         'context': (ContextExporter, 'context.md', 'CONTEXT (LLM narrative)'),

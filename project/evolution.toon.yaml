@@ -1,104 +1,82 @@
-format: evolution-toon-yaml
-timestamp: '2026-03-25'
-stats:
-  total_funcs: 745
-  total_files: 83
-  avg_cc: 4.8
-  max_cc: 65
-  high_cc_count: 11
-  critical_count: 70
-refactoring:
-  action_count: 13
-  actions:
-  - priority: critical
-    action: SPLIT-FUNC
-    target: _extract_declarations
-    cc: 65
-    fan_out: 45
-    reason: CC=65 exceeds 15
-    effort: ~1h
-  - priority: critical
-    action: SPLIT-FUNC
-    target: MapExporter.export_to_yaml
-    cc: 25
-    fan_out: 23
-    reason: CC=25 exceeds 15
-    effort: ~1h
-  - priority: critical
-    action: SPLIT-FUNC
-    target: MermaidExporter.export_flow_detailed
-    cc: 25
-    fan_out: 21
-    reason: CC=25 exceeds 15
-    effort: ~1h
-  - priority: high
-    action: SPLIT
-    target: code2llm/exporters/index_generator.py
-    reason: 790L, 1 classes, max CC=5
-    effort: ~4h
-  - priority: high
-    action: SPLIT
-    target: code2llm/exporters/mermaid_exporter.py
-    reason: 637L, 1 classes, max CC=25
-    effort: ~4h
-  - priority: high
-    action: SPLIT
-    target: code2llm/exporters/project_yaml_exporter.py
-    reason: 513L, 1 classes, max CC=13
-    effort: ~4h
-  - priority: high
-    action: SPLIT-FUNC
-    target: MermaidExporter.export_flow_full
-    cc: 23
-    fan_out: 20
-    reason: CC=23 exceeds 15
-    effort: ~1h
-  - priority: high
-    action: SPLIT-FUNC
-    target: MermaidExporter.export_flow_compact
-    cc: 23
-    fan_out: 18
-    reason: CC=23 exceeds 15
-    effort: ~1h
-  - priority: high
-    action: SPLIT-FUNC
-    target: analyze_ruby
-    cc: 17
-    fan_out: 19
-    reason: CC=17 exceeds 15
-    effort: ~1h
-  - priority: high
-    action: SPLIT-FUNC
-    target: _export_simple_formats
-    cc: 16
-    fan_out: 17
-    reason: CC=16 exceeds 15
-    effort: ~1h
-risks:
-  count: 3
-  items:
-  - type: breaking_imports
-    target: code2llm/exporters/index_generator.py
-    impact: may break 7 import paths
-  - type: breaking_imports
-    target: code2llm/exporters/mermaid_exporter.py
-    impact: may break 18 import paths
-  - type: breaking_imports
-    target: code2llm/exporters/project_yaml_exporter.py
-    impact: may break 18 import paths
-metrics_target:
-  avg_cc:
-    current: 4.8
-    target: 3.4
-  max_cc:
-    current: 65
-    target: 20
-  god_modules:
-    current: 6
-    target: 0
-  high_cc:
-    current: 11
-    target: 5
-  hub_types:
-    current: 0
-    target: 0
+# code2llm/evolution | 745 func | 83f | 2026-03-25
+
+NEXT[10] (ranked by impact):
+  [1] !! SPLIT-FUNC      _extract_declarations  CC=65  fan=45
+      WHY: CC=65 exceeds 15
+      EFFORT: ~1h  IMPACT: 2925
+
+  [2] !! SPLIT-FUNC      MapExporter.export_to_yaml  CC=25  fan=23
+      WHY: CC=25 exceeds 15
+      EFFORT: ~1h  IMPACT: 575
+
+  [3] !! SPLIT-FUNC      MermaidExporter.export_flow_detailed  CC=25  fan=21
+      WHY: CC=25 exceeds 15
+      EFFORT: ~1h  IMPACT: 525
+
+  [4] !  SPLIT-FUNC      MermaidExporter.export_flow_full  CC=23  fan=20
+      WHY: CC=23 exceeds 15
+      EFFORT: ~1h  IMPACT: 460
+
+  [5] !  SPLIT-FUNC      MermaidExporter.export_flow_compact  CC=23  fan=18
+      WHY: CC=23 exceeds 15
+      EFFORT: ~1h  IMPACT: 414
+
+  [6] !  SPLIT-FUNC      analyze_ruby  CC=17  fan=19
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 323
+
+  [7] !  SPLIT-FUNC      _export_mermaid  CC=16  fan=16
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 256
+
+  [8] !  SPLIT-FUNC      main  CC=17  fan=14
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 238
+
+  [9] !  SPLIT-FUNC      validate_chunked_output  CC=15  fan=14
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 210
+
+  [10] !! SPLIT           code2llm/exporters/index_generator.py
+      WHY: 790L, 0 classes, max CC=0
+      EFFORT: ~4h  IMPACT: 0
+
+
+RISKS[3]:
+  ⚠ Splitting code2llm/exporters/index_generator.py may break 0 import paths
+  ⚠ Splitting code2llm/exporters/mermaid_exporter.py may break 0 import paths
+  ⚠ Splitting code2llm/exporters/project_yaml_exporter.py may break 0 import paths
+
+METRICS-TARGET:
+  CC̄:          4.8 → ≤3.4
+  max-CC:      65 → ≤20
+  god-modules: 6 → 0
+  high-CC(≥15): 10 → ≤5
+  hub-types:   0 → ≤0
+
+PATTERNS (language parser shared logic):
+  _extract_declarations() in base.py — unified extraction for:
+    - TypeScript: interfaces, types, classes, functions, arrow funcs
+    - PHP: namespaces, traits, classes, functions, includes
+    - Ruby: modules, classes, methods, requires
+    - C++: classes, structs, functions, #includes
+    - C#: classes, interfaces, methods, usings
+    - Java: classes, interfaces, methods, imports
+    - Go: packages, functions, structs
+    - Rust: modules, functions, traits, use statements
+
+  Shared regex patterns per language:
+    - import: language-specific import/require/using patterns
+    - class: class/struct/trait declarations with inheritance
+    - function: function/method signatures with visibility
+    - brace_tracking: for C-family languages ({ })
+    - end_keyword_tracking: for Ruby (module/class/def...end)
+
+  Benefits:
+    - Consistent extraction logic across all languages
+    - Reduced code duplication (~70% reduction in parser LOC)
+    - Easier maintenance: fix once, apply everywhere
+    - Standardized FunctionInfo/ClassInfo models
+
+HISTORY:
+  prev CC̄=4.8 → now CC̄=4.8

@@ -11,7 +11,6 @@ When you run `code2llm ./ -f all`, the following files are created:
 | File | Format | Purpose | Key Insights |
 |------|--------|---------|--------------|
 | `evolution.toon.yaml` | **YAML** | **📋 Refactoring queue** - Prioritized improvements | 0 refactoring actions needed |
-| `map.toon.yaml` | **YAML** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |
 
 ### 🤖 LLM-Ready Documentation
 
@@ -332,6 +331,6 @@ code2llm ./ -f yaml --separate-orphans
 **Analysis Date**: 2026-03-25  
 **Total Functions**: 923  
 **Total Classes**: 106  
-**Modules**: 117  
+**Modules**: 122  
 
 For more information about code2llm, visit: https://github.com/tom-sapletta/code2llm

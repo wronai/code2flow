@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.78] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_exports/formats.py
+- Update project/analysis.json
+- Update project/analysis.toon.yaml
+- Update project/analysis.yaml
+- Update project/batch_1/analysis.toon.yaml
+- Update project/batch_1/evolution.toon.yaml
+- Update project/batch_1/map.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/evolution.toon.yaml
+- ... and 8 more files
+
 ## [0.5.77] - 2026-03-25
 
 ### Other
