@@ -23,6 +23,7 @@ EXCLUDE_PATTERNS = {
     'venv', '.venv', 'env', '.env', 'publish-env', 'test-env',
     'site-packages', 'node_modules', '__pycache__', '.git',
     'dist', 'build', 'egg-info', '.tox', '.mypy_cache',
+    'TODO', 'examples',
 }
 
 

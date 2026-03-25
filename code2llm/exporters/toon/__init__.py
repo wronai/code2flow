@@ -38,9 +38,15 @@ class ToonExporter:
         sections.append("")
         sections.extend(self.renderer.render_health(ctx))
         sections.append("")
+        sections.extend(self.renderer.render_refactor(ctx))
+        sections.append("")
+        sections.extend(self.renderer.render_pipelines(ctx))
+        sections.append("")
         sections.extend(self.renderer.render_layers(ctx))
         sections.append("")
         sections.extend(self.renderer.render_coupling(ctx))
+        sections.append("")
+        sections.extend(self.renderer.render_external(ctx))
 
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:

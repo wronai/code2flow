@@ -383,3 +383,89 @@ class ToonRenderer:
             )
 
         return lines
+
+    def render_pipelines(self, ctx: Dict[str, Any]) -> List[str]:
+        """Render PIPELINES section - data flow pipelines from entry points."""
+        result: AnalysisResult = ctx["result"]
+        
+        # Find entry points and their downstream pipelines
+        pipelines = []
+        for func_name, func_info in result.functions.items():
+            # Entry points: functions with no callers but have calls
+            if not func_info.called_by and func_info.calls:
+                chain = self._trace_pipeline(func_name, result, depth=0)
+                if chain:
+                    pipelines.append({
+                        "entry": func_name.split(".")[-1],
+                        "chain": chain,
+                        "purity": self._calculate_purity(chain, result),
+                    })
+        
+        if not pipelines:
+            return ["PIPELINES[0]: none detected"]
+        
+        lines = [f"PIPELINES[{len(pipelines)}]:"]
+        for i, pipe in enumerate(pipelines[:5], 1):  # Max 5 pipelines
+            purity_pct = int(pipe["purity"] * 100)
+            chain_str = " → ".join(pipe["chain"][:4])  # Show first 4 steps
+            if len(pipe["chain"]) > 4:
+                chain_str += f" → ...({len(pipe['chain']) - 4} more)"
+            lines.append(f"  [{i}] Src [{pipe['entry']}]: {chain_str}")
+            lines.append(f"      PURITY: {purity_pct}% pure")
+        
+        return lines
+    
+    def _trace_pipeline(self, start_func: str, result: AnalysisResult, depth: int) -> List[str]:
+        """Trace a pipeline starting from an entry point."""
+        if depth > 10:  # Prevent infinite recursion
+            return []
+        
+        chain = []
+        current = start_func
+        visited = set()
+        
+        while current and current not in visited and len(chain) < 20:
+            visited.add(current)
+            func_info = result.functions.get(current)
+            if not func_info:
+                break
+            
+            chain.append(current.split(".")[-1])
+            
+            # Follow the first call that's not a builtin
+            next_func = None
+            for callee in func_info.calls:
+                if callee in result.functions:
+                    next_func = callee
+                    break
+            
+            current = next_func
+        
+        return chain
+    
+    def _calculate_purity(self, chain: List[str], result: AnalysisResult) -> float:
+        """Calculate purity ratio (functions without side effects)."""
+        if not chain:
+            return 0.0
+        
+        pure_count = 0
+        for func_name in chain:
+            full_name = None
+            for qname, fi in result.functions.items():
+                if fi.name == func_name:
+                    full_name = qname
+                    break
+            
+            if full_name:
+                func_info = result.functions.get(full_name)
+                if func_info and not getattr(func_info, 'has_side_effects', False):
+                    pure_count += 1
+        
+        return pure_count / len(chain)
+
+    def render_external(self, ctx: Dict[str, Any]) -> List[str]:
+        """Render EXTERNAL section - cross-references to other tools."""
+        lines = ["EXTERNAL:"]
+        lines.append("  validation: run `vallm batch .` → validation.toon")
+        lines.append("  duplication: run `redup scan .` → duplication.toon")
+        return lines

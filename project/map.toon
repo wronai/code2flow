@@ -1,10 +1,10 @@
-# code2llm | 117f 21936L | python:115,php:1,shell:1 | 2026-03-25
-# stats: 891 func | 106 cls | 117 mod | CC̄=4.3 | critical:12 | cycles:0
+# code2llm | 108f 20478L | python:106,rust:1,shell:1 | 2026-03-25
+# stats: 791 func | 86 cls | 108 mod | CC̄=4.6 | critical:12 | cycles:0
 # alerts[5]: CC analyze_typescript_js=41; fan-out analyze_typescript_js=41; fan-out analyze_php=35; fan-out analyze_ruby=30; CC analyze_php=29
 # hotspots[5]: analyze_typescript_js fan=41; analyze_php fan=35; analyze_ruby fan=30; analyze_java fan=29; analyze_cpp fan=26
-# evolution: CC̄ 4.3→4.3 (flat 0.0)
+# evolution: CC̄ 4.3→4.6 (regressed +0.3)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[117]:
+M[108]:
   badges/server.py,110
   benchmarks/benchmark_constants.py,29
   benchmarks/benchmark_evolution.py,137
@@ -76,19 +76,19 @@ M[117]:
   code2llm/exporters/flow_exporter.py,391
   code2llm/exporters/flow_renderer.py,188
   code2llm/exporters/html_dashboard.py,504
-  code2llm/exporters/index_generator.py,752
+  code2llm/exporters/index_generator.py,777
   code2llm/exporters/json_exporter.py,17
   code2llm/exporters/llm_exporter.py,12
-  code2llm/exporters/map_exporter.py,326
+  code2llm/exporters/map_exporter.py,327
   code2llm/exporters/mermaid_exporter.py,253
   code2llm/exporters/project_yaml_exporter.py,513
   code2llm/exporters/readme_exporter.py,493
   code2llm/exporters/report_generators.py,34
-  code2llm/exporters/toon/__init__.py,52
+  code2llm/exporters/toon/__init__.py,58
   code2llm/exporters/toon/helpers.py,120
   code2llm/exporters/toon/metrics.py,501
   code2llm/exporters/toon/module_detail.py,162
-  code2llm/exporters/toon/renderer.py,385
+  code2llm/exporters/toon/renderer.py,471
   code2llm/exporters/toon_view.py,157
   code2llm/exporters/validate_project.py,118
   code2llm/exporters/yaml_exporter.py,108
@@ -107,16 +107,7 @@ M[117]:
   code2llm/patterns/detector.py,168
   code2llm/refactor/__init__.py,0
   code2llm/refactor/prompt_engine.py,150
-  demo_langs/valid/sample.php,44
-  examples/functional_refactoring_example.py,644
-  examples/litellm/run.py,120
-  examples/streaming-analyzer/demo.py,251
-  examples/streaming-analyzer/sample_project/__init__.py,1
-  examples/streaming-analyzer/sample_project/api.py,76
-  examples/streaming-analyzer/sample_project/auth.py,88
-  examples/streaming-analyzer/sample_project/database.py,157
-  examples/streaming-analyzer/sample_project/main.py,158
-  examples/streaming-analyzer/sample_project/utils.py,84
+  demo_langs/valid/sample.rs,47
   project.sh,49
   scripts/benchmark_badges.py,392
   scripts/bump_version.py,96
@@ -300,12 +291,12 @@ S...
   code2llm/exporters/readme_exporter.py:
     e: READMEExporter
     READMEExporter(BaseExporter): export(2),_extract_insights(2),_generate_readme_content(6),_get_existing_files(1),_build_core_files_section(2),_build_llm_files_section(1),_build_viz_files_section(1)  # Export README.md with documentation of all generated files...
-  code2llm/exporters/mermaid_exporter.py:
-    e: MermaidExporter
-    MermaidExporter(Exporter): export(2),_render_subgraphs(2),_render_edges(3),_render_cc_styles(2),_get_cc(0),export_call_graph(2),export_compact(2),_readable_id(1),_safe_module(1),_module_of(1),_resolve(2),_write(2)  # Export call graph to Mermaid format...
   code2llm/exporters/project_yaml_exporter.py:
     e: ProjectYAMLExporter
     ProjectYAMLExporter(Exporter): export(2),_build_project_yaml(2),_build_health(2),_build_alerts(1),_count_duplicates(1),_build_modules(2),_group_by_file(0),_compute_module_entry(5),_compute_inbound_deps(2),_build_exports(3),_build_class_export(1),_build_function_exports(1),_build_hotspots(1),_hotspot_note(1),_build_refactoring(3),_build_evolution(3),_detect_primary_language(1),_load_previous_evolution(1)  # Export unified project.yaml — single source of truth for dia...
+  code2llm/exporters/mermaid_exporter.py:
+    e: MermaidExporter
+    MermaidExporter(Exporter): export(2),_render_subgraphs(2),_render_edges(3),_render_cc_styles(2),_get_cc(0),export_call_graph(2),export_compact(2),_readable_id(1),_safe_module(1),_module_of(1),_resolve(2),_write(2)  # Export call graph to Mermaid format...
   code2llm/generators/mermaid.py:
     e: validate_mermaid_file,_strip_label_segments,_is_balanced_node_line,_check_bracket_balance,_scan_brackets,_check_node_ids,_sanitize_label_text,_sanitize_node_id,fix_mermaid_file,_fix_edge_line,_fix_edge_label_pipes,_fix_subgraph_line,_fix_class_line,generate_pngs,generate_single_png,generate_with_puppeteer
     validate_mermaid_file(mmd_path)
@@ -365,7 +356,7 @@ S...
     _cross_check_toon(data;toon_path)
   code2llm/exporters/toon/renderer.py:
     e: ToonRenderer
-    ToonRenderer: render_header(1),_detect_language_label(0),render_health(1),render_refactor(1),render_coupling(1),_select_top_packages(2),_render_coupling_header(1),_render_coupling_rows(4),_build_coupling_row(3),_coupling_row_tag(1),_render_coupling_summary(2),render_layers(1),_render_layer_package(5),_render_layer_files(4),_format_layer_file_row(1),_render_zero_line_files(1),render_duplicates(1),render_functions(1),_format_function_row(1),_render_cc_summary(2),render_hotspots(1),render_classes(1)  # Renders all sections for TOON export...
+    ToonRenderer: render_header(1),_detect_language_label(0),render_health(1),render_refactor(1),render_coupling(1),_select_top_packages(2),_render_coupling_header(1),_render_coupling_rows(4),_build_coupling_row(3),_coupling_row_tag(1),_render_coupling_summary(2),render_layers(1),_render_layer_package(5),_render_layer_files(4),_format_layer_file_row(1),_render_zero_line_files(1),render_duplicates(1),render_functions(1),_format_function_row(1),_render_cc_summary(2),render_hotspots(1),render_classes(1),render_pipelines(1),_trace_pipeline(3),_calculate_purity(2),render_external(1)  # Renders all sections for TOON export...
   code2llm/core/gitignore.py:
     e: GitIgnoreParser,load_gitignore_patterns
     GitIgnoreParser: __init__(1),_load_gitignore(1),_parse_pattern(1),_wildcard_to_regex(1),is_ignored(2)  # Parse and apply .gitignore patterns to file paths...
@@ -405,9 +396,6 @@ Sections: P...
   code2llm/analysis/type_inference.py:
     e: TypeInferenceEngine
     TypeInferenceEngine: __init__(0),enrich_function(1),get_arg_types(1),get_return_type(1),get_typed_signature(1),extract_all_types(1),_get_ast(1),_find_function_node(3),_extract_from_node(2),_extract_args(1),_annotation_to_str(1),_ann_constant(1),_ann_name(1),_ann_attribute(1),_ann_subscript(1),_ann_tuple(1),_ann_binop(1),_infer_from_name(1),_infer_arg_type(1)  # Extract and infer type information from Python source files...
-  code2llm/analysis/call_graph.py:
-    e: CallGraphExtractor
-    CallGraphExtractor(ast.NodeVisitor): __init__(1),extract(3),_calculate_metrics(0),visit_Import(1),visit_ImportFrom(1),visit_ClassDef(1),visit_FunctionDef(1),visit_AsyncFunctionDef(1),visit_Call(1),_qualified_name(1),_resolve_call(1),_resolve_with_astroid(1),_expr_to_str(1)  # Extract call graph from AST...
   code2llm/core/large_repo.py:
     e: SubProject,HierarchicalRepoSplitter,should_use_chunking,get_analysis_plan
     SubProject:  # Represents a sub-project within a larger repository...
@@ -416,6 +404,9 @@ Sections: P...
 Stra...
     should_use_chunking(project_path;size_threshold_kb)
     get_analysis_plan(project_path;size_limit_kb)
+  code2llm/analysis/call_graph.py:
+    e: CallGraphExtractor
+    CallGraphExtractor(ast.NodeVisitor): __init__(1),extract(3),_calculate_metrics(0),visit_Import(1),visit_ImportFrom(1),visit_ClassDef(1),visit_FunctionDef(1),visit_AsyncFunctionDef(1),visit_Call(1),_qualified_name(1),_resolve_call(1),_resolve_with_astroid(1),_expr_to_str(1)  # Extract call graph from AST...
   code2llm/patterns/detector.py:
     e: PatternDetector
     PatternDetector: __init__(1),detect_patterns(1),_detect_recursion(1),_detect_state_machines(1),_detect_factory_pattern(1),_detect_singleton(1),_detect_strategy_pattern(1),_check_returns_classes(2)  # Detect behavioral patterns in code...
@@ -503,13 +494,6 @@ Stra...
   code2llm/exporters/toon/module_detail.py:
     e: ModuleDetailRenderer
     ModuleDetailRenderer: render_details(1),_rank_modules_by_cc(1),_render_module_detail(4),_get_module_exports(2),_render_module_classes(4),_get_method_items(2),_find_root_method(1),_render_standalone_funcs(3),_render_call_chain(5)  # Renders detailed module information...
-  examples/streaming-analyzer/sample_project/utils.py:
-    e: validate_input,format_output,calculate_metrics,filter_data,transform_data
-    validate_input(data)
-    format_output(data)
-    calculate_metrics(data)
-    filter_data(data;criteria)
-    transform_data(data;transformations)
   benchmarks/reporting.py:
     e: _print_header,_print_scores_table,_print_problems_detail,_print_pipelines_detail,_print_structural_features,_print_gap_analysis,print_results,build_report,save_report
     _print_header()
@@ -521,26 +505,6 @@ Stra...
     print_results(scores)
     build_report(scores)
     save_report(report;filename)
-  examples/functional_refactoring_example.py:
-    e: TemplateGenerator,CommandContext,CommandResult,EntityPreparer,ShellEntityPreparer,DockerEntityPreparer,SQLEntityPreparer,KubernetesEntityPreparer,EntityPreparationPipeline,Template,TemplateLoader,TemplateRenderer,CommandGenerator,CacheEntry,EvolutionaryCache,generate
-    TemplateGenerator: __init__(0),generate(3),_prepare_shell_entities(0),_prepare_docker_entities(0),_prepare_sql_entities(0),_prepare_kubernetes_entities(0),_apply_shell_find_flags(0),_build_shell_find_name_flag(0),_build_shell_find_size_flag(0)  # Original - handles EVERYTHING: loading, matching, rendering,...
-    CommandContext:  # Context for command generation...
-    CommandResult:  # Result of command generation...
-    EntityPreparer(Protocol): supports(1),prepare(3)  # Protocol for domain-specific entity preparation...
-    ShellEntityPreparer: supports(1),prepare(3),_apply_path_defaults(4),_apply_pattern_defaults(2),_apply_find_flags(3)  # Prepares entities for shell commands...
-    DockerEntityPreparer: supports(1),prepare(3),_resolve_container_name(1)  # Prepares entities for docker commands...
-    SQLEntityPreparer: supports(1),prepare(3),_sanitize_identifier(1),_sanitize_columns(1)  # Prepares entities for SQL commands...
-    KubernetesEntityPreparer: supports(1),prepare(3)  # Prepares entities for kubernetes commands...
-    EntityPreparationPipeline: __init__(0),prepare(3)  # Coordinates entity preparation across domains...
-    Template:  # Command template...
-    TemplateLoader: __init__(1),load(0),_load_templates(0),_load_defaults(0),get_template(1),get_default(2),find_alternative_template(2)  # Loads templates from various sources...
-    TemplateRenderer: render(2),_manual_render(2),render_with_conditionals(2)  # Renders templates with entity substitution...
-    CommandGenerator: __init__(3),generate(3)  # Generates commands from natural language intents...
-    CacheEntry:  # Single cache entry with evolution metadata...
-    EvolutionaryCache: __init__(2),_load(0),_save(0),get(2),put(3),report_success(2),report_failure(2),_make_key(2),_calculate_score(1),_evict_worst(0)  # Cache that evolves based on usage patterns.
-
-Unlike simple L...
-    generate(query;intent;dry_run;cache_dir)
   benchmarks/benchmark_performance.py:
     e: save_report,create_test_project,benchmark_original_analyzer,benchmark_streaming_analyzer,benchmark_with_strategies,print_comparison,main
     save_report(results;filename)
@@ -567,11 +531,6 @@ Unlike simple L...
     _handle_code2logic_error(res;cmd)
     _find_code2logic_output(output_dir;res)
     _normalize_code2logic_output(found;target;args)
-  examples/streaming-analyzer/sample_project/main.py:
-    e: UserRequest,Application,main
-    UserRequest:  # User request data structure...
-    Application: __init__(0),start(0),get_next_request(0),process_request(1),handle_get_request(1),handle_set_request(1),handle_delete_request(1),handle_default_request(1)  # Main application class with multiple responsibilities...
-    main()
   benchmarks/format_evaluator.py:
     e: FormatScore,_detect_problems,_detect_pipelines,_detect_hub_types,_check_structural_features,evaluate_format
     FormatScore:  # Wynik oceny pojedynczego formatu...
@@ -589,21 +548,11 @@ Unlike simple L...
   code2llm/core/streaming/incremental.py:
     e: IncrementalAnalyzer
     IncrementalAnalyzer: __init__(1),_load_state(0),_save_state(1),get_changed_files(1),_get_module_name(2)  # Incremental analysis with change detection...
-  examples/streaming-analyzer/sample_project/api.py:
-    e: APIHandler
-    APIHandler: __init__(0),process_request(1),_check_rate_limit(1),_get_stats(0),_get_user_info(1),_health_check(0),format_response(1)  # Handles API requests and responses...
-  examples/streaming-analyzer/demo.py:
-    e: demo_quick_strategy,demo_standard_strategy,demo_deep_strategy,demo_incremental_analysis,demo_memory_limited,demo_custom_progress,main
-    demo_quick_strategy()
-    demo_standard_strategy()
-    demo_deep_strategy()
-    demo_incremental_analysis()
-    demo_memory_limited()
-    demo_custom_progress()
-    main()
-  examples/streaming-analyzer/sample_project/database.py:
-    e: DatabaseConnection
-    DatabaseConnection: __init__(1),_load_data(0),_save_data(0),get_user(1),get_user_settings(1),get_user_logs(1),update_user_settings(2),update_user_profile(2),delete_user(1),clear_user_data(1),create_user(1),_log_action(3),get_stats(0)  # Simple database connection simulator...
+  badges/server.py:
+    e: index,generate_badges,get_badges
+    index()
+    generate_badges()
+    get_badges()
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()
@@ -613,11 +562,6 @@ Unlike simple L...
     update_pyproject_toml(new_version)
     update_version_file(new_version)
     main()
-  badges/server.py:
-    e: index,generate_badges,get_badges
-    index()
-    generate_badges()
-    get_badges()
   benchmarks/benchmark_format_quality.py:
     e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
     _print_benchmark_header()
@@ -631,11 +575,6 @@ Unlike simple L...
   code2llm/core/streaming/cache.py:
     e: StreamingFileCache
     StreamingFileCache: __init__(2),_get_cache_key(2),_evict_if_needed(0),get(2),put(3)  # Memory-efficient cache with LRU eviction...
-  examples/litellm/run.py:
-    e: run_analysis,get_refactoring_advice,main
-    run_analysis(project_path)
-    get_refactoring_advice(outputs;model)
-    main()
   code2llm/__init__.py:
     e: __getattr__
     __getattr__(name)
@@ -648,9 +587,6 @@ Unlike simple L...
   code2llm/exporters/report_generators.py:
     e: load_project_yaml
     load_project_yaml(path)
-  examples/streaming-analyzer/sample_project/auth.py:
-    e: AuthManager
-    AuthManager: __init__(0),_hash(1),authenticate(2),_verify_password(2),create_session(1),validate_session(1),revoke_session(1),get_user_role(1),has_permission(3),list_active_sessions(0)  # Manages user authentication and authorization...
   setup.py:
     e: read_readme
     read_readme()
@@ -658,10 +594,10 @@ Unlike simple L...
     e: analyze,analyze_file
     analyze(project_path;config)
     analyze_file(file_path;config)
-  demo_langs/valid/sample.php:
+  demo_langs/valid/sample.rs:
     e: User,UserService
-    User: __construct(-1)
-    UserService: addUser(-1),getUser(-1),processUsers(-1)
+    User:
+    UserService:
   code2llm/analysis/__init__.py:
     e: __getattr__
     __getattr__(name)
@@ -713,5 +649,4 @@ Unlike simple L...
     e: ScanStrategy
     ScanStrategy:  # Scanning methodology configuration...
   code2llm/core/core/lang/__init__.py:
-  examples/streaming-analyzer/sample_project/__init__.py:
   project.sh:

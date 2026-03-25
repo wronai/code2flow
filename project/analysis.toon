@@ -1,5 +1,5 @@
-# code2llm | 113f 20563L | python:106,php:1,shell:1 | 2026-03-25
-# CC̄=4.6 | critical:12/891 | dups:0 | cycles:0
+# code2llm | 113f 20681L | python:106,rust:1,shell:1 | 2026-03-25
+# CC̄=4.6 | critical:12/895 | dups:0 | cycles:0
 
 HEALTH[12]:
   🟡 CC    main CC=17 (limit:15)
@@ -8,16 +8,31 @@ HEALTH[12]:
   🟡 CC    _render_header CC=16 (limit:15)
   🟡 CC    _export_chunked_results CC=17 (limit:15)
   🟡 CC    extract_calls_regex CC=16 (limit:15)
-  🟡 CC    analyze_cpp CC=20 (limit:15)
   🟡 CC    analyze_ruby CC=19 (limit:15)
-  🟡 CC    analyze_csharp CC=20 (limit:15)
+  🟡 CC    analyze_cpp CC=20 (limit:15)
   🟡 CC    analyze_php CC=29 (limit:15)
+  🟡 CC    analyze_csharp CC=20 (limit:15)
   🟡 CC    analyze_java CC=15 (limit:15)
   🟡 CC    analyze_typescript_js CC=41 (limit:15)
 
+REFACTOR[1]:
+  1. split 12 high-CC methods  (CC>15)
+
+PIPELINES[615]:
+  [1] Src [run_benchmark]: run_benchmark → load_previous
+      PURITY: 100% pure
+  [2] Src [read_readme]: read_readme
+      PURITY: 100% pure
+  [3] Src [main]: main → load_file → is_toon_file
+      PURITY: 100% pure
+  [4] Src [save_report]: save_report
+      PURITY: 100% pure
+  [5] Src [__init__]: __init__
+      PURITY: 100% pure
+
 LAYERS:
   code2llm/                       CC̄=4.8    ←in:0  →out:5
-  │ !! index_generator            752L  1C    7m  CC=5      ←0
+  │ !! index_generator            777L  1C    7m  CC=5      ←0
   │ !! project_yaml_exporter      513L  1C   18m  CC=13     ←0
   │ !! html_dashboard             504L  1C   14m  CC=7      ←0
   │ !! metrics                    501L  1C   27m  CC=12     ←0
@@ -26,14 +41,14 @@ LAYERS:
   │ !! pipeline_detector          486L  3C   14m  CC=18     ←0
   │ mermaid                    485L  0C   16m  CC=13     ←1
   │ llm_flow                   472L  1C   24m  CC=14     ←0
+  │ renderer                   471L  1C   26m  CC=11     ←0
   │ file_analyzer              398L  1C   17m  CC=12     ←0
   │ flow_exporter              391L  1C   14m  CC=10     ←0
   │ pipeline                   388L  3C   20m  CC=10     ←0
-  │ renderer                   385L  1C   22m  CC=11     ←0
   │ evolution_exporter         350L  1C   15m  CC=10     ←0
   │ analyzer                   328L  1C    9m  CC=14     ←0
+  │ !! map_exporter               327L  1C   17m  CC=16     ←4
   │ entity_resolution          326L  3C   16m  CC=13     ←0
-  │ !! map_exporter               326L  1C   17m  CC=16     ←4
   │ side_effects               324L  2C   17m  CC=14     ←0
   │ type_inference             321L  1C   19m  CC=9      ←0
   │ cli_analysis               313L  0C   11m  CC=14     ←1
@@ -90,10 +105,10 @@ LAYERS:
   │ cli                         69L  0C    1m  CC=7      ←0
   │ strategies                  68L  1C    0m  CC=0.0    ←0
   │ file_cache                  62L  1C    6m  CC=4      ←0
+  │ __init__                    58L  1C    3m  CC=1      ←0
   │ file_filter                 58L  1C    3m  CC=10     ←0
   │ __init__                    55L  0C    0m  CC=0.0    ←0
   │ __init__                    52L  0C    1m  CC=3      ←0
-  │ __init__                    52L  1C    3m  CC=1      ←0
   │ cache                       51L  1C    5m  CC=4      ←0
   │ __init__                    48L  0C    0m  CC=0.0    ←0
   │ __init__                    44L  0C    1m  CC=3      ←0
@@ -134,7 +149,7 @@ LAYERS:
   │ server                     110L  0C    3m  CC=4      ←0
   │
   demo_langs/                     CC̄=1.5    ←in:0  →out:0
-  │ sample.rs                   47L  1C    5m  CC=2      ←0
+  │ sample.rs                   47L  2C    5m  CC=2      ←0
   │ sample.java                 47L  2C    3m  CC=2      ←0
   │ sample.go                   46L  0C    4m  CC=3      ←0
   │ sample.php                  44L  2C    4m  CC=2      ←2
@@ -155,3 +170,7 @@ COUPLING:
          validate_toon                                                                                                             2                    ──                      
    code2llm.generators                    ←1                                                                                                                                  ──
   CYCLES: none
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

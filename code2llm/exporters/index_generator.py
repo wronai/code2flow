@@ -28,6 +28,12 @@ class IndexHTMLGenerator:
         '.go': {'icon': '🐹', 'type': 'code', 'name': 'Go'},
         '.rs': {'icon': '🦀', 'type': 'code', 'name': 'Rust'},
         '.java': {'icon': '☕', 'type': 'code', 'name': 'Java'},
+        '.png': {'icon': '🖼️', 'type': 'image', 'name': 'Image'},
+        '.jpg': {'icon': '🖼️', 'type': 'image', 'name': 'Image'},
+        '.jpeg': {'icon': '🖼️', 'type': 'image', 'name': 'Image'},
+        '.gif': {'icon': '🖼️', 'type': 'image', 'name': 'Image'},
+        '.svg': {'icon': '🖼️', 'type': 'image', 'name': 'Image'},
+        '.webp': {'icon': '🖼️', 'type': 'image', 'name': 'Image'},
     }
 
     def __init__(self, output_dir: Path):
@@ -535,6 +541,22 @@ class IndexHTMLGenerator:
             background: transparent;
         }}
         
+        /* Image preview styles */
+        .image-preview {{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }}
+        
+        .image-preview img {{
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }}
+        
         /* Mobile responsive */
         @media (max-width: 768px) {{
             .container {{
@@ -694,6 +716,9 @@ class IndexHTMLGenerator:
             }} else if (file.type === 'html') {{
                 // For HTML files, show in iframe for safety
                 body.innerHTML = `<iframe src="${{file.rel_path}}" style="width:100%;height:100%;border:none;border-radius:0.5rem;"></iframe>`;
+            }} else if (file.type === 'image') {{
+                // For images, display the actual image
+                body.innerHTML = `<div class="image-preview"><img src="${{file.rel_path}}" alt="${{file.name}}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:0.5rem;"></div>`;
             }} else if (file.type === 'mermaid') {{
                 // Render mermaid diagram
                 const diagramId = 'mermaid-diagram-' + Date.now();

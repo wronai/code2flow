@@ -105,13 +105,13 @@ class TestToonExporterV2:
         assert "HEALTH[" in content
     
     def test_refactor_section(self, sample_result, tmp_path):
-        """REFACTOR section should no longer be present in analysis.toon."""
+        """REFACTOR section should be present in analysis.toon with actionable steps."""
         exporter = ToonExporter()
         output_file = tmp_path / "test.toon"
         exporter.export(sample_result, str(output_file))
         
         content = output_file.read_text()
-        assert "REFACTOR[" not in content
+        assert "REFACTOR[" in content
     
     def test_layers_section(self, sample_result, tmp_path):
         """Test LAYERS section shows package structure."""

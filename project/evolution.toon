@@ -6,8 +6,8 @@ NEXT[10] (ranked by impact):
       EFFORT: ~4h  IMPACT: 3864
 
   [2] !! SPLIT           code2llm/exporters/index_generator.py
-      WHY: 721L, 1 classes, max CC=5
-      EFFORT: ~4h  IMPACT: 3605
+      WHY: 752L, 1 classes, max CC=5
+      EFFORT: ~4h  IMPACT: 3760
 
   [3] !! SPLIT-FUNC      analyze_typescript_js  CC=41  fan=41
       WHY: CC=41 exceeds 15
