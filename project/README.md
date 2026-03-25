@@ -125,7 +125,7 @@ grep "SIDE_EFFECTS" flow.toon
 **Key sections**:
 - **MODULES**: All modules with basic stats
 - **IMPORTS**: Dependency relationships
-- **EXPORTS**: Public API surface and signatures
+- **e:** Public API exports and signatures
 - **HEADER**: Stats, alerts, hotspots, evolution trend
 
 **Example usage**:
@@ -134,7 +134,7 @@ grep "SIDE_EFFECTS" flow.toon
 cat map.toon | head -50
 
 # Find public APIs
-grep "SIGNATURES" map.toon
+grep "^    e:" map.toon
 ```
 
 ### `project.toon` - Legacy Project Logic (Deprecated)
