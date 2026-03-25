@@ -1,4 +1,4 @@
-# code2llm | 114f 20752L | python:106,shell:2,php:1 | 2026-03-25
+# code2llm | 113f 20760L | python:105,shell:2,php:1 | 2026-03-25
 # CC̄=4.6 | critical:12/895 | dups:0 | cycles:0
 
 HEALTH[12]:
@@ -10,24 +10,24 @@ HEALTH[12]:
   🟡 CC    analyze_ruby CC=19 (limit:15)
   🟡 CC    extract_calls_regex CC=16 (limit:15)
   🟡 CC    analyze_cpp CC=20 (limit:15)
+  🟡 CC    analyze_php CC=29 (limit:15)
   🟡 CC    analyze_java CC=15 (limit:15)
   🟡 CC    analyze_csharp CC=20 (limit:15)
-  🟡 CC    analyze_php CC=29 (limit:15)
   🟡 CC    analyze_typescript_js CC=41 (limit:15)
 
 REFACTOR[1]:
   1. split 12 high-CC methods  (CC>15)
 
 PIPELINES[615]:
-  [1] Src [read_readme]: read_readme
+  [1] Src [run_benchmark]: run_benchmark → load_previous
       PURITY: 100% pure
-  [2] Src [run_benchmark]: run_benchmark → load_previous
+  [2] Src [save_report]: save_report
       PURITY: 100% pure
-  [3] Src [save_report]: save_report
+  [3] Src [read_readme]: read_readme
       PURITY: 100% pure
   [4] Src [main]: main → load_file → is_toon_file
       PURITY: 100% pure
-  [5] Src [__init__]: __init__
+  [5] Src [main]: main → create_html → get_shield_url
       PURITY: 100% pure
 
 LAYERS:
@@ -46,7 +46,7 @@ LAYERS:
   │ flow_exporter              391L  1C   14m  CC=10     ←0
   │ pipeline                   388L  3C   20m  CC=10     ←0
   │ evolution_exporter         350L  1C   15m  CC=10     ←0
-  │ analyzer                   328L  1C    9m  CC=14     ←0
+  │ analyzer                   333L  1C    9m  CC=14     ←0
   │ !! map_exporter               327L  1C   17m  CC=16     ←4
   │ entity_resolution          326L  3C   16m  CC=13     ←0
   │ side_effects               324L  2C   17m  CC=14     ←0
@@ -105,13 +105,13 @@ LAYERS:
   │ cli                         69L  0C    1m  CC=7      ←0
   │ strategies                  68L  1C    0m  CC=0.0    ←0
   │ file_cache                  62L  1C    6m  CC=4      ←0
-  │ __init__                    58L  1C    3m  CC=1      ←0
   │ file_filter                 58L  1C    3m  CC=10     ←0
+  │ __init__                    58L  1C    3m  CC=1      ←0
   │ __init__                    55L  0C    0m  CC=0.0    ←0
+  │ __init__                    53L  0C    1m  CC=6      ←0
   │ __init__                    52L  0C    1m  CC=3      ←0
   │ cache                       51L  1C    5m  CC=4      ←0
   │ __init__                    48L  0C    0m  CC=0.0    ←0
-  │ __init__                    44L  0C    1m  CC=3      ←0
   │ report_generators           34L  0C    1m  CC=3      ←1
   │ __init__                    33L  0C    1m  CC=2      ←0
   │ flow_constants              29L  0C    0m  CC=0.0    ←0
@@ -123,7 +123,6 @@ LAYERS:
   │ __init__                    11L  0C    0m  CC=0.0    ←0
   │ __init__                     7L  0C    0m  CC=0.0    ←0
   │ __main__                     6L  0C    0m  CC=0.0    ←0
-  │ __init__                     6L  0C    0m  CC=0.0    ←0
   │ __init__                     0L  0C    0m  CC=0.0    ←0
   │ __init__                     0L  0C    0m  CC=0.0    ←0
   │

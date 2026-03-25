@@ -21,7 +21,7 @@ class RefactoringAnalyzer:
             print("Performing refactoring analysis...")
             
         # 1. Calculate metrics (fan-in/fan-out)
-        from ...analysis.call_graph import CallGraphExtractor
+        from ..analysis.call_graph import CallGraphExtractor
         cg_ext = CallGraphExtractor(self.config)
         cg_ext.result = result
         cg_ext._calculate_metrics()
@@ -122,13 +122,13 @@ class RefactoringAnalyzer:
 
     def _analyze_coupling(self, result: AnalysisResult) -> None:
         """Analyze coupling between modules."""
-        from ...analysis.coupling import CouplingAnalyzer
+        from ..analysis.coupling import CouplingAnalyzer
         coupling_analyzer = CouplingAnalyzer(result)
         coupling_analyzer.analyze()
 
     def _detect_smells(self, result: AnalysisResult) -> None:
         """Detect code smells."""
-        from ...analysis.smells import SmellDetector
+        from ..analysis.smells import SmellDetector
         smell_detector = SmellDetector(result)
         smell_detector.detect()
 

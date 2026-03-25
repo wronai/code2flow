@@ -4,11 +4,11 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Primary Language**: python
-- **Languages**: python: 115, shell: 2, php: 1
+- **Languages**: python: 114, shell: 2, php: 1
 - **Analysis Mode**: static
 - **Total Functions**: 895
 - **Total Classes**: 106
-- **Modules**: 118
+- **Modules**: 117
 - **Entry Points**: 671
 
 ## Architecture by Module
@@ -68,15 +68,15 @@
 - **Classes**: 1
 - **File**: `cfg.py`
 
+### code2llm.core.file_analyzer
+- **Functions**: 17
+- **Classes**: 1
+- **File**: `file_analyzer.py`
+
 ### code2llm.exporters.map_exporter
 - **Functions**: 17
 - **Classes**: 1
 - **File**: `map_exporter.py`
-
-### code2llm.core.core.file_analyzer
-- **Functions**: 17
-- **Classes**: 1
-- **File**: `file_analyzer.py`
 
 ### code2llm.nlp.entity_resolution
 - **Functions**: 16
@@ -96,15 +96,15 @@
 - **Classes**: 3
 - **File**: `intent_matching.py`
 
-### code2llm.exporters.evolution_exporter
-- **Functions**: 15
-- **Classes**: 1
-- **File**: `evolution_exporter.py`
-
 ### code2llm.exporters.context_exporter
 - **Functions**: 15
 - **Classes**: 1
 - **File**: `context_exporter.py`
+
+### code2llm.exporters.evolution_exporter
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `evolution_exporter.py`
 
 ### code2llm.generators.llm_task
 - **Functions**: 15
@@ -350,15 +350,15 @@ Keys: M=modules, D=details, i=im
 - **Methods**: 16
 - **Key Methods**: code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_flow, code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_structures, code2llm.analysis.data_analysis.DataAnalyzer._find_data_pipelines, code2llm.analysis.data_analysis.DataAnalyzer._find_state_patterns, code2llm.analysis.data_analysis.DataAnalyzer._find_data_dependencies, code2llm.analysis.data_analysis.DataAnalyzer._find_event_flows, code2llm.analysis.data_analysis.DataAnalyzer._detect_types_from_name, code2llm.analysis.data_analysis.DataAnalyzer._create_type_entry, code2llm.analysis.data_analysis.DataAnalyzer._update_type_stats, code2llm.analysis.data_analysis.DataAnalyzer._analyze_data_types
 
+### code2llm.core.file_analyzer.FileAnalyzer
+> Analyzes a single file.
+- **Methods**: 16
+- **Key Methods**: code2llm.core.file_analyzer.FileAnalyzer.__init__, code2llm.core.file_analyzer.FileAnalyzer.analyze_file, code2llm.core.file_analyzer.FileAnalyzer._analyze_python, code2llm.core.file_analyzer.FileAnalyzer._analyze_ast, code2llm.core.file_analyzer.FileAnalyzer._calculate_complexity, code2llm.core.file_analyzer.FileAnalyzer._perform_deep_analysis, code2llm.core.file_analyzer.FileAnalyzer._process_class, code2llm.core.file_analyzer.FileAnalyzer._process_function, code2llm.core.file_analyzer.FileAnalyzer._build_cfg, code2llm.core.file_analyzer.FileAnalyzer._process_cfg_block
+
 ### code2llm.nlp.pipeline.NLPPipeline
 > Main NLP processing pipeline (4a-4e).
 - **Methods**: 16
 - **Key Methods**: code2llm.nlp.pipeline.NLPPipeline.__init__, code2llm.nlp.pipeline.NLPPipeline.process, code2llm.nlp.pipeline.NLPPipeline._step_normalize, code2llm.nlp.pipeline.NLPPipeline._step_match_intent, code2llm.nlp.pipeline.NLPPipeline._step_resolve_entities, code2llm.nlp.pipeline.NLPPipeline._infer_entity_types, code2llm.nlp.pipeline.NLPPipeline._calculate_overall_confidence, code2llm.nlp.pipeline.NLPPipeline._calculate_entity_confidence, code2llm.nlp.pipeline.NLPPipeline._apply_fallback, code2llm.nlp.pipeline.NLPPipeline._format_action
-
-### code2llm.core.core.file_analyzer.FileAnalyzer
-> Analyzes a single file.
-- **Methods**: 16
-- **Key Methods**: code2llm.core.core.file_analyzer.FileAnalyzer.__init__, code2llm.core.core.file_analyzer.FileAnalyzer.analyze_file, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_python, code2llm.core.core.file_analyzer.FileAnalyzer._analyze_ast, code2llm.core.core.file_analyzer.FileAnalyzer._calculate_complexity, code2llm.core.core.file_analyzer.FileAnalyzer._perform_deep_analysis, code2llm.core.core.file_analyzer.FileAnalyzer._process_class, code2llm.core.core.file_analyzer.FileAnalyzer._process_function, code2llm.core.core.file_analyzer.FileAnalyzer._build_cfg, code2llm.core.core.file_analyzer.FileAnalyzer._process_cfg_block
 
 ### code2llm.analysis.side_effects.SideEffectDetector
 > Detect side effects in Python functions via AST analysis.
@@ -367,18 +367,18 @@ Scans function bodies for IO operations,
 - **Methods**: 15
 - **Key Methods**: code2llm.analysis.side_effects.SideEffectDetector.__init__, code2llm.analysis.side_effects.SideEffectDetector.analyze_function, code2llm.analysis.side_effects.SideEffectDetector.analyze_all, code2llm.analysis.side_effects.SideEffectDetector.get_purity_score, code2llm.analysis.side_effects.SideEffectDetector._scan_node, code2llm.analysis.side_effects.SideEffectDetector._check_calls, code2llm.analysis.side_effects.SideEffectDetector._check_assignments, code2llm.analysis.side_effects.SideEffectDetector._check_globals, code2llm.analysis.side_effects.SideEffectDetector._check_yield, code2llm.analysis.side_effects.SideEffectDetector._check_delete
 
-### code2llm.exporters.evolution_exporter.EvolutionExporter
-> Export evolution.toon — prioritized refactoring queue.
-- **Methods**: 15
-- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
-- **Inherits**: Exporter
-
 ### code2llm.exporters.context_exporter.ContextExporter
 > Export LLM-ready analysis summary with architecture and flows.
 
 Output: context.md — architecture na
 - **Methods**: 15
 - **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._detect_languages, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns
+- **Inherits**: Exporter
+
+### code2llm.exporters.evolution_exporter.EvolutionExporter
+> Export evolution.toon — prioritized refactoring queue.
+- **Methods**: 15
+- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
 - **Inherits**: Exporter
 
 ### code2llm.nlp.entity_resolution.EntityResolver
@@ -486,14 +486,6 @@ Checks:
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
-### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
-> Process large directories with file-level chunking.
-- **Output to**: self._chunk_by_files, chunks.extend
-
-### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
-> Process Python files directly in level1 directory.
-- **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
-
 ### code2llm.core.repo_files._get_gitignore_parser
 > Load gitignore parser for project if available.
 - **Output to**: code2llm.core.gitignore.load_gitignore_patterns
@@ -508,25 +500,33 @@ Checks:
 Returns list of (module_name, start_line, end_line).
 - **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
 
+### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
+> Process large directories with file-level chunking.
+- **Output to**: self._chunk_by_files, chunks.extend
+
+### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
+> Process Python files directly in level1 directory.
+- **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
+
 ### code2llm.analysis.cfg.CFGExtractor._format_except
 > Format except handler.
 - **Output to**: self._expr_to_str
 
-### code2llm.nlp.pipeline.NLPPipeline.process
-> Process query through full pipeline (4a-4e).
-- **Output to**: time.time, time.time, self._step_normalize, stages.append, time.time
+### code2llm.core.file_filter.FastFileFilter.should_process
+> Check if file should be processed.
+- **Output to**: file_path.lower, Path, self._gitignore_parser.is_ignored, any, fnmatch.fnmatch
 
-### code2llm.nlp.pipeline.NLPPipeline._format_action
-> 4e. Format action recommendation.
-- **Output to**: result.get_intent, result.get_entities
+### code2llm.core.file_analyzer.FileAnalyzer._process_class
+> Process class definition.
+- **Output to**: ClassInfo, None.classes.append, isinstance, isinstance, methods.append
 
-### code2llm.nlp.pipeline.NLPPipeline._format_response
-> 4e. Format human-readable response.
-- **Output to**: None.join, lines.append, lines.append, lines.append, result.get_intent
+### code2llm.core.file_analyzer.FileAnalyzer._process_function
+> Process function definition with limited CFG depth.
+- **Output to**: func_name.startswith, any, self._file_filter.should_skip_function, FunctionInfo, ast.walk
 
-### code2llm.nlp.pipeline.NLPPipeline.step_4e_format
-> Step 4e: Output formatting.
-- **Output to**: self._format_response
+### code2llm.core.file_analyzer.FileAnalyzer._process_cfg_block
+> Process a block of statements for CFG with depth limiting.
+- **Output to**: None.append, isinstance, None.append, FlowEdge, self._process_if_stmt
 
 ## Behavioral Patterns
 
@@ -549,25 +549,25 @@ Returns list of (module_name, start_line, end_line).
 
 Functions exposed as public API (no underscore prefix):
 
-- `code2llm.core.core.lang.typescript.analyze_typescript_js` - 67 calls
-- `code2llm.core.core.lang.php.analyze_php` - 53 calls
+- `code2llm.core.lang.typescript.analyze_typescript_js` - 67 calls
+- `code2llm.core.lang.php.analyze_php` - 53 calls
 - `validate_toon.main` - 45 calls
 - `code2llm.generators.llm_task.normalize_llm_task` - 43 calls
 - `code2llm.generators.llm_flow.render_llm_flow_md` - 42 calls
 - `benchmarks.benchmark_performance.main` - 41 calls
-- `code2llm.core.core.lang.java.analyze_java` - 40 calls
+- `code2llm.core.lang.java.analyze_java` - 40 calls
 - `validate_toon.analyze_class_differences` - 39 calls
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 39 calls
-- `code2llm.core.core.lang.ruby.analyze_ruby` - 37 calls
+- `code2llm.core.lang.ruby.analyze_ruby` - 37 calls
 - `benchmarks.benchmark_evolution.run_benchmark` - 34 calls
 - `code2llm.cli_parser.create_parser` - 34 calls
 - `code2llm.cli_commands.validate_chunked_output` - 34 calls
-- `code2llm.core.core.lang.csharp.analyze_csharp` - 34 calls
-- `code2llm.core.core.lang.rust.analyze_rust` - 31 calls
-- `code2llm.core.core.lang.cpp.analyze_cpp` - 31 calls
+- `code2llm.core.lang.csharp.analyze_csharp` - 34 calls
+- `code2llm.core.lang.rust.analyze_rust` - 31 calls
+- `code2llm.core.lang.cpp.analyze_cpp` - 31 calls
 - `benchmarks.benchmark_performance.create_test_project` - 29 calls
 - `code2llm.nlp.pipeline.NLPPipeline.process` - 29 calls
-- `code2llm.core.core.lang.go_lang.analyze_go` - 28 calls
+- `code2llm.core.lang.go_lang.analyze_go` - 28 calls
 - `validate_toon.compare_modules` - 26 calls
 - `code2llm.core.streaming_analyzer.StreamingAnalyzer.analyze_streaming` - 26 calls
 - `code2llm.exporters.mermaid_exporter.MermaidExporter.export_compact` - 26 calls
@@ -584,7 +584,7 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.cli_commands.generate_llm_context` - 21 calls
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_files` - 20 calls
 - `code2llm.exporters.evolution_exporter.EvolutionExporter.export` - 20 calls
-- `code2llm.core.core.lang.generic.analyze_generic` - 20 calls
+- `code2llm.core.lang.generic.analyze_generic` - 20 calls
 - `validate_toon.compare_classes` - 19 calls
 - `scripts.benchmark_badges.parse_evolution_metrics` - 19 calls
 - `code2llm.exporters.yaml_exporter.YAMLExporter.export_grouped` - 19 calls

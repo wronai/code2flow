@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.63] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/core/file_analyzer.py
+- Update code2llm/core/lang/base.py
+- Update code2llm/core/lang/cpp.py
+- Update code2llm/core/lang/csharp.py
+- Update code2llm/core/lang/java.py
+- Update code2llm/core/lang/php.py
+- Update code2llm/core/lang/ruby.py
+- Update code2llm/core/lang/typescript.py
+- Update code2llm/core/refactoring.py
+- Update project/analysis.json
+- ... and 11 more files
+
 ## [0.5.62] - 2026-03-25
 
 ### Docs

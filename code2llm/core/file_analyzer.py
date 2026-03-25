@@ -392,7 +392,7 @@ class FileAnalyzer:
 def _analyze_single_file(args):
     """Analyze single file - module level function for pickle compatibility."""
     file_path, module_name, config_dict = args
-    from ..config import Config
+    from code2llm.core.config import Config
     config = Config(**config_dict)
     analyzer = FileAnalyzer(config, None)
     return analyzer.analyze_file(file_path, module_name)
