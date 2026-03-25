@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.64] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/core/lang/base.py
+- Update project/analysis.json
+- Update project/analysis.toon
+- Update project/analysis.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/evolution.toon
+- Update project/flow.mmd
+- ... and 3 more files
+
 ## [0.5.63] - 2026-03-25
 
 ### Docs

@@ -1,4 +1,4 @@
-# code2llm/evolution | 895 func | 105f | 2026-03-25
+# code2llm/evolution | 897 func | 105f | 2026-03-25
 
 NEXT[10] (ranked by impact):
   [1] !! SPLIT           code2llm/exporters/index_generator.py
@@ -9,37 +9,37 @@ NEXT[10] (ranked by impact):
       WHY: 644L, 15 classes, max CC=6
       EFFORT: ~4h  IMPACT: 3864
 
-  [3] !! SPLIT-FUNC      analyze_typescript_js  CC=41  fan=41
-      WHY: CC=41 exceeds 15
-      EFFORT: ~1h  IMPACT: 1681
+  [3] !! SPLIT-FUNC      _extract_declarations  CC=62  fan=45
+      WHY: CC=62 exceeds 15
+      EFFORT: ~1h  IMPACT: 2790
 
-  [4] !! SPLIT-FUNC      analyze_php  CC=29  fan=35
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 1015
-
-  [5] !  SPLIT-FUNC      analyze_ruby  CC=19  fan=30
-      WHY: CC=19 exceeds 15
-      EFFORT: ~1h  IMPACT: 570
-
-  [6] !  SPLIT-FUNC      analyze_cpp  CC=20  fan=26
-      WHY: CC=20 exceeds 15
-      EFFORT: ~1h  IMPACT: 520
-
-  [7] !  SPLIT-FUNC      analyze_csharp  CC=20  fan=25
-      WHY: CC=20 exceeds 15
-      EFFORT: ~1h  IMPACT: 500
-
-  [8] !  SPLIT-FUNC      analyze_java  CC=15  fan=29
-      WHY: CC=15 exceeds 15
-      EFFORT: ~1h  IMPACT: 435
-
-  [9] !  SPLIT-FUNC      MapExporter._render_header  CC=16  fan=21
+  [4] !  SPLIT-FUNC      MapExporter._render_header  CC=16  fan=21
       WHY: CC=16 exceeds 15
       EFFORT: ~1h  IMPACT: 336
 
-  [10] !  SPLIT-FUNC      _export_chunked_results  CC=17  fan=16
+  [5] !  SPLIT-FUNC      analyze_ruby  CC=17  fan=19
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 323
+
+  [6] !  SPLIT-FUNC      _export_chunked_results  CC=17  fan=16
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 272
+
+  [7] !  SPLIT-FUNC      main  CC=17  fan=14
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 238
+
+  [8] !  SPLIT-FUNC      validate_chunked_output  CC=15  fan=14
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 210
+
+  [9] !  SPLIT-FUNC      extract_calls_regex  CC=16  fan=12
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 192
+
+  [10] !! SPLIT           tests/test_nonpython_cc_calls.py
+      WHY: 642L, 0 classes, max CC=0
+      EFFORT: ~4h  IMPACT: 0
 
 
 RISKS[3]:
@@ -48,11 +48,11 @@ RISKS[3]:
   ⚠ Splitting tests/test_nonpython_cc_calls.py may break 0 import paths
 
 METRICS-TARGET:
-  CC̄:          4.4 → ≤3.1
-  max-CC:      41 → ≤20
+  CC̄:          4.3 → ≤3.0
+  max-CC:      62 → ≤20
   god-modules: 6 → 0
-  high-CC(≥15): 12 → ≤6
+  high-CC(≥15): 8 → ≤4
   hub-types:   0 → ≤0
 
 HISTORY:
-  prev CC̄=0.0 → now CC̄=4.4
+  prev CC̄=4.4 → now CC̄=4.3

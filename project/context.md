@@ -6,7 +6,7 @@
 - **Primary Language**: python
 - **Languages**: python: 114, shell: 2, php: 1
 - **Analysis Mode**: static
-- **Total Functions**: 895
+- **Total Functions**: 897
 - **Total Classes**: 106
 - **Modules**: 117
 - **Entry Points**: 671
@@ -96,15 +96,15 @@
 - **Classes**: 3
 - **File**: `intent_matching.py`
 
-### code2llm.exporters.context_exporter
-- **Functions**: 15
-- **Classes**: 1
-- **File**: `context_exporter.py`
-
 ### code2llm.exporters.evolution_exporter
 - **Functions**: 15
 - **Classes**: 1
 - **File**: `evolution_exporter.py`
+
+### code2llm.exporters.context_exporter
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `context_exporter.py`
 
 ### code2llm.generators.llm_task
 - **Functions**: 15
@@ -367,18 +367,18 @@ Scans function bodies for IO operations,
 - **Methods**: 15
 - **Key Methods**: code2llm.analysis.side_effects.SideEffectDetector.__init__, code2llm.analysis.side_effects.SideEffectDetector.analyze_function, code2llm.analysis.side_effects.SideEffectDetector.analyze_all, code2llm.analysis.side_effects.SideEffectDetector.get_purity_score, code2llm.analysis.side_effects.SideEffectDetector._scan_node, code2llm.analysis.side_effects.SideEffectDetector._check_calls, code2llm.analysis.side_effects.SideEffectDetector._check_assignments, code2llm.analysis.side_effects.SideEffectDetector._check_globals, code2llm.analysis.side_effects.SideEffectDetector._check_yield, code2llm.analysis.side_effects.SideEffectDetector._check_delete
 
+### code2llm.exporters.evolution_exporter.EvolutionExporter
+> Export evolution.toon — prioritized refactoring queue.
+- **Methods**: 15
+- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
+- **Inherits**: Exporter
+
 ### code2llm.exporters.context_exporter.ContextExporter
 > Export LLM-ready analysis summary with architecture and flows.
 
 Output: context.md — architecture na
 - **Methods**: 15
 - **Key Methods**: code2llm.exporters.context_exporter.ContextExporter.export, code2llm.exporters.context_exporter.ContextExporter._get_overview, code2llm.exporters.context_exporter.ContextExporter._detect_languages, code2llm.exporters.context_exporter.ContextExporter._get_architecture_by_module, code2llm.exporters.context_exporter.ContextExporter._get_important_entries, code2llm.exporters.context_exporter.ContextExporter._get_key_entry_points, code2llm.exporters.context_exporter.ContextExporter._get_process_flows, code2llm.exporters.context_exporter.ContextExporter._get_key_classes, code2llm.exporters.context_exporter.ContextExporter._get_data_transformations, code2llm.exporters.context_exporter.ContextExporter._get_behavioral_patterns
-- **Inherits**: Exporter
-
-### code2llm.exporters.evolution_exporter.EvolutionExporter
-> Export evolution.toon — prioritized refactoring queue.
-- **Methods**: 15
-- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
 - **Inherits**: Exporter
 
 ### code2llm.nlp.entity_resolution.EntityResolver
@@ -490,15 +490,9 @@ Checks:
 > Load gitignore parser for project if available.
 - **Output to**: code2llm.core.gitignore.load_gitignore_patterns
 
-### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
-> Parse a single gitignore pattern into regex.
-- **Output to**: pattern.startswith, pattern.endswith, pattern.startswith, self._wildcard_to_regex, re.compile
-
-### code2llm.core.toon_size_manager._parse_modules
-> Parse module sections from TOON content.
-
-Returns list of (module_name, start_line, end_line).
-- **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
+### code2llm.analysis.cfg.CFGExtractor._format_except
+> Format except handler.
+- **Output to**: self._expr_to_str
 
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
@@ -508,9 +502,15 @@ Returns list of (module_name, start_line, end_line).
 > Process Python files directly in level1 directory.
 - **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
 
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
+### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
+> Parse a single gitignore pattern into regex.
+- **Output to**: pattern.startswith, pattern.endswith, pattern.startswith, self._wildcard_to_regex, re.compile
+
+### code2llm.core.toon_size_manager._parse_modules
+> Parse module sections from TOON content.
+
+Returns list of (module_name, start_line, end_line).
+- **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
 
 ### code2llm.core.file_filter.FastFileFilter.should_process
 > Check if file should be processed.
@@ -549,24 +549,20 @@ Returns list of (module_name, start_line, end_line).
 
 Functions exposed as public API (no underscore prefix):
 
-- `code2llm.core.lang.typescript.analyze_typescript_js` - 67 calls
-- `code2llm.core.lang.php.analyze_php` - 53 calls
 - `validate_toon.main` - 45 calls
 - `code2llm.generators.llm_task.normalize_llm_task` - 43 calls
 - `code2llm.generators.llm_flow.render_llm_flow_md` - 42 calls
 - `benchmarks.benchmark_performance.main` - 41 calls
-- `code2llm.core.lang.java.analyze_java` - 40 calls
 - `validate_toon.analyze_class_differences` - 39 calls
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 39 calls
-- `code2llm.core.lang.ruby.analyze_ruby` - 37 calls
 - `benchmarks.benchmark_evolution.run_benchmark` - 34 calls
 - `code2llm.cli_parser.create_parser` - 34 calls
 - `code2llm.cli_commands.validate_chunked_output` - 34 calls
-- `code2llm.core.lang.csharp.analyze_csharp` - 34 calls
+- `code2llm.core.lang.php.analyze_php` - 33 calls
 - `code2llm.core.lang.rust.analyze_rust` - 31 calls
-- `code2llm.core.lang.cpp.analyze_cpp` - 31 calls
 - `benchmarks.benchmark_performance.create_test_project` - 29 calls
 - `code2llm.nlp.pipeline.NLPPipeline.process` - 29 calls
+- `code2llm.core.lang.ruby.analyze_ruby` - 28 calls
 - `code2llm.core.lang.go_lang.analyze_go` - 28 calls
 - `validate_toon.compare_modules` - 26 calls
 - `code2llm.core.streaming_analyzer.StreamingAnalyzer.analyze_streaming` - 26 calls
@@ -589,6 +585,10 @@ Functions exposed as public API (no underscore prefix):
 - `scripts.benchmark_badges.parse_evolution_metrics` - 19 calls
 - `code2llm.exporters.yaml_exporter.YAMLExporter.export_grouped` - 19 calls
 - `code2llm.core.streaming.prioritizer.SmartPrioritizer.prioritize_files` - 19 calls
+- `code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file` - 19 calls
+- `examples.streaming-analyzer.demo.demo_incremental_analysis` - 19 calls
+- `code2llm.exporters.flow_renderer.FlowRenderer.render_pipelines` - 18 calls
+- `code2llm.generators.llm_flow.main` - 18 calls
 
 ## System Interactions
 

@@ -173,7 +173,13 @@ def _extract_declarations(
     for line_no, line in enumerate(lines, 1):
         raw_line = line
         line = line.strip()
-        if not line or line.startswith(('//', '/*', '*', '#')):
+        # Skip empty lines and comments, but NOT preprocessor directives like #include
+        if not line:
+            continue
+        if line.startswith(('//', '/*', '*')):
+            continue
+        # Skip # comments (Python, Ruby, shell) but NOT #include/#define (C-family)
+        if line.startswith('#') and not line.startswith('#include') and not line.startswith('#define'):
             continue
         
         if track_braces:
