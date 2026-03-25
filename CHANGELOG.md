@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.68] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_exports/formats.py
+- Update code2llm/cli_exports/prompt.py
+- Update code2llm/cli_parser.py
+- Update code2llm/exporters/__init__.py
+- Update code2llm/exporters/evolution_exporter.py
+- Update code2llm/exporters/flow_exporter.py
+- Update code2llm/exporters/map_exporter.py
+- Update code2llm/exporters/readme_exporter.py
+- Update code2llm/exporters/toon/metrics.py
+- Update code2llm/exporters/toon/module_detail.py
+- ... and 12 more files
+
 ## [0.5.67] - 2026-03-25
 
 ### Other

@@ -34,8 +34,8 @@ Examples:
 
 Format Options (-f):
   toon         — Health diagnostics (analysis.toon) [default]
-  map          — Structural map (map.toon) — modules, imports, exports, signatures, project header
-  evolution    — Refactoring queue (evolution.toon)
+  map          — Structural map (map.toon.yaml) — modules, imports, exports, signatures, project header
+  evolution    — Refactoring queue (evolution.toon.yaml)
   context      — LLM narrative (context.md) — architecture summary
   yaml         — Standard YAML format
   json         — Machine-readable JSON
@@ -43,7 +43,7 @@ Format Options (-f):
   flow         — Data-flow analysis (flow.toon) — legacy, explicit opt-in
   code2logic   — Generate project logic (legacy project.toon) via external code2logic
   project-yaml — Unified project.yaml (single source of truth) + generated views
-  all          — Generate core formats (analysis.toon, map.toon, evolution.toon, context, yaml, json, mermaid)
+  all          — Generate core formats (analysis.toon, map.toon.yaml, evolution.toon.yaml, context, yaml, json, mermaid)
 
 Strategy Options (--strategy):
   quick     — Fast overview, fewer files analyzed

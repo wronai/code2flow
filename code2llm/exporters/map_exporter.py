@@ -1,4 +1,4 @@
-"""Map Exporter — generates map.toon (structural map).
+"""Map Exporter — generates map.toon.yaml (structural map).
 
 Produces a compact project header plus a key:value structural map showing
 modules, imports, exports, and signatures.
@@ -29,7 +29,7 @@ EXCLUDE_PATTERNS = {
 
 
 class MapExporter(Exporter):
-    """Export to map.toon — structural map with a compact project header.
+    """Export to map.toon.yaml — structural map with a compact project header.
 
     Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions,
     m=methods
@@ -45,6 +45,89 @@ class MapExporter(Exporter):
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
+
+    def export_to_yaml(self, result: AnalysisResult, output_path: str, **kwargs) -> None:
+        """Export analysis result to map.toon.yaml format (structured YAML)."""
+        project_name = Path(result.project_path).name if result.project_path else "project"
+        langs = self._detect_languages(result)
+
+        included_funcs = [fi for fi in result.functions.values() if not self._is_excluded(fi.file)]
+        included_files = [mi for mi in result.modules.values() if not self._is_excluded(mi.file)]
+        total_lines = self._count_total_lines(result)
+
+        # Build modules data
+        modules_data = []
+        for mname, mi in sorted(result.modules.items()):
+            if self._is_excluded(mi.file):
+                continue
+            rel = self._rel_path(mi.file, result.project_path)
+            lc = self._file_line_count(mi.file)
+
+            # Get exports (classes and standalone functions)
+            exports = []
+            for cq in mi.classes:
+                ci = result.classes.get(cq)
+                if ci:
+                    exports.append({"type": "class", "name": ci.name})
+            for fq in mi.functions:
+                fi = result.functions.get(fq)
+                if fi and not fi.class_name:
+                    exports.append({"type": "function", "name": fi.name})
+
+            # Get classes with methods
+            classes_data = []
+            for cq in mi.classes:
+                ci = result.classes.get(cq)
+                if not ci:
+                    continue
+                methods = []
+                for mq in ci.methods:
+                    fi = result.functions.get(mq)
+                    if fi:
+                        arity = len(fi.args) - (1 if fi.is_method else 0)
+                        methods.append({"name": fi.name, "arity": arity})
+                classes_data.append({
+                    "name": ci.name,
+                    "bases": ci.bases,
+                    "methods": methods,
+                })
+
+            # Get standalone functions
+            functions_data = []
+            for fq in mi.functions:
+                fi = result.functions.get(fq)
+                if fi and not fi.class_name:
+                    functions_data.append({
+                        "name": fi.name,
+                        "args": [a for a in fi.args if a != "self"],
+                        "returns": fi.returns or None,
+                    })
+
+            modules_data.append({
+                "path": rel,
+                "lines": lc,
+                "imports": sorted(mi.imports) if mi.imports else [],
+                "exports": exports,
+                "classes": classes_data,
+                "functions": functions_data,
+            })
+
+        data = {
+            "format": "map-toon-yaml",
+            "project": project_name,
+            "timestamp": datetime.now().strftime("%Y-%m-%d"),
+            "stats": {
+                "files": len(included_files),
+                "lines": total_lines,
+                "functions": len(included_funcs),
+                "languages": langs,
+            },
+            "modules": modules_data,
+        }
+
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
     # ------------------------------------------------------------------
     # header

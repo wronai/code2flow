@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Tuple
 
-from ...core.models import AnalysisResult, FunctionInfo, ClassInfo, ModuleInfo
+from code2llm.core.models import AnalysisResult, FunctionInfo, ClassInfo, ModuleInfo
 
 from .helpers import _rel_path
 

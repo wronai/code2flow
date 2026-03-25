@@ -2,14 +2,14 @@ format: toon-v2-yaml
 timestamp: '2026-03-25'
 header:
   files: 113
-  lines: 21044
-  functions: 917
+  lines: 21128
+  functions: 918
   avg_cc: 4.6
-  critical_count: 11
+  critical_count: 12
   duplicates: 0
   cycles: 0
 health:
-  count: 11
+  count: 12
   status: issues_found
   issues:
   - severity: yellow
@@ -21,6 +21,9 @@ health:
   - severity: yellow
     code: CC
     message: _resolve_callee CC=18 (limit:15)
+  - severity: yellow
+    code: CC
+    message: export_to_yaml CC=25 (limit:15)
   - severity: yellow
     code: CC
     message: export_flow_compact CC=23 (limit:15)
@@ -48,7 +51,7 @@ health:
 refactor:
   steps:
   - action: split_methods
-    count: 11
+    count: 12
     reason: high_cc
 pipelines:
   count: 0

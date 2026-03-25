@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from ..exporters import (
+from code2llm.exporters import (
     YAMLExporter, JSONExporter, MermaidExporter,
     ContextExporter, ToonExporter, MapExporter, FlowExporter,
     EvolutionExporter, READMEExporter, ProjectYAMLExporter,
@@ -16,14 +16,14 @@ from ..exporters import (
 
 
 def _export_evolution(args, result, output_dir: Path):
-    """Export evolution.toon format."""
+    """Export evolution.toon.yaml format."""
     if 'evolution' not in [f.strip() for f in args.format.split(',')] and 'all' not in [f.strip() for f in args.format.split(',')]:
         return
     exporter = EvolutionExporter()
-    filepath = output_dir / 'evolution.toon'
-    exporter.export(result, str(filepath))
+    filepath = output_dir / 'evolution.toon.yaml'
+    exporter.export_to_yaml(result, str(filepath))
     if args.verbose:
-        print(f"  - EVOLUTION (refactoring queue): {filepath}")
+        print(f"  - EVOLUTION-YAML (refactoring queue): {filepath}")
 
 
 def _export_data_structures(args, result, output_dir: Path):
@@ -101,7 +101,7 @@ def _export_simple_formats(args, result, output_dir: Path, formats):
     """Export toon, map, flow, context, yaml, json, project-yaml formats."""
     format_map = {
         'toon': (ToonExporter, 'analysis.toon.yaml', 'TOON-YAML (diagnostics)'),
-        'map': (MapExporter, 'map.toon', 'MAP (structure + header)'),
+        'map': (MapExporter, 'map.toon.yaml', 'MAP-YAML (structure)'),
         'flow': (FlowExporter, 'flow.toon', 'FLOW (data-flow)'),
         'context': (ContextExporter, 'context.md', 'CONTEXT (LLM narrative)'),
     }
@@ -109,8 +109,8 @@ def _export_simple_formats(args, result, output_dir: Path, formats):
     for fmt, (exporter_cls, filename, label) in format_map.items():
         if fmt in formats:
             exporter = exporter_cls()
-            # For toon format, export as YAML (analysis.toon.yaml)
-            if fmt == 'toon':
+            # For toon and map formats, export as YAML
+            if fmt in ('toon', 'map'):
                 filepath = output_dir / filename
                 exporter.export_to_yaml(result, str(filepath))
                 if args.verbose:

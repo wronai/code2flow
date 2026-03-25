@@ -19,12 +19,12 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from .base import Exporter
 from .flow_constants import CC_HIGH, FAN_OUT_THRESHOLD, EXCLUDE_PATTERNS, HUB_SPLIT_RECOMMENDATIONS, HUB_TYPE_THRESHOLD
 from .flow_renderer import FlowRenderer
-from ..core.models import (
+from code2llm.core.models import (
     AnalysisResult, FunctionInfo, ClassInfo, ModuleInfo, FlowNode
 )
-from ..analysis.type_inference import TypeInferenceEngine
-from ..analysis.side_effects import SideEffectDetector, SideEffectInfo
-from ..analysis.pipeline_detector import PipelineDetector, Pipeline
+from code2llm.analysis.type_inference import TypeInferenceEngine
+from code2llm.analysis.side_effects import SideEffectDetector, SideEffectInfo
+from code2llm.analysis.pipeline_detector import PipelineDetector, Pipeline
 
 # Thresholds - already imported from flow_constants
 

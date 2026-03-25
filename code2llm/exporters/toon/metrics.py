@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict, List, Tuple, Set, Optional
 
-from ...core.models import AnalysisResult, FunctionInfo, ClassInfo
+from code2llm.core.models import AnalysisResult, FunctionInfo, ClassInfo
 
 from .helpers import _is_excluded, _rel_path, _package_of, _package_of_module, _scan_line_counts
 

@@ -3,8 +3,8 @@
 from typing import List, Dict, Set
 from collections import defaultdict
 
-from ..core.config import Config
-from ..core.models import AnalysisResult
+from code2llm.core.config import Config
+from code2llm.core.models import AnalysisResult
 
 
 class PatternDetector:

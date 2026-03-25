@@ -5,7 +5,7 @@ import tiktoken
 from tree_sitter import Language, Parser
 import tree_sitter_python
 from typing import List, Dict, Any, Optional
-from ..core.models import AnalysisResult, CodeSmell
+from code2llm.core.models import AnalysisResult, CodeSmell
 
 class PromptEngine:
     """Generate refactoring prompts from analysis results and detected smells."""

@@ -78,9 +78,9 @@ def _get_prompt_paths(source_path: Optional[Path], output_dir: Path) -> Tuple[st
 
 _MAIN_FILES = [
     ('analysis.toon', 'Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities'),
-    ('map.toon', 'Structural map - files, sizes, imports, exports, signatures, project header'),
+    ('map.toon.yaml', 'Structural map - files, sizes, imports, exports, signatures, project header'),
     ('context.md', 'LLM narrative - architecture summary, key entry points, process flows, public API surface'),
-    ('evolution.toon', 'Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history'),
+    ('evolution.toon.yaml', 'Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history'),
     ('README.md', 'Documentation - complete guide to all generated files, usage examples, interpretation'),
 ]
 
@@ -139,7 +139,7 @@ def _build_subprojects_section(subprojects: list, output_dir: Path, output_rel_p
         level_name = {0: 'root', 1: 'L1', 2: 'L2', 3: 'chunk'}.get(sp.level, f'L{sp.level}')
         sp_files = []
         total_size = 0
-        for f in ['analysis.toon', 'context.md', 'evolution.toon']:
+        for f in ['analysis.toon', 'context.md', 'evolution.toon.yaml']:
             f_path = sp_dir / f
             if f_path.exists():
                 size = f_path.stat().st_size
@@ -169,9 +169,9 @@ def _analyze_generated_files(output_dir: Path, subprojects: list = None) -> dict
     """Analyze which files were generated and determine appropriate focus areas."""
     analysis = {
         'has_analysis_toon': (output_dir / 'analysis.toon').exists(),
-        'has_map_toon': (output_dir / 'map.toon').exists(),
+        'has_map_toon': (output_dir / 'map.toon.yaml').exists(),
         'has_context_md': (output_dir / 'context.md').exists(),
-        'has_evolution_toon': (output_dir / 'evolution.toon').exists(),
+        'has_evolution_toon': (output_dir / 'evolution.toon.yaml').exists(),
         'has_readme': (output_dir / 'README.md').exists(),
         'has_yaml': (output_dir / 'analysis.yaml').exists(),
         'has_json': (output_dir / 'analysis.json').exists(),
@@ -196,10 +196,10 @@ def _build_dynamic_focus_areas(file_analysis: dict) -> List[str]:
         focus_areas.append("1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon")
 
     if file_analysis['has_map_toon']:
-        focus_areas.append("2. **Structural Map** - Use map.toon to inspect imports, exports, signatures, and the project header")
+        focus_areas.append("2. **Structural Map** - Use map.toon.yaml to inspect imports, exports, signatures, and the project header")
     
     if file_analysis['has_evolution_toon']:
-        focus_areas.append("3. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon")
+        focus_areas.append("3. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon.yaml")
     
     if file_analysis['has_context_md']:
         focus_areas.append("4. **Architecture Overview** - Understand main flows, entry points, and public API from context.md")
@@ -231,10 +231,10 @@ def _build_dynamic_tasks(file_analysis: dict) -> List[str]:
         tasks.append("- Highlight critical functions (CC ≥ 10) and top problem areas from analysis.toon.")
 
     if file_analysis['has_map_toon']:
-        tasks.append("- Cross-check imports, exports, and signatures against map.toon before proposing splits.")
+        tasks.append("- Cross-check imports, exports, and signatures against map.toon.yaml before proposing splits.")
     
     if file_analysis['has_evolution_toon']:
-        tasks.append("- Prioritize refactoring actions by impact/effort ratio from evolution.toon.")
+        tasks.append("- Prioritize refactoring actions by impact/effort ratio from evolution.toon.yaml.")
     
     if file_analysis['has_context_md']:
         tasks.append("- Validate entry points and public API surface match the architecture described.")
@@ -271,9 +271,9 @@ def _build_prompt_footer(chunked: bool = False, file_analysis: dict = None) -> L
         lines.append("")
         lines.append("Analysis Strategy:")
         if file_analysis['has_analysis_toon'] and file_analysis['has_map_toon']:
-            lines.append("- Start with analysis.toon for health metrics, then map.toon for structure and signatures")
+            lines.append("- Start with analysis.toon for health metrics, then map.toon.yaml for structure and signatures")
             if file_analysis['has_evolution_toon']:
-                lines.append("- Finish with evolution.toon for action priorities and next steps")
+                lines.append("- Finish with evolution.toon.yaml for action priorities and next steps")
         elif file_analysis['has_context_md']:
             lines.append("- Use context.md as the primary reference for architectural understanding")
         

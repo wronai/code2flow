@@ -68,8 +68,8 @@ class READMEExporter(BaseExporter):
             except Exception:
                 pass
         
-        # Check evolution.toon for refactoring plan
-        evolution_toon = output_dir / 'evolution.toon'
+        # Check evolution.toon.yaml for refactoring plan
+        evolution_toon = output_dir / 'evolution.toon.yaml'
         if evolution_toon.exists():
             try:
                 content = evolution_toon.read_text(encoding='utf-8')
@@ -169,7 +169,7 @@ cat analysis.toon | head -30
 grep "REFACTOR" analysis.toon
 ```
 
-### `evolution.toon` - Refactoring Queue
+### `evolution.toon.yaml` - Refactoring Queue
 **Purpose**: Step-by-step refactoring plan
 **Key sections**:
 - **NEXT**: Immediate actions to take
@@ -179,10 +179,10 @@ grep "REFACTOR" analysis.toon
 **Example usage**:
 ```bash
 # Get refactoring plan
-cat evolution.toon
+cat evolution.toon.yaml
 
 # Track progress
-grep "NEXT" evolution.toon
+grep "NEXT" evolution.toon.yaml
 ```
 
 ### `flow.toon` - Legacy Data Flow Analysis
@@ -201,7 +201,7 @@ grep "PIPELINES" flow.toon
 grep "SIDE_EFFECTS" flow.toon
 ```
 
-### `map.toon` - Structural Map + Project Header
+### `map.toon.yaml` - Structural Map + Project Header
 **Purpose**: High-level architecture overview plus compact project header
 **Key sections**:
 - **MODULES**: All modules with basic stats
@@ -212,10 +212,10 @@ grep "SIDE_EFFECTS" flow.toon
 **Example usage**:
 ```bash
 # See project structure
-cat map.toon | head -50
+cat map.toon.yaml | head -50
 
 # Find public APIs
-grep "SIGNATURES" map.toon
+grep "SIGNATURES" map.toon.yaml
 ```
 
 ### `project.toon` - Legacy Project Logic (Deprecated)
@@ -297,7 +297,7 @@ cat analysis.toon | grep -E "(HEALTH|REFACTOR)"
 ```bash
 # Get refactoring queue
 code2llm ./ -f evolution
-cat evolution.toon
+cat evolution.toon.yaml
 
 # Focus on specific issues
 code2llm ./ -f toon --refactor --smell god_function
@@ -376,7 +376,7 @@ cat docs/context.md >> README.md
 ## 📚 Next Steps
 
 1. **Review `analysis.toon`** - Identify critical issues
-2. **Check `evolution.toon`** - Plan refactoring priorities
+2. **Check `evolution.toon.yaml`** - Plan refactoring priorities
 3. **Use `context.md`** - Get LLM assistance for complex changes
 4. **Reference visualizations** - Understand system architecture
 5. **Track progress** - Re-run analysis after changes
@@ -424,9 +424,9 @@ For more information about code2llm, visit: https://github.com/tom-sapletta/code
         """Check which files exist in the output directory."""
         files_to_check = {
             'analysis.toon': 'Health diagnostics',
-            'evolution.toon': 'Refactoring queue',
+            'evolution.toon.yaml': 'Refactoring queue',
             'flow.toon': 'Data flow analysis',
-            'map.toon': 'Structural map',
+            'map.toon.yaml': 'Structural map',
             'project.toon': 'Project logic',
             'prompt.txt': 'LLM prompt',
             'context.md': 'LLM narrative',
@@ -446,10 +446,10 @@ For more information about code2llm, visit: https://github.com/tom-sapletta/code
         
         if existing.get('analysis.toon'):
             lines.append(f"| `analysis.toon` | **TOON** | **🔥 Health diagnostics** - Health, LAYERS, COUPLING | {insights['critical_functions']} critical functions, {insights['god_modules']} god modules |")
-        if existing.get('evolution.toon'):
-            lines.append(f"| `evolution.toon` | **TOON** | **📋 Refactoring queue** - Prioritized improvements | {insights['refactoring_actions']} refactoring actions needed |")
-        if existing.get('map.toon'):
-            lines.append("| `map.toon` | **TOON** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |")
+        if existing.get('evolution.toon.yaml'):
+            lines.append(f"| `evolution.toon.yaml` | **YAML** | **📋 Refactoring queue** - Prioritized improvements | {insights['refactoring_actions']} refactoring actions needed |")
+        if existing.get('map.toon.yaml'):
+            lines.append("| `map.toon.yaml` | **YAML** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |")
         
         lines.append("")
         return "\n".join(lines)

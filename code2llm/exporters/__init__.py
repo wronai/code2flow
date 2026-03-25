@@ -1,12 +1,12 @@
 """Exporters package for code2llm.
 
 Available exporters:
-  - ToonExporter      → analysis.toon  (health diagnostics)
-  - MapExporter       → map.toon       (structural map + project header)
-  - FlowExporter      → flow.toon      (data-flow: pipelines, contracts, types)
-  - EvolutionExporter  → evolution.toon (ranked refactoring queue)
-  - ContextExporter   → context.md     (LLM narrative)
-  - READMEExporter    → README.md      (documentation of all files)
+  - ToonExporter      → analysis.toon       (health diagnostics)
+  - MapExporter       → map.toon.yaml       (structural map + project header)
+  - FlowExporter      → flow.toon           (data-flow: pipelines, contracts, types)
+  - EvolutionExporter → evolution.toon.yaml (ranked refactoring queue)
+  - ContextExporter   → context.md          (LLM narrative)
+  - READMEExporter    → README.md           (documentation of all files)
   - YAMLExporter      → analysis.yaml
   - JSONExporter      → analysis.json
   - MermaidExporter   → *.mmd
