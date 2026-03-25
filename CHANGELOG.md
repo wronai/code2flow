@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.5.80] - 2026-03-25
+
+### Other
+- Update project/validation.toon
+
 ## [0.5.79] - 2026-03-25
 
 ### Docs
