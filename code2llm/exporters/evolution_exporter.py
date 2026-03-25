@@ -448,7 +448,7 @@ class EvolutionExporter(Exporter):
         return lines
 
     def _render_history(self, ctx: Dict[str, Any], output_path: str) -> List[str]:
-        """Render HISTORY — load previous evolution.toon if exists."""
+        """Render HISTORY — load previous evolution.toon.yaml if exists."""
         lines = ["HISTORY:"]
 
         prev_path = Path(output_path)
@@ -462,9 +462,9 @@ class EvolutionExporter(Exporter):
                         lines.append(f"  prev CC̄={prev_avg} → now CC̄={ctx['avg_cc']}")
                         break
                 else:
-                    lines.append(f"  previous evolution.toon found but no metrics parsed")
+                    lines.append(f"  previous evolution.toon.yaml found but no metrics parsed")
             except Exception:
-                lines.append(f"  (could not read previous evolution.toon)")
+                lines.append(f"  (could not read previous evolution.toon.yaml)")
         else:
             lines.append(f"  (first run — no previous data)")
 

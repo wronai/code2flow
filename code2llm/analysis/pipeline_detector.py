@@ -451,36 +451,56 @@ class PipelineDetector:
         Returns None for ambiguous matches (multiple candidates)
         to avoid creating phantom pipeline edges.
         """
+        # Direct match
         if callee in funcs:
             return callee
 
-        # Strip self. prefix for method→method calls
-        bare = callee
-        is_self_call = False
-        if callee.startswith("self."):
-            bare = callee[5:]  # strip "self."
-            is_self_call = True
+        bare, is_self_call = self._strip_self_prefix(callee)
 
-        # Try same-class resolution first (for self.X or unqualified method calls)
+        # Try same-class resolution first
+        if result := self._try_same_class_resolution(bare, caller, funcs):
+            return result
+
+        # Suffix match
+        candidates = self._get_suffix_candidates(bare, funcs)
+        if len(candidates) == 1:
+            return candidates[0]
+
+        # Prefer same-class candidates for method calls
+        return self._select_same_class_candidate(candidates, caller, is_self_call)
+
+    def _strip_self_prefix(self, callee: str) -> Tuple[str, bool]:
+        """Strip self. prefix and return bare name + flag."""
+        if callee.startswith("self."):
+            return callee[5:], True
+        return callee, False
+
+    def _try_same_class_resolution(
+        self, bare: str, caller: Optional[FunctionInfo], funcs: Dict[str, FunctionInfo]
+    ) -> Optional[str]:
+        """Try to resolve method in the same class as caller."""
         if caller and caller.class_name:
             class_prefix = f"{caller.module}.{caller.class_name}."
             class_candidate = class_prefix + bare
             if class_candidate in funcs:
                 return class_candidate
+        return None
 
-        # Suffix match
-        candidates = [qn for qn in funcs if qn.endswith(f".{bare}")]
-        if len(candidates) == 1:
-            return candidates[0]
+    def _get_suffix_candidates(self, bare: str, funcs: Dict[str, FunctionInfo]) -> List[str]:
+        """Find candidates matching by suffix."""
+        return [qn for qn in funcs if qn.endswith(f".{bare}")]
 
-        # For self.X calls, prefer candidates in the same class
-        if (is_self_call or caller and caller.class_name) and len(candidates) > 1:
-            same_class = [
-                qn for qn in candidates
-                if caller and caller.class_name and f".{caller.class_name}." in qn
-            ]
-            if len(same_class) == 1:
-                return same_class[0]
+    def _select_same_class_candidate(
+        self, candidates: List[str], caller: Optional[FunctionInfo], is_self_call: bool
+    ) -> Optional[str]:
+        """Select candidate from same class if applicable."""
+        if not candidates or not (is_self_call or (caller and caller.class_name)):
+            return None
 
-        # Ambiguous or not found — skip to avoid wrong edges
+        same_class = [
+            qn for qn in candidates
+            if caller and caller.class_name and f".{caller.class_name}." in qn
+        ]
+        if len(same_class) == 1:
+            return same_class[0]
         return None

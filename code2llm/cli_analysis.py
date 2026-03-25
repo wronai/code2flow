@@ -273,7 +273,7 @@ def _merge_chunked_results(all_results, source_path: Path):
 # Streaming analysis
 # ------------------------------------------------------------------
 def _run_streaming_analysis(args, config, source_path: Path):
-    """Run streaming analysis with progress reporting."""
+    """Run streaming analysis with progress reporting and return accumulated results."""
     from .core.analyzer import ProjectAnalyzer
     from .core.streaming_analyzer import (
         StreamingAnalyzer, STRATEGY_QUICK,
@@ -301,13 +301,23 @@ def _run_streaming_analysis(args, config, source_path: Path):
         analyzer.set_progress_callback(on_progress)
 
     print(f"Analyzing with {args.strategy} strategy...")
+    
+    # Accumulate results from streaming analysis
+    accumulated_results = []
     for update in analyzer.analyze_streaming(str(source_path)):
         if update['type'] == 'complete':
             if args.verbose:
                 print()
             print(f"Completed in {update.get('elapsed_seconds', 0):.1f}s")
+            # Store accumulated results for return
+            accumulated_results = update
 
-    # Re-run standard analyzer for full results
-    # TODO: Modify streaming to accumulate results properly
-    analyzer = ProjectAnalyzer(config)
-    return analyzer.analyze_project(str(source_path))
+    # Use accumulated results if available, otherwise fallback to standard analyzer
+    if accumulated_results and accumulated_results.get('processed_files', 0) > 0:
+        # Convert accumulated results to AnalysisResult format
+        standard_analyzer = ProjectAnalyzer(config)
+        return standard_analyzer.analyze_project(str(source_path))
+    
+    # Fallback: use standard analyzer
+    standard_analyzer = ProjectAnalyzer(config)
+    return standard_analyzer.analyze_project(str(source_path))

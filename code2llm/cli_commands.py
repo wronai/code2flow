@@ -111,7 +111,7 @@ def validate_chunked_output(output_dir: Path, args) -> bool:
     """Validate generated chunked output.
     
     Checks:
-    1. All chunks have required files (analysis.toon, context.md, evolution.toon)
+    1. All chunks have required files (analysis.toon, context.md, evolution.toon.yaml)
     2. Files are not empty
     3. Report summary
     
@@ -128,7 +128,7 @@ def validate_chunked_output(output_dir: Path, args) -> bool:
         print(f"✗ No chunk directories found in: {output_dir}", file=sys.stderr)
         return False
     
-    required_files = ['analysis.toon', 'context.md', 'evolution.toon']
+    required_files = ['analysis.toon', 'context.md', 'evolution.toon.yaml']
     issues = []
     valid_chunks = []
     

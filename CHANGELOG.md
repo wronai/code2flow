@@ -1,5 +1,27 @@
 ## [Unreleased]
 
+## [0.5.69] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_prompt_txt.py
+
+### Other
+- Update code2llm/analysis/pipeline_detector.py
+- Update code2llm/cli_analysis.py
+- Update code2llm/cli_commands.py
+- Update code2llm/exporters/evolution_exporter.py
+- Update code2llm/exporters/map_exporter.py
+- Update code2llm/exporters/project_yaml_exporter.py
+- Update project/analysis.json
+- Update project/analysis.toon.yaml
+- Update project/analysis.yaml
+- Update project/calls.mmd
+- ... and 8 more files
+
 ## [0.5.68] - 2026-03-25
 
 ### Docs

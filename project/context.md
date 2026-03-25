@@ -6,10 +6,10 @@
 - **Primary Language**: python
 - **Languages**: python: 114, shell: 2, php: 1
 - **Analysis Mode**: static
-- **Total Functions**: 918
+- **Total Functions**: 919
 - **Total Classes**: 106
 - **Modules**: 117
-- **Entry Points**: 690
+- **Entry Points**: 691
 
 ## Architecture by Module
 
@@ -83,15 +83,15 @@
 - **Classes**: 1
 - **File**: `file_analyzer.py`
 
+### code2llm.exporters.evolution_exporter
+- **Functions**: 17
+- **Classes**: 1
+- **File**: `evolution_exporter.py`
+
 ### code2llm.nlp.entity_resolution
 - **Functions**: 16
 - **Classes**: 3
 - **File**: `entity_resolution.py`
-
-### code2llm.exporters.evolution_exporter
-- **Functions**: 16
-- **Classes**: 1
-- **File**: `evolution_exporter.py`
 
 ### code2llm.generators.mermaid
 - **Functions**: 16
@@ -217,6 +217,10 @@ Shows entry points, high-level modules, and critical path.
 > Calculate string similarity using configured algorithm.
 - **Calls**: None.ratio, None.ratio, a.lower, b.lower, None.ratio, SequenceMatcher, SequenceMatcher, None.join
 
+### code2llm.exporters.evolution_exporter.EvolutionExporter.export_to_yaml
+> Generate evolution.toon.yaml (structured YAML).
+- **Calls**: self._build_context, actions.sort, None.parent.mkdir, actions.append, risks.append, open, yaml.dump, actions.append
+
 ### code2llm.analysis.pipeline_detector.PipelineDetector._find_pipeline_paths
 > Find longest paths in the call graph as pipeline candidates.
 
@@ -239,9 +243,6 @@ Args:
 
 ### code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_refactoring
 - **Calls**: result.functions.items, result.metrics.get, proj_metrics.get, priorities.sort, code2llm.exporters.map_exporter.MapExporter._is_excluded, fi.complexity.get, priorities.append, code2llm.exporters.map_exporter.MapExporter._rel_path
-
-### code2llm.exporters.toon_view.ToonViewGenerator._render
-- **Calls**: data.get, data.get, data.get, data.get, data.get, data.get, lines.extend, lines.extend
 
 ## Process Flows
 
@@ -315,9 +316,9 @@ _render_architecture [code2llm.exporters.context_view.ContextViewGenerator]
 - **Key Methods**: code2llm.exporters.toon.renderer.ToonRenderer.render_header, code2llm.exporters.toon.renderer.ToonRenderer._detect_language_label, code2llm.exporters.toon.renderer.ToonRenderer.render_health, code2llm.exporters.toon.renderer.ToonRenderer.render_refactor, code2llm.exporters.toon.renderer.ToonRenderer.render_coupling, code2llm.exporters.toon.renderer.ToonRenderer._select_top_packages, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_header, code2llm.exporters.toon.renderer.ToonRenderer._render_coupling_rows, code2llm.exporters.toon.renderer.ToonRenderer._build_coupling_row, code2llm.exporters.toon.renderer.ToonRenderer._coupling_row_tag
 
 ### code2llm.exporters.map_exporter.MapExporter
-> Export to map.toon — structural map with a compact project header.
+> Export to map.toon.yaml — structural map with a compact project header.
 
-Keys: M=modules, D=details, i=im
+Keys: M=modules, D=details,
 - **Methods**: 21
 - **Key Methods**: code2llm.exporters.map_exporter.MapExporter.export, code2llm.exporters.map_exporter.MapExporter.export_to_yaml, code2llm.exporters.map_exporter.MapExporter._render_header, code2llm.exporters.map_exporter.MapExporter._render_stats_line, code2llm.exporters.map_exporter.MapExporter._render_alerts_line, code2llm.exporters.map_exporter.MapExporter._render_hotspots_line, code2llm.exporters.map_exporter.MapExporter._render_module_list, code2llm.exporters.map_exporter.MapExporter._render_details, code2llm.exporters.map_exporter.MapExporter._rank_modules, code2llm.exporters.map_exporter.MapExporter._render_map_module
 - **Inherits**: Exporter
@@ -358,6 +359,12 @@ Combines data from analysis.t
 - **Key Methods**: code2llm.analysis.cfg.CFGExtractor.__init__, code2llm.analysis.cfg.CFGExtractor.extract, code2llm.analysis.cfg.CFGExtractor.new_node, code2llm.analysis.cfg.CFGExtractor.connect, code2llm.analysis.cfg.CFGExtractor.visit_FunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_AsyncFunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_If, code2llm.analysis.cfg.CFGExtractor.visit_For, code2llm.analysis.cfg.CFGExtractor.visit_While, code2llm.analysis.cfg.CFGExtractor.visit_Try
 - **Inherits**: ast.NodeVisitor
 
+### code2llm.exporters.evolution_exporter.EvolutionExporter
+> Export evolution.toon.yaml — prioritized refactoring queue.
+- **Methods**: 17
+- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter.export_to_yaml, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules
+- **Inherits**: Exporter
+
 ### code2llm.analysis.data_analysis.DataAnalyzer
 > Analyze data flows, structures, and optimization opportunities.
 - **Methods**: 16
@@ -372,12 +379,6 @@ Combines data from analysis.t
 > Main NLP processing pipeline (4a-4e).
 - **Methods**: 16
 - **Key Methods**: code2llm.nlp.pipeline.NLPPipeline.__init__, code2llm.nlp.pipeline.NLPPipeline.process, code2llm.nlp.pipeline.NLPPipeline._step_normalize, code2llm.nlp.pipeline.NLPPipeline._step_match_intent, code2llm.nlp.pipeline.NLPPipeline._step_resolve_entities, code2llm.nlp.pipeline.NLPPipeline._infer_entity_types, code2llm.nlp.pipeline.NLPPipeline._calculate_overall_confidence, code2llm.nlp.pipeline.NLPPipeline._calculate_entity_confidence, code2llm.nlp.pipeline.NLPPipeline._apply_fallback, code2llm.nlp.pipeline.NLPPipeline._format_action
-
-### code2llm.exporters.evolution_exporter.EvolutionExporter
-> Export evolution.toon — prioritized refactoring queue.
-- **Methods**: 16
-- **Key Methods**: code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded, code2llm.exporters.evolution_exporter.EvolutionExporter.export, code2llm.exporters.evolution_exporter.EvolutionExporter._build_context, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_func_data, code2llm.exporters.evolution_exporter.EvolutionExporter._scan_file_sizes, code2llm.exporters.evolution_exporter.EvolutionExporter._aggregate_file_stats, code2llm.exporters.evolution_exporter.EvolutionExporter._make_relative_path, code2llm.exporters.evolution_exporter.EvolutionExporter._filter_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_god_modules, code2llm.exporters.evolution_exporter.EvolutionExporter._compute_hub_types
-- **Inherits**: Exporter
 
 ### code2llm.analysis.side_effects.SideEffectDetector
 > Detect side effects in Python functions via AST analysis.
@@ -442,6 +443,17 @@ Key functions that process and transform data:
 > Validate toon format structure.
 - **Output to**: print, print, bool, bool, bool
 
+### benchmarks.format_evaluator.evaluate_format
+> Oceń pojedynczy format względem ground truth.
+- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+
+### scripts.bump_version.parse_version
+> Parse version string into tuple of (major, minor, patch)
+- **Output to**: version_str.split, tuple, int
+
+### scripts.bump_version.format_version
+> Format version tuple as string
+
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, m.group
@@ -457,17 +469,6 @@ Key functions that process and transform data:
 ### scripts.benchmark_badges.generate_format_quality_badges
 > Generate badges from format quality scores.
 - **Output to**: enumerate, badges.append, sorted, badges.append, format_scores.items
-
-### scripts.bump_version.parse_version
-> Parse version string into tuple of (major, minor, patch)
-- **Output to**: version_str.split, tuple, int
-
-### scripts.bump_version.format_version
-> Format version tuple as string
-
-### benchmarks.format_evaluator.evaluate_format
-> Oceń pojedynczy format względem ground truth.
-- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
 
 ### code2llm.cli_parser.create_parser
 > Create CLI argument parser.
@@ -498,14 +499,6 @@ Checks:
 > Format except handler.
 - **Output to**: self._expr_to_str
 
-### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
-> Process large directories with file-level chunking.
-- **Output to**: self._chunk_by_files, chunks.extend
-
-### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
-> Process Python files directly in level1 directory.
-- **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
-
 ### code2llm.core.repo_files._get_gitignore_parser
 > Load gitignore parser for project if available.
 - **Output to**: code2llm.core.gitignore.load_gitignore_patterns
@@ -513,6 +506,14 @@ Checks:
 ### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
 > Parse a single gitignore pattern into regex.
 - **Output to**: pattern.startswith, pattern.endswith, pattern.startswith, self._wildcard_to_regex, re.compile
+
+### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
+> Process large directories with file-level chunking.
+- **Output to**: self._chunk_by_files, chunks.extend
+
+### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
+> Process Python files directly in level1 directory.
+- **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
 
 ### code2llm.core.toon_size_manager._parse_modules
 > Parse module sections from TOON content.
@@ -590,13 +591,13 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.exporters.flow_exporter.FlowExporter.export` - 23 calls
 - `benchmarks.format_evaluator.evaluate_format` - 22 calls
 - `benchmarks.benchmark_format_quality.run_benchmark` - 22 calls
+- `code2llm.exporters.evolution_exporter.EvolutionExporter.export_to_yaml` - 22 calls
 - `code2llm.cli_commands.generate_llm_context` - 21 calls
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_files` - 20 calls
 - `code2llm.core.lang.generic.analyze_generic` - 20 calls
 - `validate_toon.compare_classes` - 19 calls
 - `scripts.benchmark_badges.parse_evolution_metrics` - 19 calls
 - `code2llm.exporters.yaml_exporter.YAMLExporter.export_grouped` - 19 calls
-- `code2llm.core.streaming.prioritizer.SmartPrioritizer.prioritize_files` - 19 calls
 
 ## System Interactions
 

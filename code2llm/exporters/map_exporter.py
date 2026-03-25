@@ -145,7 +145,7 @@ class MapExporter(Exporter):
         stats_line = self._render_stats_line(included_funcs, included_files, total_lines, lang_str)
         alerts_line = self._render_alerts_line(included_funcs)
         hotspots_line = self._render_hotspots_line(included_funcs)
-        trend = self._load_evolution_trend(Path(output_path).with_name("evolution.toon"),
+        trend = self._load_evolution_trend(Path(output_path).with_name("evolution.toon.yaml"),
                                           stats_line.get('avg_cc', 0.0))
 
         lines = [
@@ -398,7 +398,7 @@ class MapExporter(Exporter):
 
     @staticmethod
     def _load_evolution_trend(evolution_path: Path, current_cc: float) -> str:
-        """Summarize the latest CC trend from the previous evolution.toon file."""
+        """Summarize the latest CC trend from the previous evolution.toon.yaml file."""
         previous_cc = MapExporter._read_previous_cc_avg(evolution_path)
         if previous_cc is None:
             return "baseline"
@@ -416,7 +416,7 @@ class MapExporter(Exporter):
 
     @staticmethod
     def _read_previous_cc_avg(evolution_path: Path) -> Optional[float]:
-        """Read the previous CC average from an existing evolution.toon file."""
+        """Read the previous CC average from an existing evolution.toon.yaml file."""
         if not evolution_path.exists():
             return None
 
