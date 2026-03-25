@@ -1,5 +1,27 @@
 ## [Unreleased]
 
+## [0.5.60] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_format_quality.py
+
+### Other
+- Update code2llm/exporters/index_generator.py
+- Update code2llm/exporters/toon/metrics.py
+- Update code2llm/exporters/toon/renderer.py
+- Update project/analysis.json
+- Update project/analysis.toon
+- Update project/analysis.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- ... and 5 more files
+
 ## [0.5.59] - 2026-03-25
 
 ### Docs

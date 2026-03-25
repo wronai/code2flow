@@ -11,8 +11,8 @@ from .helpers import _dup_file_set, _package_of
 
 
 # Constants
-CC_CRITICAL = 10
-CC_HIGH = 5
+CC_CRITICAL = 15
+CC_HIGH = 10
 CC_WARNING = 15
 GOD_MODULE_LINES = 500
 MAX_HEALTH_ISSUES = 20

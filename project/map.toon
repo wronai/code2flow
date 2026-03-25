@@ -1,8 +1,8 @@
-# code2llm | 117f 21905L | python:115,php:1,shell:1 | 2026-03-25
+# code2llm | 117f 21936L | python:115,php:1,shell:1 | 2026-03-25
 # stats: 891 func | 106 cls | 117 mod | CC̄=4.3 | critical:12 | cycles:0
 # alerts[5]: CC analyze_typescript_js=41; fan-out analyze_typescript_js=41; fan-out analyze_php=35; fan-out analyze_ruby=30; CC analyze_php=29
 # hotspots[5]: analyze_typescript_js fan=41; analyze_php fan=35; analyze_ruby fan=30; analyze_java fan=29; analyze_cpp fan=26
-# evolution: baseline
+# evolution: CC̄ 4.3→4.3 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[117]:
   badges/server.py,110
@@ -76,7 +76,7 @@ M[117]:
   code2llm/exporters/flow_exporter.py,391
   code2llm/exporters/flow_renderer.py,188
   code2llm/exporters/html_dashboard.py,504
-  code2llm/exporters/index_generator.py,721
+  code2llm/exporters/index_generator.py,752
   code2llm/exporters/json_exporter.py,17
   code2llm/exporters/llm_exporter.py,12
   code2llm/exporters/map_exporter.py,326
@@ -129,12 +129,12 @@ D:
   code2llm/core/core/lang/php.py:
     e: analyze_php
     analyze_php(content;file_path;module_name;stats)
-  code2llm/core/core/lang/csharp.py:
-    e: analyze_csharp
-    analyze_csharp(content;file_path;module_name;stats)
   code2llm/core/core/lang/cpp.py:
     e: analyze_cpp
     analyze_cpp(content;file_path;module_name;ext;stats)
+  code2llm/core/core/lang/csharp.py:
+    e: analyze_csharp
+    analyze_csharp(content;file_path;module_name;stats)
   code2llm/core/core/lang/ruby.py:
     e: _extract_ruby_body,analyze_ruby
     _extract_ruby_body(content;start_line)
@@ -232,19 +232,6 @@ S...
     dump_yaml(data)
     create_parser()
     main(argv)
-  code2llm/cli_exports/formats.py:
-    e: _export_evolution,_export_data_structures,_export_context_fallback,_export_readme,_export_project_yaml,_run_report,_export_simple_formats,_export_yaml,_export_mermaid,_export_refactor_prompts,_export_index_html
-    _export_evolution(args;result;output_dir)
-    _export_data_structures(args;result;output_dir)
-    _export_context_fallback(args;result;output_dir;formats)
-    _export_readme(args;result;output_dir)
-    _export_project_yaml(args;result;output_dir)
-    _run_report(args;project_yaml_path;output_dir)
-    _export_simple_formats(args;result;output_dir;formats)
-    _export_yaml(args;result;output_dir)
-    _export_mermaid(args;result;output_dir)
-    _export_refactor_prompts(args;result;output_dir)
-    _export_index_html(args;output_dir)
   code2llm/generators/llm_flow.py:
     e: FuncSummary,_strip_bom,_safe_read_yaml,_as_dict,_as_list,_shorten,_parse_call_label,_parse_func_label,_collect_nodes,_group_nodes_by_file,_is_entrypoint_file,_extract_entrypoint_info,_deduplicate_entrypoints,_collect_entrypoints,_collect_functions,_node_counts_by_function,_pick_relevant_functions,_summarize_functions,_build_call_graph,_reachable,generate_llm_flow,render_llm_flow_md,dump_yaml,create_parser,main
     FuncSummary:
@@ -272,6 +259,19 @@ S...
     dump_yaml(data)
     create_parser()
     main(argv)
+  code2llm/cli_exports/formats.py:
+    e: _export_evolution,_export_data_structures,_export_context_fallback,_export_readme,_export_project_yaml,_run_report,_export_simple_formats,_export_yaml,_export_mermaid,_export_refactor_prompts,_export_index_html
+    _export_evolution(args;result;output_dir)
+    _export_data_structures(args;result;output_dir)
+    _export_context_fallback(args;result;output_dir;formats)
+    _export_readme(args;result;output_dir)
+    _export_project_yaml(args;result;output_dir)
+    _run_report(args;project_yaml_path;output_dir)
+    _export_simple_formats(args;result;output_dir;formats)
+    _export_yaml(args;result;output_dir)
+    _export_mermaid(args;result;output_dir)
+    _export_refactor_prompts(args;result;output_dir)
+    _export_index_html(args;output_dir)
   code2llm/core/streaming/scanner.py:
     e: StreamingScanner
     StreamingScanner: __init__(2),quick_scan_file(1),deep_analyze_file(1),build_call_graph_streaming(1),select_important_files(2),collect_files(1)  # Handles file scanning operations...
@@ -422,13 +422,13 @@ Stra...
   code2llm/core/core/refactoring.py:
     e: RefactoringAnalyzer
     RefactoringAnalyzer: __init__(2),perform_refactoring_analysis(1),_build_call_graph(1),_calculate_centrality(2),_detect_cycles(2),_detect_communities(2),_analyze_coupling(1),_detect_smells(1),_detect_dead_code(1),_map_dead_code_to_items(2),_mark_reachable_items(1)  # Performs refactoring analysis on code...
-  code2llm/core/core/lang/rust.py:
-    e: analyze_rust
-    analyze_rust(content;file_path;module_name;stats)
   code2llm/core/streaming/prioritizer.py:
     e: FilePriority,SmartPrioritizer
     FilePriority:  # Priority scoring for file analysis order...
     SmartPrioritizer: __init__(1),prioritize_files(2),_build_import_graph(1),_check_has_main(1)  # Smart file prioritization for optimal analysis order...
+  code2llm/core/core/lang/rust.py:
+    e: analyze_rust
+    analyze_rust(content;file_path;module_name;stats)
   code2llm/core/repo_files.py:
     e: _get_gitignore_parser,should_skip_file,collect_files_in_dir,collect_root_files,count_py_files,contains_python_files,get_level1_dirs,calculate_priority
     _get_gitignore_parser(project_path)
@@ -708,10 +708,10 @@ Unlike simple L...
   code2llm/refactor/__init__.py:
   code2llm/patterns/__init__.py:
   code2llm/core/core/__init__.py:
+  code2llm/core/streaming/__init__.py:
   code2llm/core/streaming/strategies.py:
     e: ScanStrategy
     ScanStrategy:  # Scanning methodology configuration...
-  code2llm/core/streaming/__init__.py:
   code2llm/core/core/lang/__init__.py:
   examples/streaming-analyzer/sample_project/__init__.py:
   project.sh:

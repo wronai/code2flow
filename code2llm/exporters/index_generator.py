@@ -120,6 +120,10 @@ class IndexHTMLGenerator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>code2llm Analysis Results</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
     <style>
         :root {{
             --bg: #0f172a;
@@ -517,6 +521,20 @@ class IndexHTMLGenerator:
             margin: 1.5rem 0;
         }}
         
+        /* Mermaid diagram styles */
+        .mermaid-content {{
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }}
+        
+        .mermaid-content .mermaid {{
+            background: transparent;
+        }}
+        
         /* Mobile responsive */
         @media (max-width: 768px) {{
             .container {{
@@ -603,6 +621,9 @@ class IndexHTMLGenerator:
     </div>
 
     <script>
+        // Initialize mermaid
+        mermaid.initialize({{ startOnLoad: false, theme: 'dark' }});
+        
         const files = {files_json};
         let currentFile = null;
 
@@ -673,10 +694,20 @@ class IndexHTMLGenerator:
             }} else if (file.type === 'html') {{
                 // For HTML files, show in iframe for safety
                 body.innerHTML = `<iframe src="${{file.rel_path}}" style="width:100%;height:100%;border:none;border-radius:0.5rem;"></iframe>`;
+            }} else if (file.type === 'mermaid') {{
+                // Render mermaid diagram
+                const diagramId = 'mermaid-diagram-' + Date.now();
+                body.innerHTML = `<div class="mermaid-content"><pre class="mermaid" id="${{diagramId}}">${{file.content}}</pre></div>`;
+                // Initialize mermaid on the new element
+                setTimeout(() => {{
+                    mermaid.init(undefined, document.getElementById(diagramId));
+                }}, 0);
             }} else if (file.type === 'json') {{
                 try {{
                     const json = JSON.parse(file.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
-                    body.innerHTML = `<pre>${{JSON.stringify(json, null, 2)}}</pre>`;
+                    const formatted = JSON.stringify(json, null, 2);
+                    body.innerHTML = `<pre><code class="language-json">${{formatted.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</code></pre>`;
+                    hljs.highlightElement(body.querySelector('code'));
                 }} catch {{
                     body.innerHTML = `<pre>${{file.content}}</pre>`;
                 }}

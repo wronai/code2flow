@@ -53,11 +53,15 @@ def ground_truth_project(tmp_path_factory) -> Path:
                 return Result(errors=["empty"])
             if not isinstance(data, list):
                 return Result(errors=["not list"])
+            if len(data) > config.max_items:
+                return Result(errors=["too many items"])
             filtered = []
             for item in data:
                 if isinstance(item, dict):
                     if "id" in item:
                         if item.get("active", True):
+                            if config.debug:
+                                print(f"Adding active: {item['id']}")
                             filtered.append(item)
                         elif config.debug:
                             filtered.append(item)
