@@ -4,12 +4,12 @@
 
 - **Project**: /home/tom/github/wronai/code2llm
 - **Primary Language**: python
-- **Languages**: python: 114, shell: 2, php: 1
+- **Languages**: python: 114, shell: 2, java: 1
 - **Analysis Mode**: static
 - **Total Functions**: 897
 - **Total Classes**: 106
 - **Modules**: 117
-- **Entry Points**: 671
+- **Entry Points**: 670
 
 ## Architecture by Module
 
@@ -426,13 +426,13 @@ Builds a call graph as a DiGraph, fin
 
 Key functions that process and transform data:
 
-### benchmarks.benchmark_evolution.parse_evolution_metrics
-> Extract metrics from evolution.toon content.
-- **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
-
 ### validate_toon.validate_toon_completeness
 > Validate toon format structure.
 - **Output to**: print, print, bool, bool, bool
+
+### benchmarks.benchmark_evolution.parse_evolution_metrics
+> Extract metrics from evolution.toon content.
+- **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
 
 ### benchmarks.format_evaluator.evaluate_format
 > Oceń pojedynczy format względem ground truth.
@@ -479,16 +479,12 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
-- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
 ### benchmarks.benchmark_format_quality._generate_format_outputs
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
-### code2llm.core.repo_files._get_gitignore_parser
-> Load gitignore parser for project if available.
-- **Output to**: code2llm.core.gitignore.load_gitignore_patterns
+### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
+- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
 
 ### code2llm.analysis.cfg.CFGExtractor._format_except
 > Format except handler.
@@ -501,6 +497,10 @@ Checks:
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
 > Process Python files directly in level1 directory.
 - **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
+
+### code2llm.core.repo_files._get_gitignore_parser
+> Load gitignore parser for project if available.
+- **Output to**: code2llm.core.gitignore.load_gitignore_patterns
 
 ### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
 > Parse a single gitignore pattern into regex.

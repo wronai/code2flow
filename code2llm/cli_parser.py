@@ -247,5 +247,24 @@ Strategy Options (--strategy):
         action='store_true',
         help='Validate generated chunked output - check all chunks have required files'
     )
-    
+
+    # Flow diagram options (Plan R1)
+    parser.add_argument(
+        '--flow-detail',
+        action='store_true',
+        help='Export detailed flow diagram (flow_detailed.mmd) with per-module view (~150 nodes)'
+    )
+
+    parser.add_argument(
+        '--flow-full',
+        action='store_true',
+        help='Export full flow diagram (flow_full.mmd) with all nodes (debug view)'
+    )
+
+    parser.add_argument(
+        '--flow-include-examples',
+        action='store_true',
+        help='Include examples/, benchmarks/, demo_langs/, tests/ in flow diagrams'
+    )
+
     return parser

@@ -65,29 +65,10 @@ def _export_single_project(args, result, output_dir: Path, formats: list, source
 
 def _export_chunked_results(args, result, output_dir: Path, source_path: Path, formats: list):
     """Export chunked analysis results to subproject directories."""
-    from ..core.large_repo import HierarchicalRepoSplitter
-
-    splitter = HierarchicalRepoSplitter(size_limit_kb=args.chunk_size)
-    subprojects = splitter.get_analysis_plan(source_path)
-
-    if hasattr(args, 'only_subproject') and args.only_subproject:
-        subprojects = [sp for sp in subprojects if sp.name == args.only_subproject or sp.name.startswith(args.only_subproject + '.')]
-
-    if hasattr(args, 'skip_subprojects') and args.skip_subprojects:
-        subprojects = [sp for sp in subprojects if not any(sp.name.startswith(skip) for skip in args.skip_subprojects)]
+    subprojects = _get_filtered_subprojects(args, source_path)
 
     for sp in subprojects:
-        sp_output_dir = output_dir / sp.name.replace('.', '_')
-        if not sp_output_dir.exists():
-            continue
-
-        for ext in ['.toon', '.yaml', '.json']:
-            result_file = sp_output_dir / f'analysis{ext}'
-            if result_file.exists():
-                if args.verbose:
-                    level_name = {0: 'root', 1: 'L1', 2: 'L2'}.get(sp.level, f'L{sp.level}')
-                    print(f"  - Exported [{level_name}] {sp.name}")
-                break
+        _process_subproject_result(args, sp, output_dir)
 
     # Also create merged summary in root output dir
     _export_simple_formats(args, result, output_dir, ['toon', 'context'])
@@ -98,6 +79,43 @@ def _export_chunked_results(args, result, output_dir: Path, source_path: Path, f
         _export_chunked_prompt_txt(args, output_dir, formats, source_path, subprojects)
 
     _export_readme(args, result, output_dir)
-    
+
     # Generate index.html for browsing all files (only when 'all' formats used)
     _export_index_html(args, output_dir)
+
+
+def _get_filtered_subprojects(args, source_path: Path):
+    """Get subprojects list with filtering applied."""
+    from ..core.large_repo import HierarchicalRepoSplitter
+
+    splitter = HierarchicalRepoSplitter(size_limit_kb=args.chunk_size)
+    subprojects = splitter.get_analysis_plan(source_path)
+
+    if hasattr(args, 'only_subproject') and args.only_subproject:
+        subprojects = [
+            sp for sp in subprojects
+            if sp.name == args.only_subproject or sp.name.startswith(args.only_subproject + '.')
+        ]
+
+    if hasattr(args, 'skip_subprojects') and args.skip_subprojects:
+        subprojects = [
+            sp for sp in subprojects
+            if not any(sp.name.startswith(skip) for skip in args.skip_subprojects)
+        ]
+
+    return subprojects
+
+
+def _process_subproject_result(args, sp, output_dir: Path) -> None:
+    """Process a single subproject result file."""
+    sp_output_dir = output_dir / sp.name.replace('.', '_')
+    if not sp_output_dir.exists():
+        return
+
+    for ext in ['.toon', '.yaml', '.json']:
+        result_file = sp_output_dir / f'analysis{ext}'
+        if result_file.exists():
+            if args.verbose:
+                level_name = {0: 'root', 1: 'L1', 2: 'L2'}.get(sp.level, f'L{sp.level}')
+                print(f"  - Exported [{level_name}] {sp.name}")
+            break

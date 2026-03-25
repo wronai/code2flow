@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+## [0.5.65] - 2026-03-25
+
+### Docs
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_exports/formats.py
+- Update code2llm/cli_exports/orchestrator.py
+- Update code2llm/cli_parser.py
+- Update code2llm/core/file_analyzer.py
+- Update code2llm/core/lang/cpp.py
+- Update code2llm/core/lang/csharp.py
+- Update code2llm/core/lang/go_lang.py
+- Update code2llm/core/lang/java.py
+- Update code2llm/core/lang/php.py
+- Update code2llm/core/lang/ruby.py
+- ... and 14 more files
+
 ## [0.5.64] - 2026-03-25
 
 ### Docs

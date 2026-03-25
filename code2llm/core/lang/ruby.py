@@ -50,7 +50,7 @@ _RUBY_CC_PATTERN = re.compile(
 
 
 def analyze_ruby(content: str, file_path: str, module_name: str,
-                 stats: Dict) -> Dict:
+                 ext: str, stats: Dict) -> Dict:
     """Analyze Ruby files using shared extraction."""
     
     patterns = {

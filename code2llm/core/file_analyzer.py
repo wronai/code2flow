@@ -56,19 +56,19 @@ class FileAnalyzer:
         elif ext in ('.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'):
             return analyze_typescript_js(content, file_path, module_name, ext, self.stats)
         elif ext == '.go':
-            return analyze_go(content, file_path, module_name, self.stats)
+            return analyze_go(content, file_path, module_name, ext, self.stats)
         elif ext == '.rs':
-            return analyze_rust(content, file_path, module_name, self.stats)
+            return analyze_rust(content, file_path, module_name, ext, self.stats)
         elif ext == '.java':
-            return analyze_java(content, file_path, module_name, self.stats)
+            return analyze_java(content, file_path, module_name, ext, self.stats)
         elif ext in ('.c', '.cpp', '.cc', '.h', '.hpp', '.hh', '.cxx', '.hxx'):
             return analyze_cpp(content, file_path, module_name, ext, self.stats)
         elif ext in ('.cs', '.csharp'):
-            return analyze_csharp(content, file_path, module_name, self.stats)
+            return analyze_csharp(content, file_path, module_name, ext, self.stats)
         elif ext == '.php':
-            return analyze_php(content, file_path, module_name, self.stats)
+            return analyze_php(content, file_path, module_name, ext, self.stats)
         elif ext in ('.rb', '.ruby'):
-            return analyze_ruby(content, file_path, module_name, self.stats)
+            return analyze_ruby(content, file_path, module_name, ext, self.stats)
         else:
             # For unsupported languages, do basic structural analysis
             return analyze_generic(content, file_path, module_name, ext, self.stats)

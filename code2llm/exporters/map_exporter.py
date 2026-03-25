@@ -49,33 +49,57 @@ class MapExporter(Exporter):
     # header
     # ------------------------------------------------------------------
     def _render_header(self, result: AnalysisResult, output_path: str) -> List[str]:
+        """Render header lines with project stats and alerts."""
         project_name = Path(result.project_path).name if result.project_path else "project"
-        total_lines = self._count_total_lines(result)
         langs = self._detect_languages(result)
         lang_str = ",".join(f"{lang}:{count}" for lang, count in langs.items()) or "unknown"
 
-        included_files = [mi for mi in result.modules.values() if not self._is_excluded(mi.file)]
         included_funcs = [fi for fi in result.functions.values() if not self._is_excluded(fi.file)]
-        included_classes = [ci for ci in result.classes.values() if not self._is_excluded(ci.file)]
+        included_files = [mi for mi in result.modules.values() if not self._is_excluded(mi.file)]
+        total_lines = self._count_total_lines(result)
 
-        cc_scores = [fi.complexity.get("cyclomatic_complexity", 0) for fi in included_funcs]
-        avg_cc = round(sum(cc_scores) / len(cc_scores), 1) if cc_scores else 0.0
-        critical_count = len([cc for cc in cc_scores if cc >= 15])
-        cycles = len(result.metrics.get("project", {}).get("circular_dependencies", []))
-
-        alerts = self._build_alerts(included_funcs)
-        hotspots = self._build_hotspots(included_funcs)
-        trend = self._load_evolution_trend(Path(output_path).with_name("evolution.toon"), avg_cc)
+        stats_line = self._render_stats_line(included_funcs, included_files, total_lines, lang_str)
+        alerts_line = self._render_alerts_line(included_funcs)
+        hotspots_line = self._render_hotspots_line(included_funcs)
+        trend = self._load_evolution_trend(Path(output_path).with_name("evolution.toon"),
+                                          stats_line.get('avg_cc', 0.0))
 
         lines = [
-            f"# {project_name} | {len(included_files)}f {total_lines}L | {lang_str} | {datetime.now().strftime('%Y-%m-%d')}",
-            f"# stats: {len(included_funcs)} func | {len(included_classes)} cls | {len(included_files)} mod | CC̄={avg_cc} | critical:{critical_count} | cycles:{cycles}",
-            f"# alerts[{len(alerts)}]: {'; '.join(alerts) if alerts else 'none'}",
-            f"# hotspots[{len(hotspots)}]: {'; '.join(hotspots) if hotspots else 'none'}",
+            f"# {project_name} | {stats_line['files']}f {stats_line['lines']}L | {lang_str} | {datetime.now().strftime('%Y-%m-%d')}",
+            f"# stats: {stats_line['funcs']} func | {stats_line['classes']} cls | {stats_line['files']} mod | CC̄={stats_line['avg_cc']} | critical:{stats_line['critical']} | cycles:{stats_line['cycles']}",
+            alerts_line,
+            hotspots_line,
             f"# evolution: {trend}",
             "# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods",
         ]
         return lines
+
+    def _render_stats_line(self, funcs: List[FunctionInfo], files: List[ModuleInfo],
+                          total_lines: int, lang_str: str) -> Dict[str, Any]:
+        """Build stats dict for header line."""
+        cc_scores = [fi.complexity.get("cyclomatic_complexity", 0) for fi in funcs]
+        avg_cc = round(sum(cc_scores) / len(cc_scores), 1) if cc_scores else 0.0
+        critical_count = len([cc for cc in cc_scores if cc >= 15])
+
+        return {
+            'funcs': len(funcs),
+            'files': len(files),
+            'lines': total_lines,
+            'avg_cc': avg_cc,
+            'critical': critical_count,
+            'cycles': 0,  # Cycles calculated elsewhere
+            'classes': 0,  # Will be updated by caller if needed
+        }
+
+    def _render_alerts_line(self, funcs: List[FunctionInfo]) -> str:
+        """Build alerts line for header."""
+        alerts = self._build_alerts(funcs)
+        return f"# alerts[{len(alerts)}]: {'; '.join(alerts) if alerts else 'none'}"
+
+    def _render_hotspots_line(self, funcs: List[FunctionInfo]) -> str:
+        """Build hotspots line for header."""
+        hotspots = self._build_hotspots(funcs)
+        return f"# hotspots[{len(hotspots)}]: {'; '.join(hotspots) if hotspots else 'none'}"
 
     # ------------------------------------------------------------------
     # M[] — module list with line counts

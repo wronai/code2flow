@@ -170,13 +170,41 @@ def _export_yaml(args, result, output_dir: Path):
 
 
 def _export_mermaid(args, result, output_dir: Path):
-    """Export Mermaid diagrams + optional PNG generation."""
+    """Export Mermaid diagrams + optional PNG generation.
+    
+    Plan R1: 3-level flow diagrams
+    - flow.mmd (compact, ~50 nodes) - architectural view [default]
+    - flow_detailed.mmd (~150 nodes) - per-module view [with --flow-detail]
+    - flow_full.mmd (all nodes) - debug view [with --flow-full]
+    """
     exporter = MermaidExporter()
-    exporter.export(result, str(output_dir / 'flow.mmd'))
+    
+    # Get include_examples flag
+    include_examples = getattr(args, 'flow_include_examples', False)
+    
+    # Default: export compact flow (architectural view, ~50 nodes)
+    exporter.export_flow_compact(result, str(output_dir / 'flow.mmd'), include_examples)
+    
+    # Optional: detailed flow (per-module, ~150 nodes)
+    if getattr(args, 'flow_detail', False):
+        exporter.export_flow_detailed(result, str(output_dir / 'flow_detailed.mmd'), include_examples)
+    
+    # Optional: full flow (all nodes, debug view)
+    if getattr(args, 'flow_full', False):
+        exporter.export_flow_full(result, str(output_dir / 'flow_full.mmd'), include_examples)
+    
+    # Legacy exports (for backward compatibility)
     exporter.export_call_graph(result, str(output_dir / 'calls.mmd'))
     exporter.export_compact(result, str(output_dir / 'compact_flow.mmd'))
+    
     if args.verbose:
-        print(f"  - Mermaid: {output_dir / '*.mmd'}")
+        files = ['flow.mmd']
+        if getattr(args, 'flow_detail', False):
+            files.append('flow_detailed.mmd')
+        if getattr(args, 'flow_full', False):
+            files.append('flow_full.mmd')
+        files.extend(['calls.mmd', 'compact_flow.mmd'])
+        print(f"  - Mermaid: {output_dir}/*.mmd ({', '.join(files)})")
 
     if not args.no_png:
         try:

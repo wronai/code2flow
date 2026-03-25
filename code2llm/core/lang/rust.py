@@ -9,7 +9,7 @@ from .base import calculate_complexity_regex, extract_calls_regex
 
 
 def analyze_rust(content: str, file_path: str, module_name: str,
-                 stats: Dict) -> Dict:
+                 ext: str, stats: Dict) -> Dict:
     """Analyze Rust files using regex-based parsing."""
     result = {
         'module': ModuleInfo(name=module_name, file=file_path, is_package=Path(file_path).name == 'mod.rs'),

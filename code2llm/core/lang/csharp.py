@@ -8,7 +8,7 @@ from .base import calculate_complexity_regex, extract_calls_regex, _extract_decl
 
 
 def analyze_csharp(content: str, file_path: str, module_name: str,
-                   stats: Dict) -> Dict:
+                   ext: str, stats: Dict) -> Dict:
     """Analyze C# files using shared extraction."""
     
     patterns = {

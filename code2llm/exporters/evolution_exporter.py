@@ -31,6 +31,7 @@ class EvolutionExporter(Exporter):
         'venv', '.venv', 'env', '.env', 'publish-env', 'test-env',
         'site-packages', 'node_modules', '__pycache__', '.git',
         'dist', 'build', 'egg-info', '.tox', '.mypy_cache',
+        'examples', 'benchmarks', 'tests', 'scripts', 'demo_langs',
     }
 
     def _is_excluded(self, path: str) -> bool:

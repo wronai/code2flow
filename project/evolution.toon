@@ -9,9 +9,9 @@ NEXT[10] (ranked by impact):
       WHY: 644L, 15 classes, max CC=6
       EFFORT: ~4h  IMPACT: 3864
 
-  [3] !! SPLIT-FUNC      _extract_declarations  CC=62  fan=45
-      WHY: CC=62 exceeds 15
-      EFFORT: ~1h  IMPACT: 2790
+  [3] !! SPLIT-FUNC      _extract_declarations  CC=65  fan=45
+      WHY: CC=65 exceeds 15
+      EFFORT: ~1h  IMPACT: 2925
 
   [4] !  SPLIT-FUNC      MapExporter._render_header  CC=16  fan=21
       WHY: CC=16 exceeds 15
@@ -49,10 +49,10 @@ RISKS[3]:
 
 METRICS-TARGET:
   CC̄:          4.3 → ≤3.0
-  max-CC:      62 → ≤20
+  max-CC:      65 → ≤20
   god-modules: 6 → 0
   high-CC(≥15): 8 → ≤4
   hub-types:   0 → ≤0
 
 HISTORY:
-  prev CC̄=4.4 → now CC̄=4.3
+  prev CC̄=4.3 → now CC̄=4.3
