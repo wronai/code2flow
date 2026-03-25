@@ -1,7 +1,7 @@
 import pytest
 import ast
 from code2llm.core.analyzer import ProjectAnalyzer
-from code2llm.core.core import FileAnalyzer, FastFileFilter, RefactoringAnalyzer
+from code2llm.core import FileAnalyzer, FastFileFilter, RefactoringAnalyzer
 from code2llm.core.config import Config
 from code2llm.core.models import AnalysisResult
 

@@ -28,10 +28,19 @@ __all__ = [
 
 def __getattr__(name):
     """Lazy import heavy modules on first access."""
-    _analyzer_names = {'ProjectAnalyzer', 'FileCache', 'FastFileFilter'}
-    if name in _analyzer_names:
-        from . import analyzer as _mod
-        return getattr(_mod, name)
+    if name == 'ProjectAnalyzer':
+        from .analyzer import ProjectAnalyzer
+        return ProjectAnalyzer
+    if name == 'FileAnalyzer':
+        from .file_analyzer import FileAnalyzer
+        return FileAnalyzer
+    if name == 'RefactoringAnalyzer':
+        from .refactoring import RefactoringAnalyzer
+        return RefactoringAnalyzer
+    if name in {'FileCache', 'FastFileFilter'}:
+        from .file_cache import FileCache
+        from .file_filter import FastFileFilter
+        return locals()[name]
     
     _streaming_names = {
         'StreamingAnalyzer', 'IncrementalAnalyzer', 'ScanStrategy',

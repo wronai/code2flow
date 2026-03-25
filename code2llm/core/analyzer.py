@@ -9,7 +9,10 @@ from .config import Config, FAST_CONFIG, ALL_EXTENSIONS, LANGUAGE_EXTENSIONS
 from .models import AnalysisResult, FlowEdge, FlowNode, Pattern
 from ..analysis.call_graph import CallGraphExtractor
 
-from .core import FileCache, FastFileFilter, FileAnalyzer, RefactoringAnalyzer, _analyze_single_file
+from .file_cache import FileCache
+from .file_filter import FastFileFilter
+from .file_analyzer import FileAnalyzer, _analyze_single_file
+from .refactoring import RefactoringAnalyzer
 
 
 class ProjectAnalyzer:
@@ -325,4 +328,6 @@ class ProjectAnalyzer:
 
 
 # Re-export for backward compatibility
-from .core import FileCache, FastFileFilter, FileAnalyzer
+from .file_cache import FileCache
+from .file_filter import FastFileFilter
+from .file_analyzer import FileAnalyzer

@@ -1,15 +1,15 @@
-"""C/C++ analyzer (regex-based)."""
+"""PHP analyzer (regex-based)."""
 
 import re
 from typing import Dict
 
-from ...models import ClassInfo, FunctionInfo, ModuleInfo
+from ..models import ClassInfo, FunctionInfo, ModuleInfo
 from .base import calculate_complexity_regex, extract_calls_regex
 
 
-def analyze_cpp(content: str, file_path: str, module_name: str,
-                ext: str, stats: Dict) -> Dict:
-    """Analyze C/C++ files using regex-based parsing."""
+def analyze_php(content: str, file_path: str, module_name: str,
+                stats: Dict) -> Dict:
+    """Analyze PHP files using regex-based parsing."""
     result = {
         'module': ModuleInfo(name=module_name, file=file_path, is_package=False),
         'functions': {},
@@ -20,52 +20,48 @@ def analyze_cpp(content: str, file_path: str, module_name: str,
 
     lines = content.split('\n')
 
-    # Patterns for C/C++
-    include_pattern = re.compile(r'^\s*#include\s+["<]([^">]+)[">]')
-    class_pattern = re.compile(r'^\s*(?:class|struct)\s+(\w+)')
-    func_pattern = re.compile(
-        r'^\s*(?:inline\s+|static\s+|virtual\s+|explicit\s+|constexpr\s+)?'
-        r'[\w<>,:*&\s]+\s+'  # return type with templates/pointers/refs
-        r'(\w+)\s*\([^)]*\)'  # function name and params
+    # Patterns for PHP
+    include_pattern = re.compile(r'^\s*(?:include|require|include_once|require_once)\s*["\']([^"\']+)["\']')
+    namespace_pattern = re.compile(r'^\s*namespace\s+([\\\w]+)')
+    use_pattern = re.compile(r'^\s*use\s+([\\\w]+)')
+    class_pattern = re.compile(
+        r'^\s*(?:abstract\s+|final\s+)?'
+        r'class\s+(\w+)'
+        r'(?:\s+extends\s+(\w+))?'
+        r'(?:\s+implements\s+([\w,\s\\]+))?'
     )
-    namespace_pattern = re.compile(r'^\s*namespace\s+(\w+)')
+    interface_pattern = re.compile(r'^\s*interface\s+(\w+)')
+    trait_pattern = re.compile(r'^\s*trait\s+(\w+)')
+    func_pattern = re.compile(
+        r'^\s*(?:public\s+|private\s+|protected\s+)?'
+        r'(?:static\s+)?'
+        r'function\s+(\w+)\s*\('
+    )
 
-    current_class = None
     current_namespace = None
+    current_class = None
     brace_depth = 0
     class_brace_depth = 0
-    in_block_comment = False
-    in_line_comment = False
+    in_php = False
 
     for line_no, line in enumerate(lines, 1):
         raw_line = line
         line = line.strip()
-        
-        # Handle block comments (/* ... */) and line comments
-        if not in_block_comment:
-            if '/*' in raw_line:
-                in_block_comment = True
-                # Remove everything after /* start
-                raw_line = raw_line.split('/*')[0]
-                line = raw_line.strip()
-            elif line.startswith('//'):
-                # Single line comment, skip entirely
-                continue
-        else:
-            if '*/' in raw_line:
-                # End of block comment
-                in_block_comment = False
-                # Remove everything before */ end
-                raw_line = raw_line.split('*/')[1]
-                line = raw_line.strip()
-            else:
-                # Still in block comment, skip this line
-                continue
-        
-        if not line:
+
+        # Track PHP context
+        if line.startswith('<?php') or line.startswith('<?'):
+            in_php = True
+            continue
+        if line == '?>':
+            in_php = False
+            continue
+        if not in_php and not line.startswith('<?'):
             continue
 
-        # Track brace depth for class scope
+        if not line or line.startswith('//'):
+            continue
+
+        # Track brace depth
         for ch in raw_line:
             if ch == '{':
                 brace_depth += 1
@@ -83,17 +79,47 @@ def analyze_cpp(content: str, file_path: str, module_name: str,
             result['module'].imports.append(include_match.group(1))
             continue
 
-        # Namespaces
+        # Namespace
         ns_match = namespace_pattern.match(line)
         if ns_match:
             current_namespace = ns_match.group(1)
             continue
 
-        # Classes/structs
+        # Use statements
+        use_match = use_pattern.match(line)
+        if use_match:
+            result['module'].imports.append(use_match.group(1))
+            continue
+
+        # Classes
         class_match = class_pattern.match(line)
         if class_match:
             class_name = class_match.group(1)
-            # Qualify with namespace if present
+            bases = []
+            if class_match.group(2):
+                bases.append(class_match.group(2).strip())
+            if class_match.group(3):
+                bases.extend([b.strip() for b in class_match.group(3).split(',')])
+
+            if current_namespace:
+                qualified_name = f"{module_name}.{current_namespace}.{class_name}"
+            else:
+                qualified_name = f"{module_name}.{class_name}"
+            result['classes'][qualified_name] = ClassInfo(
+                name=class_name, qualified_name=qualified_name,
+                file=file_path, line=line_no, module=module_name,
+                bases=bases, methods=[], docstring="",
+            )
+            result['module'].classes.append(qualified_name)
+            stats['classes_found'] += 1
+            current_class = qualified_name
+            class_brace_depth = brace_depth
+            continue
+
+        # Interfaces
+        interface_match = interface_pattern.match(line)
+        if interface_match:
+            class_name = interface_match.group(1)
             if current_namespace:
                 qualified_name = f"{module_name}.{current_namespace}.{class_name}"
             else:
@@ -105,21 +131,29 @@ def analyze_cpp(content: str, file_path: str, module_name: str,
             )
             result['module'].classes.append(qualified_name)
             stats['classes_found'] += 1
-            current_class = qualified_name
-            class_brace_depth = brace_depth
             continue
 
-        # Functions
+        # Traits
+        trait_match = trait_pattern.match(line)
+        if trait_match:
+            class_name = trait_match.group(1)
+            if current_namespace:
+                qualified_name = f"{module_name}.{current_namespace}.{class_name}"
+            else:
+                qualified_name = f"{module_name}.{class_name}"
+            result['classes'][qualified_name] = ClassInfo(
+                name=class_name, qualified_name=qualified_name,
+                file=file_path, line=line_no, module=module_name,
+                bases=[], methods=[], docstring="",
+            )
+            result['module'].classes.append(qualified_name)
+            stats['classes_found'] += 1
+            continue
+
+        # Functions/methods
         func_match = func_pattern.match(line)
         if func_match:
             func_name = func_match.group(1)
-            # Skip keywords that look like functions, plus common license terms
-            if func_name in ('if', 'for', 'while', 'switch', 'catch', 'return',
-                             'sizeof', 'decltype', 'typeof', 'new', 'delete',
-                             'Copyright', 'License', 'TORT', 'WITHOUT', 'WARRANTY',
-                             'Permission', 'Redistribution', 'Conditions', 'Disclaimer'):
-                continue
-
             if current_class:
                 qualified_name = f"{current_class}.{func_name}"
                 result['classes'][current_class].methods.append(qualified_name)

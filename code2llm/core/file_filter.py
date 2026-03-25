@@ -2,8 +2,8 @@
 
 import fnmatch
 from pathlib import Path
-from ..config import FilterConfig
-from ..gitignore import load_gitignore_patterns
+from .config import FilterConfig
+from .gitignore import load_gitignore_patterns
 
 
 class FastFileFilter:

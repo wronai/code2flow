@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Dict
 
-from ...models import ClassInfo, FunctionInfo, ModuleInfo
+from ..models import ClassInfo, FunctionInfo, ModuleInfo
 from .base import calculate_complexity_regex, extract_calls_regex
 
 

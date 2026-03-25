@@ -1,4 +1,4 @@
-# code2llm | 113f 20681L | python:106,php:1,shell:1 | 2026-03-25
+# code2llm | 114f 20752L | python:106,shell:2,php:1 | 2026-03-25
 # CC̄=4.6 | critical:12/895 | dups:0 | cycles:0
 
 HEALTH[12]:
@@ -7,11 +7,11 @@ HEALTH[12]:
   🟡 CC    _resolve_callee CC=18 (limit:15)
   🟡 CC    _render_header CC=16 (limit:15)
   🟡 CC    _export_chunked_results CC=17 (limit:15)
-  🟡 CC    analyze_cpp CC=20 (limit:15)
   🟡 CC    analyze_ruby CC=19 (limit:15)
   🟡 CC    extract_calls_regex CC=16 (limit:15)
-  🟡 CC    analyze_csharp CC=20 (limit:15)
+  🟡 CC    analyze_cpp CC=20 (limit:15)
   🟡 CC    analyze_java CC=15 (limit:15)
+  🟡 CC    analyze_csharp CC=20 (limit:15)
   🟡 CC    analyze_php CC=29 (limit:15)
   🟡 CC    analyze_typescript_js CC=41 (limit:15)
 
@@ -21,18 +21,18 @@ REFACTOR[1]:
 PIPELINES[615]:
   [1] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [2] Src [save_report]: save_report
+  [2] Src [run_benchmark]: run_benchmark → load_previous
       PURITY: 100% pure
-  [3] Src [run_benchmark]: run_benchmark → load_previous
+  [3] Src [save_report]: save_report
       PURITY: 100% pure
   [4] Src [main]: main → load_file → is_toon_file
       PURITY: 100% pure
-  [5] Src [main]: main → create_html → get_shield_url
+  [5] Src [__init__]: __init__
       PURITY: 100% pure
 
 LAYERS:
   code2llm/                       CC̄=4.8    ←in:0  →out:5
-  │ !! index_generator            777L  1C    7m  CC=5      ←0
+  │ !! index_generator            790L  1C    7m  CC=5      ←0
   │ !! project_yaml_exporter      513L  1C   18m  CC=13     ←0
   │ !! html_dashboard             504L  1C   14m  CC=7      ←0
   │ !! metrics                    501L  1C   27m  CC=12     ←0
@@ -130,6 +130,7 @@ LAYERS:
   ./                              CC̄=4.2    ←in:0  →out:0
   │ !! validate_toon              394L  0C   15m  CC=17     ←0
   │ setup                       67L  0C    1m  CC=2      ←0
+  │ orchestrator.sh             58L  0C    0m  CC=0.0    ←0
   │ project.sh                  49L  0C    0m  CC=0.0    ←0
   │
   scripts/                        CC̄=3.9    ←in:0  →out:0

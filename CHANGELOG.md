@@ -1,5 +1,27 @@
 ## [Unreleased]
 
+## [0.5.62] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_advanced_analysis.py
+
+### Other
+- Update code2llm/core/__init__.py
+- Update code2llm/core/analyzer.py
+- Update code2llm/core/core/__init__.py
+- Update code2llm/core/file_analyzer.py
+- Update code2llm/core/file_cache.py
+- Update code2llm/core/file_filter.py
+- Update code2llm/core/lang/__init__.py
+- Update code2llm/core/lang/base.py
+- Update code2llm/core/lang/cpp.py
+- Update code2llm/core/lang/csharp.py
+- ... and 21 more files
+
 ## [0.5.61] - 2026-03-25
 
 ### Docs

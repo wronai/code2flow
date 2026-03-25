@@ -3,7 +3,7 @@
 import re
 from typing import Dict
 
-from ...models import ClassInfo, FunctionInfo, ModuleInfo
+from ..models import ClassInfo, FunctionInfo, ModuleInfo
 from .base import extract_calls_regex
 
 

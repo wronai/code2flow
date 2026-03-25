@@ -1,18 +1,18 @@
-"""Rust analyzer (regex-based)."""
+"""Go analyzer (regex-based)."""
 
 import re
 from pathlib import Path
 from typing import Dict
 
-from ...models import ClassInfo, FunctionInfo, ModuleInfo
+from ..models import ClassInfo, FunctionInfo, ModuleInfo
 from .base import calculate_complexity_regex, extract_calls_regex
 
 
-def analyze_rust(content: str, file_path: str, module_name: str,
-                 stats: Dict) -> Dict:
-    """Analyze Rust files using regex-based parsing."""
+def analyze_go(content: str, file_path: str, module_name: str,
+               stats: Dict) -> Dict:
+    """Analyze Go files using regex-based parsing."""
     result = {
-        'module': ModuleInfo(name=module_name, file=file_path, is_package=Path(file_path).name == 'mod.rs'),
+        'module': ModuleInfo(name=module_name, file=file_path, is_package=False),
         'functions': {},
         'classes': {},
         'nodes': {},
@@ -21,13 +21,10 @@ def analyze_rust(content: str, file_path: str, module_name: str,
 
     lines = content.split('\n')
 
-    use_pattern = re.compile(r'^\s*use\s+([\w:]+)')
-    fn_pattern = re.compile(r'^\s*(?:pub\s+)?fn\s+(\w+)\s*\(')
-    struct_pattern = re.compile(r'^\s*(?:pub\s+)?struct\s+(\w+)')
-    impl_pattern = re.compile(r'^\s*impl\s+(?:<[^>]+>\s+)?(\w+)')
-    trait_pattern = re.compile(r'^\s*(?:pub\s+)?trait\s+(\w+)')
-
-    current_impl = None
+    import_pattern = re.compile(r'^\s*import\s+(?:\(\s*["\']([^"\']+)["\']|["\']([^"\']+)["\'])')
+    func_pattern = re.compile(r'^\s*func\s+(?:\([^)]+\)\s+)?(\w+)\s*\(')
+    struct_pattern = re.compile(r'^\s*type\s+(\w+)\s+struct')
+    interface_pattern = re.compile(r'^\s*type\s+(\w+)\s+interface')
 
     for line_no, line in enumerate(lines, 1):
         line = line.strip()
@@ -35,27 +32,28 @@ def analyze_rust(content: str, file_path: str, module_name: str,
             continue
 
         # Imports
-        use_match = use_pattern.match(line)
-        if use_match:
-            result['module'].imports.append(use_match.group(1))
+        import_match = import_pattern.match(line)
+        if import_match:
+            imp = import_match.group(1) or import_match.group(2)
+            if imp:
+                result['module'].imports.append(imp)
 
         # Functions
-        fn_match = fn_pattern.match(line)
-        if fn_match:
-            func_name = fn_match.group(1)
+        func_match = func_pattern.match(line)
+        if func_match:
+            func_name = func_match.group(1)
             qualified_name = f"{module_name}.{func_name}"
             result['functions'][qualified_name] = FunctionInfo(
                 name=func_name, qualified_name=qualified_name,
                 file=file_path, line=line_no, column=0,
-                module=module_name, class_name=current_impl,
-                is_method=current_impl is not None,
-                is_private=not line.startswith('pub'),
+                module=module_name, class_name=None,
+                is_method=False, is_private=func_name.startswith('_'),
                 is_property=False, docstring="", args=[], decorators=[],
             )
             result['module'].functions.append(qualified_name)
             stats['functions_found'] += 1
 
-        # Structs
+        # Structs (treated as classes)
         struct_match = struct_pattern.match(line)
         if struct_match:
             class_name = struct_match.group(1)
@@ -68,15 +66,10 @@ def analyze_rust(content: str, file_path: str, module_name: str,
             result['module'].classes.append(qualified_name)
             stats['classes_found'] += 1
 
-        # impl blocks
-        impl_match = impl_pattern.match(line)
-        if impl_match:
-            current_impl = impl_match.group(1)
-
-        # Traits (interfaces)
-        trait_match = trait_pattern.match(line)
-        if trait_match:
-            class_name = trait_match.group(1)
+        # Interfaces
+        interface_match = interface_pattern.match(line)
+        if interface_match:
+            class_name = interface_match.group(1)
             qualified_name = f"{module_name}.{class_name}"
             result['classes'][qualified_name] = ClassInfo(
                 name=class_name, qualified_name=qualified_name,
@@ -87,7 +80,7 @@ def analyze_rust(content: str, file_path: str, module_name: str,
             stats['classes_found'] += 1
 
     # Regex-based complexity estimation and call extraction
-    calculate_complexity_regex(content, result, lang='rust')
+    calculate_complexity_regex(content, result, lang='go')
     extract_calls_regex(content, module_name, result)
 
     stats['files_processed'] += 1

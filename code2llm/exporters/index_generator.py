@@ -130,6 +130,7 @@ class IndexHTMLGenerator:
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
     <style>
         :root {{
             --bg: #0f172a;
@@ -736,6 +737,18 @@ class IndexHTMLGenerator:
                 }} catch {{
                     body.innerHTML = `<pre>${{file.content}}</pre>`;
                 }}
+            }} else if (file.type === 'yaml') {{
+                // YAML with syntax highlighting
+                body.innerHTML = `<pre><code class="language-yaml">${{file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            }} else if (file.type === 'toon') {{
+                // TOON with simple highlighting (use ini as closest match for key: value format)
+                body.innerHTML = `<pre><code class="language-ini">${{file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
+            }} else if (file.type === 'code') {{
+                // Code files with auto-highlighting
+                body.innerHTML = `<pre><code>${{file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}}</code></pre>`;
+                hljs.highlightElement(body.querySelector('code'));
             }} else {{
                 body.innerHTML = `<pre>${{file.content}}</pre>`;
             }}

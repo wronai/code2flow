@@ -7,13 +7,13 @@ from typing import Dict, List, Optional
 
 from radon.complexity import cc_visit, cc_rank
 
-from ..config import Config, LANGUAGE_EXTENSIONS
-from ..models import (
+from .config import Config, LANGUAGE_EXTENSIONS
+from .models import (
     AnalysisResult, ClassInfo, FlowEdge, FlowNode,
     FunctionInfo, ModuleInfo
 )
-from ...analysis.dfg import DFGExtractor
-from ...analysis.call_graph import CallGraphExtractor
+from ..analysis.dfg import DFGExtractor
+from ..analysis.call_graph import CallGraphExtractor
 from .file_filter import FastFileFilter
 from .lang import (
     analyze_typescript_js, analyze_go, analyze_rust, analyze_java,

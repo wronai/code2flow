@@ -1,10 +1,10 @@
-# code2llm | 108f 20475L | python:106,php:1,shell:1 | 2026-03-25
-# stats: 791 func | 86 cls | 108 mod | CC̄=4.6 | critical:12 | cycles:0
+# code2llm | 109f 20546L | python:106,php:1,shell:2 | 2026-03-25
+# stats: 791 func | 86 cls | 109 mod | CC̄=4.6 | critical:12 | cycles:0
 # alerts[5]: CC analyze_typescript_js=41; fan-out analyze_typescript_js=41; fan-out analyze_php=35; fan-out analyze_ruby=30; CC analyze_php=29
 # hotspots[5]: analyze_typescript_js fan=41; analyze_php fan=35; analyze_ruby fan=30; analyze_java fan=29; analyze_cpp fan=26
 # evolution: CC̄ 4.4→4.6 (regressed +0.2)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[108]:
+M[109]:
   badges/server.py,110
   benchmarks/benchmark_constants.py,29
   benchmarks/benchmark_evolution.py,137
@@ -76,7 +76,7 @@ M[108]:
   code2llm/exporters/flow_exporter.py,391
   code2llm/exporters/flow_renderer.py,188
   code2llm/exporters/html_dashboard.py,504
-  code2llm/exporters/index_generator.py,777
+  code2llm/exporters/index_generator.py,790
   code2llm/exporters/json_exporter.py,17
   code2llm/exporters/llm_exporter.py,12
   code2llm/exporters/map_exporter.py,327
@@ -108,6 +108,7 @@ M[108]:
   code2llm/refactor/__init__.py,0
   code2llm/refactor/prompt_engine.py,150
   demo_langs/valid/sample.php,44
+  orchestrator.sh,58
   project.sh,49
   scripts/benchmark_badges.py,392
   scripts/bump_version.py,96
@@ -223,19 +224,6 @@ S...
     dump_yaml(data)
     create_parser()
     main(argv)
-  code2llm/cli_exports/formats.py:
-    e: _export_evolution,_export_data_structures,_export_context_fallback,_export_readme,_export_project_yaml,_run_report,_export_simple_formats,_export_yaml,_export_mermaid,_export_refactor_prompts,_export_index_html
-    _export_evolution(args;result;output_dir)
-    _export_data_structures(args;result;output_dir)
-    _export_context_fallback(args;result;output_dir;formats)
-    _export_readme(args;result;output_dir)
-    _export_project_yaml(args;result;output_dir)
-    _run_report(args;project_yaml_path;output_dir)
-    _export_simple_formats(args;result;output_dir;formats)
-    _export_yaml(args;result;output_dir)
-    _export_mermaid(args;result;output_dir)
-    _export_refactor_prompts(args;result;output_dir)
-    _export_index_html(args;output_dir)
   code2llm/generators/llm_flow.py:
     e: FuncSummary,_strip_bom,_safe_read_yaml,_as_dict,_as_list,_shorten,_parse_call_label,_parse_func_label,_collect_nodes,_group_nodes_by_file,_is_entrypoint_file,_extract_entrypoint_info,_deduplicate_entrypoints,_collect_entrypoints,_collect_functions,_node_counts_by_function,_pick_relevant_functions,_summarize_functions,_build_call_graph,_reachable,generate_llm_flow,render_llm_flow_md,dump_yaml,create_parser,main
     FuncSummary:
@@ -263,6 +251,19 @@ S...
     dump_yaml(data)
     create_parser()
     main(argv)
+  code2llm/cli_exports/formats.py:
+    e: _export_evolution,_export_data_structures,_export_context_fallback,_export_readme,_export_project_yaml,_run_report,_export_simple_formats,_export_yaml,_export_mermaid,_export_refactor_prompts,_export_index_html
+    _export_evolution(args;result;output_dir)
+    _export_data_structures(args;result;output_dir)
+    _export_context_fallback(args;result;output_dir;formats)
+    _export_readme(args;result;output_dir)
+    _export_project_yaml(args;result;output_dir)
+    _run_report(args;project_yaml_path;output_dir)
+    _export_simple_formats(args;result;output_dir;formats)
+    _export_yaml(args;result;output_dir)
+    _export_mermaid(args;result;output_dir)
+    _export_refactor_prompts(args;result;output_dir)
+    _export_index_html(args;output_dir)
   code2llm/core/streaming/scanner.py:
     e: StreamingScanner
     StreamingScanner: __init__(2),quick_scan_file(1),deep_analyze_file(1),build_call_graph_streaming(1),select_important_files(2),collect_files(1)  # Handles file scanning operations...
@@ -396,9 +397,6 @@ Sections: P...
   code2llm/analysis/type_inference.py:
     e: TypeInferenceEngine
     TypeInferenceEngine: __init__(0),enrich_function(1),get_arg_types(1),get_return_type(1),get_typed_signature(1),extract_all_types(1),_get_ast(1),_find_function_node(3),_extract_from_node(2),_extract_args(1),_annotation_to_str(1),_ann_constant(1),_ann_name(1),_ann_attribute(1),_ann_subscript(1),_ann_tuple(1),_ann_binop(1),_infer_from_name(1),_infer_arg_type(1)  # Extract and infer type information from Python source files...
-  code2llm/analysis/call_graph.py:
-    e: CallGraphExtractor
-    CallGraphExtractor(ast.NodeVisitor): __init__(1),extract(3),_calculate_metrics(0),visit_Import(1),visit_ImportFrom(1),visit_ClassDef(1),visit_FunctionDef(1),visit_AsyncFunctionDef(1),visit_Call(1),_qualified_name(1),_resolve_call(1),_resolve_with_astroid(1),_expr_to_str(1)  # Extract call graph from AST...
   code2llm/core/large_repo.py:
     e: SubProject,HierarchicalRepoSplitter,should_use_chunking,get_analysis_plan
     SubProject:  # Represents a sub-project within a larger repository...
@@ -407,6 +405,9 @@ Sections: P...
 Stra...
     should_use_chunking(project_path;size_threshold_kb)
     get_analysis_plan(project_path;size_limit_kb)
+  code2llm/analysis/call_graph.py:
+    e: CallGraphExtractor
+    CallGraphExtractor(ast.NodeVisitor): __init__(1),extract(3),_calculate_metrics(0),visit_Import(1),visit_ImportFrom(1),visit_ClassDef(1),visit_FunctionDef(1),visit_AsyncFunctionDef(1),visit_Call(1),_qualified_name(1),_resolve_call(1),_resolve_with_astroid(1),_expr_to_str(1)  # Extract call graph from AST...
   code2llm/patterns/detector.py:
     e: PatternDetector
     PatternDetector: __init__(1),detect_patterns(1),_detect_recursion(1),_detect_state_machines(1),_detect_factory_pattern(1),_detect_singleton(1),_detect_strategy_pattern(1),_check_returns_classes(2)  # Detect behavioral patterns in code...
@@ -474,12 +475,12 @@ Stra...
   code2llm/analysis/coupling.py:
     e: CouplingAnalyzer
     CouplingAnalyzer: __init__(1),analyze(0),_analyze_module_interactions(0),_detect_data_leakage(0),_detect_shared_state(0)  # Analyze coupling between modules...
-  code2llm/analysis/dfg.py:
-    e: DFGExtractor
-    DFGExtractor(ast.NodeVisitor): __init__(1),extract(3),visit_FunctionDef(1),visit_Assign(1),visit_AugAssign(1),visit_For(1),visit_Call(1),_extract_targets(1),_get_names(1),_extract_names(1),_expr_to_str(1),_build_data_flow_edges(0)  # Extract Data Flow Graph from AST...
   code2llm/analysis/smells.py:
     e: SmellDetector
     SmellDetector: __init__(1),detect(0),_detect_god_functions(0),_detect_god_modules(0),_detect_feature_envy(0),_detect_data_clumps(0),_detect_shotgun_surgery(0),_detect_bottlenecks(0),_detect_circular_dependencies(0)  # Detect code smells from analysis results...
+  code2llm/analysis/dfg.py:
+    e: DFGExtractor
+    DFGExtractor(ast.NodeVisitor): __init__(1),extract(3),visit_FunctionDef(1),visit_Assign(1),visit_AugAssign(1),visit_For(1),visit_Call(1),_extract_targets(1),_get_names(1),_extract_names(1),_expr_to_str(1),_build_data_flow_edges(0)  # Extract Data Flow Graph from AST...
   code2llm/nlp/intent_matching.py:
     e: IntentMatch,IntentMatchingResult,IntentMatcher
     IntentMatch:  # Single intent match result...
@@ -548,6 +549,11 @@ Stra...
   code2llm/core/streaming/incremental.py:
     e: IncrementalAnalyzer
     IncrementalAnalyzer: __init__(1),_load_state(0),_save_state(1),get_changed_files(1),_get_module_name(2)  # Incremental analysis with change detection...
+  badges/server.py:
+    e: index,generate_badges,get_badges
+    index()
+    generate_badges()
+    get_badges()
   scripts/bump_version.py:
     e: get_current_version,parse_version,format_version,bump_version,update_pyproject_toml,update_version_file,main
     get_current_version()
@@ -557,11 +563,6 @@ Stra...
     update_pyproject_toml(new_version)
     update_version_file(new_version)
     main()
-  badges/server.py:
-    e: index,generate_badges,get_badges
-    index()
-    generate_badges()
-    get_badges()
   benchmarks/benchmark_format_quality.py:
     e: _print_benchmark_header,_print_ground_truth_info,_generate_format_outputs,_create_offline_scores,run_benchmark
     _print_benchmark_header()
@@ -649,4 +650,5 @@ Stra...
     e: ScanStrategy
     ScanStrategy:  # Scanning methodology configuration...
   code2llm/core/core/lang/__init__.py:
+  orchestrator.sh:
   project.sh:
