@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.66] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update project/analysis.json
+- Update project/analysis.toon
+- Update project/analysis.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/evolution.toon
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 2 more files
+
 ## [0.5.65] - 2026-03-25
 
 ### Docs

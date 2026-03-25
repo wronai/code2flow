@@ -1,58 +1,58 @@
-# code2llm/evolution | 897 func | 105f | 2026-03-25
+# code2llm/evolution | 730 func | 83f | 2026-03-25
 
 NEXT[10] (ranked by impact):
-  [1] !! SPLIT           code2llm/exporters/index_generator.py
+  [1] !! SPLIT           code2llm/exporters/mermaid_exporter.py
+      WHY: 637L, 1 classes, max CC=25
+      EFFORT: ~4h  IMPACT: 15925
+
+  [2] !! SPLIT           code2llm/exporters/project_yaml_exporter.py
+      WHY: 513L, 1 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 6669
+
+  [3] !! SPLIT           code2llm/exporters/index_generator.py
       WHY: 790L, 1 classes, max CC=5
       EFFORT: ~4h  IMPACT: 3950
 
-  [2] !! SPLIT           examples/functional_refactoring_example.py
-      WHY: 644L, 15 classes, max CC=6
-      EFFORT: ~4h  IMPACT: 3864
-
-  [3] !! SPLIT-FUNC      _extract_declarations  CC=65  fan=45
+  [4] !! SPLIT-FUNC      _extract_declarations  CC=65  fan=45
       WHY: CC=65 exceeds 15
       EFFORT: ~1h  IMPACT: 2925
 
-  [4] !  SPLIT-FUNC      MapExporter._render_header  CC=16  fan=21
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 336
+  [5] !! SPLIT-FUNC      MermaidExporter.export_flow_detailed  CC=25  fan=21
+      WHY: CC=25 exceeds 15
+      EFFORT: ~1h  IMPACT: 525
 
-  [5] !  SPLIT-FUNC      analyze_ruby  CC=17  fan=19
+  [6] !  SPLIT-FUNC      MermaidExporter.export_flow_full  CC=23  fan=20
+      WHY: CC=23 exceeds 15
+      EFFORT: ~1h  IMPACT: 460
+
+  [7] !  SPLIT-FUNC      MermaidExporter.export_flow_compact  CC=23  fan=18
+      WHY: CC=23 exceeds 15
+      EFFORT: ~1h  IMPACT: 414
+
+  [8] !  SPLIT-FUNC      analyze_ruby  CC=17  fan=19
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 323
 
-  [6] !  SPLIT-FUNC      _export_chunked_results  CC=17  fan=16
-      WHY: CC=17 exceeds 15
-      EFFORT: ~1h  IMPACT: 272
+  [9] !  SPLIT-FUNC      _export_mermaid  CC=16  fan=16
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 256
 
-  [7] !  SPLIT-FUNC      main  CC=17  fan=14
+  [10] !  SPLIT-FUNC      main  CC=17  fan=14
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 238
-
-  [8] !  SPLIT-FUNC      validate_chunked_output  CC=15  fan=14
-      WHY: CC=15 exceeds 15
-      EFFORT: ~1h  IMPACT: 210
-
-  [9] !  SPLIT-FUNC      extract_calls_regex  CC=16  fan=12
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 192
-
-  [10] !! SPLIT           tests/test_nonpython_cc_calls.py
-      WHY: 642L, 0 classes, max CC=0
-      EFFORT: ~4h  IMPACT: 0
 
 
 RISKS[3]:
   ⚠ Splitting code2llm/exporters/index_generator.py may break 7 import paths
-  ⚠ Splitting examples/functional_refactoring_example.py may break 50 import paths
-  ⚠ Splitting tests/test_nonpython_cc_calls.py may break 0 import paths
+  ⚠ Splitting code2llm/exporters/mermaid_exporter.py may break 18 import paths
+  ⚠ Splitting code2llm/exporters/project_yaml_exporter.py may break 18 import paths
 
 METRICS-TARGET:
-  CC̄:          4.3 → ≤3.0
+  CC̄:          4.8 → ≤3.4
   max-CC:      65 → ≤20
-  god-modules: 6 → 0
-  high-CC(≥15): 8 → ≤4
+  god-modules: 5 → 0
+  high-CC(≥15): 10 → ≤5
   hub-types:   0 → ≤0
 
 HISTORY:
-  prev CC̄=4.3 → now CC̄=4.3
+  prev CC̄=4.8 → now CC̄=4.8
