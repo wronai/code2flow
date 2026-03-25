@@ -206,7 +206,7 @@ grep "SIDE_EFFECTS" flow.toon
 **Key sections**:
 - **MODULES**: All modules with basic stats
 - **IMPORTS**: Dependency relationships
-- **e:** Public API exports and signatures
+- **EXPORTS**: Public API surface and signatures
 - **HEADER**: Stats, alerts, hotspots, evolution trend
 
 **Example usage**:
@@ -215,7 +215,7 @@ grep "SIDE_EFFECTS" flow.toon
 cat map.toon | head -50
 
 # Find public APIs
-grep "^    e:" map.toon
+grep "SIGNATURES" map.toon
 ```
 
 ### `project.toon` - Legacy Project Logic (Deprecated)
@@ -425,9 +425,9 @@ For more information about code2llm, visit: https://github.com/tom-sapletta/code
         files_to_check = {
             'analysis.toon': 'Health diagnostics',
             'evolution.toon': 'Refactoring queue',
-            'flow.toon': 'Legacy data flow analysis',
-            'map.toon': 'Structural map + project header',
-            'project.toon': 'Legacy project logic',
+            'flow.toon': 'Data flow analysis',
+            'map.toon': 'Structural map',
+            'project.toon': 'Project logic',
             'prompt.txt': 'LLM prompt',
             'context.md': 'LLM narrative',
             'analysis.yaml': 'YAML data',

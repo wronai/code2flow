@@ -1,27 +1,27 @@
-# code2llm | 113f 20532L | python:109,shell:2,php:1 | 2026-03-25
+# code2llm | 113f 20532L | python:106,php:1,shell:1 | 2026-03-25
 # CC̄=4.6 | critical:69/891 | dups:0 | cycles:0
 
 HEALTH[20]:
-  🟡 CC    analyze_typescript_js CC=41 (limit:10)
-  🟡 CC    analyze_php CC=29 (limit:10)
-  🟡 CC    analyze_cpp CC=20 (limit:10)
-  🟡 CC    analyze_csharp CC=20 (limit:10)
-  🟡 CC    analyze_ruby CC=19 (limit:10)
-  🟡 CC    _resolve_callee CC=18 (limit:10)
+  🟡 CC    parse_evolution_metrics CC=13 (limit:10)
   🟡 CC    main CC=17 (limit:10)
-  🟡 CC    _export_chunked_results CC=17 (limit:10)
-  🟡 CC    _render_header CC=16 (limit:10)
-  🟡 CC    extract_calls_regex CC=16 (limit:10)
-  🟡 CC    validate_chunked_output CC=15 (limit:10)
-  🟡 CC    analyze_java CC=15 (limit:10)
+  🟡 CC    parse_evolution_metrics CC=13 (limit:10)
   🟡 CC    _analyze_subproject CC=14 (limit:10)
+  🟡 CC    validate_chunked_output CC=15 (limit:10)
+  🟡 CC    _find_pipeline_paths CC=13 (limit:10)
+  🟡 CC    _resolve_callee CC=18 (limit:10)
   🟡 CC    _find_event_flows CC=14 (limit:10)
   🟡 CC    _get_function_data_types CC=14 (limit:10)
   🟡 CC    _analyze_optimization_opportunities CC=14 (limit:10)
+  🟡 CC    _check_calls CC=13 (limit:10)
   🟡 CC    _heuristic_classify CC=14 (limit:10)
+  🟡 CC    analyze_project CC=11 (limit:10)
   🟡 CC    _build_call_graph CC=14 (limit:10)
-  🟡 CC    render_data_types CC=14 (limit:10)
-  🟡 CC    normalize_llm_task CC=14 (limit:10)
+  🟡 CC    analyze_streaming CC=12 (limit:10)
+  🟡 CC    _split_by_modules CC=10 (limit:10)
+  🟡 CC    resolve CC=13 (limit:10)
+  🟡 CC    _extract_insights CC=13 (limit:10)
+  🟡 CC    _render_header CC=16 (limit:10)
+  🟡 CC    _render_map_module CC=13 (limit:10)
 
 LAYERS:
   code2llm/                       CC̄=4.8    ←in:0  →out:5

@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.59] - 2026-03-25
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_parser.py
+- Update code2llm/exporters/project_yaml_exporter.py
+- Update code2llm/exporters/readme_exporter.py
+- Update code2llm/exporters/report_generators.py
+- Update project/analysis.toon
+- Update project/batch_1/analysis.toon
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- ... and 11 more files
+
 ## [0.5.58] - 2026-03-25
 
 ### Docs

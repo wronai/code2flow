@@ -18,8 +18,9 @@ When you run `code2llm ./ -f all`, the following files are created:
 
 | File | Format | Purpose | Use Case |
 |------|--------|---------|----------|
-| `prompt.txt` | **Text** | **📝 Ready-to-send prompt** - Lists all files with instructions | Attach to LLM conversation as context guide |
 | `context.md` | **Markdown** | **📖 LLM narrative** - Architecture summary | Paste into ChatGPT/Claude for code analysis |
+| `analysis.yaml` | **YAML** | **📊 Structured data** - Machine-readable | For scripts and automated processing |
+| `analysis.json` | **JSON** | **🔧 API format** - Programmatic access | For integration with other tools |
 
 ### 📊 Visualizations
 
@@ -332,6 +333,6 @@ code2llm ./ -f yaml --separate-orphans
 **Analysis Date**: 2026-03-25  
 **Total Functions**: 891  
 **Total Classes**: 106  
-**Modules**: 121  
+**Modules**: 117  
 
 For more information about code2llm, visit: https://github.com/tom-sapletta/code2llm
