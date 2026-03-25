@@ -179,13 +179,13 @@ Shows entry points, high-level modules, and critical path.
 ### code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_project_yaml
 - **Calls**: code2llm.exporters.toon.helpers._scan_line_counts, self._build_modules, self._build_health, self._build_hotspots, self._build_refactoring, self._build_evolution, sum, line_counts.items
 
-### code2llm.exporters.context_exporter.ContextExporter.export
-> Generate comprehensive LLM prompt with architecture description.
-- **Calls**: lines.extend, lines.extend, self._get_important_entries, lines.extend, lines.extend, lines.extend, lines.extend, lines.extend
-
 ### code2llm.exporters.mermaid_exporter.MermaidExporter.export_call_graph
 > Export simplified call graph — only connected nodes.
 - **Calls**: set, result.functions.items, sorted, set, self._write, self._module_of, result.functions.get, modules.items
+
+### code2llm.exporters.context_exporter.ContextExporter.export
+> Generate comprehensive LLM prompt with architecture description.
+- **Calls**: lines.extend, lines.extend, self._get_important_entries, lines.extend, lines.extend, lines.extend, lines.extend, lines.extend
 
 ### code2llm.exporters.html_dashboard.HTMLDashboardGenerator._assemble_html
 - **Calls**: self._render_evolution_section, self._render_evolution_script, None.join, proj.get, proj.get, proj.get, stats.get, stats.get
@@ -435,17 +435,17 @@ Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TY
 
 Key functions that process and transform data:
 
-### validate_toon.validate_toon_completeness
-> Validate toon format structure.
-- **Output to**: print, print, bool, bool, bool
-
 ### benchmarks.benchmark_evolution.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
 
-### benchmarks.benchmark_format_quality._generate_format_outputs
-> Generate all format outputs and evaluate them.
-- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
+### validate_toon.validate_toon_completeness
+> Validate toon format structure.
+- **Output to**: print, print, bool, bool, bool
+
+### benchmarks.format_evaluator.evaluate_format
+> Oceń pojedynczy format względem ground truth.
+- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
 
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
@@ -474,13 +474,6 @@ Key functions that process and transform data:
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
-### benchmarks.format_evaluator.evaluate_format
-> Oceń pojedynczy format względem ground truth.
-- **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
-
-### demo_langs.valid.sample.UserService.process_users
-- **Output to**: print
-
 ### code2llm.cli_commands.validate_and_setup
 > Validate source path and setup output directory.
 - **Output to**: Path, Path, output_dir.mkdir, print, print
@@ -492,8 +485,15 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
+
 ### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
 - **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
+
+### benchmarks.benchmark_format_quality._generate_format_outputs
+> Generate all format outputs and evaluate them.
+- **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
 
 ### code2llm.core.repo_files._get_gitignore_parser
 > Load gitignore parser for project if available.
@@ -508,18 +508,6 @@ Checks:
 
 Returns list of (module_name, start_line, end_line).
 - **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
-
-### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
-> Process large directories with file-level chunking.
-- **Output to**: self._chunk_by_files, chunks.extend
-
-### code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files
-> Process Python files directly in level1 directory.
-- **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
-
-### code2llm.core.file_filter.FastFileFilter.should_process
-> Check if file should be processed.
-- **Output to**: file_path.lower, Path, self._gitignore_parser.is_ignored, any, fnmatch.fnmatch
 
 ### code2llm.core.file_analyzer.FileAnalyzer._process_class
 > Process class definition.
@@ -536,6 +524,18 @@ Returns list of (module_name, start_line, end_line).
 ### code2llm.core.file_analyzer.FileAnalyzer._process_if_stmt
 > Process if statement for CFG.
 - **Output to**: FlowNode, func_info.cfg_nodes.append, None.append, self._process_cfg_block, FlowNode
+
+### code2llm.core.file_analyzer.FileAnalyzer._process_loop_stmt
+> Process loop statement for CFG.
+- **Output to**: FlowNode, func_info.cfg_nodes.append, None.append, self._process_cfg_block, isinstance
+
+### code2llm.core.file_analyzer.FileAnalyzer._process_return_stmt
+> Process return statement for CFG.
+- **Output to**: FlowNode, func_info.cfg_nodes.append, None.append, None.append, FlowEdge
+
+### code2llm.core.file_filter.FastFileFilter.should_process
+> Check if file should be processed.
+- **Output to**: file_path.lower, Path, self._gitignore_parser.is_ignored, any, fnmatch.fnmatch
 
 ## Behavioral Patterns
 
@@ -582,15 +582,15 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.exporters.mermaid_exporter.MermaidExporter.export_compact` - 26 calls
 - `code2llm.exporters.toon.ToonExporter.export` - 26 calls
 - `benchmarks.benchmark_evolution.parse_evolution_metrics` - 25 calls
-- `code2llm.exporters.context_exporter.ContextExporter.export` - 25 calls
 - `code2llm.exporters.mermaid_exporter.MermaidExporter.export_call_graph` - 25 calls
+- `code2llm.exporters.context_exporter.ContextExporter.export` - 25 calls
 - `validate_toon.compare_functions` - 24 calls
 - `code2llm.generators.mermaid.generate_single_png` - 24 calls
 - `scripts.benchmark_badges.main` - 23 calls
 - `code2llm.exporters.evolution_exporter.EvolutionExporter.export` - 23 calls
 - `code2llm.exporters.flow_exporter.FlowExporter.export` - 23 calls
-- `benchmarks.benchmark_format_quality.run_benchmark` - 22 calls
 - `benchmarks.format_evaluator.evaluate_format` - 22 calls
+- `benchmarks.benchmark_format_quality.run_benchmark` - 22 calls
 - `code2llm.exporters.evolution_exporter.EvolutionExporter.export_to_yaml` - 22 calls
 - `code2llm.cli_commands.generate_llm_context` - 21 calls
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_files` - 20 calls
