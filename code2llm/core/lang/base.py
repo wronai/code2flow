@@ -182,131 +182,189 @@ def _extract_declarations(
         if line.startswith('#') and not line.startswith('#include') and not line.startswith('#define'):
             continue
         
-        if track_braces:
-            for ch in raw_line:
-                if ch == '{':
-                    brace_depth += 1
-                elif ch == '}':
-                    brace_depth -= 1
-            if current_class and brace_depth < class_brace_depth:
-                current_class = None
-                class_brace_depth = 0
+        # Update brace tracking
+        brace_depth, current_class, class_brace_depth = _update_brace_tracking(
+            raw_line, brace_depth, current_class, class_brace_depth, track_braces
+        )
         
-        if decorator_re:
-            dm = decorator_re.match(line)
-            if dm:
-                pending_decorators.append(dm.group(1))
-                continue
+        # Process decorators
+        pending_decorators = _process_decorators(decorator_re, line, pending_decorators)
         
+        # Process imports
         if import_re:
             im = import_re.match(line)
             if im:
                 result['module'].imports.append(im.group(1))
                 continue
         
-        if class_re:
-            cm = class_re.match(line)
-            if cm:
-                cname = cm.group(1)
-                bases = []
-                if len(cm.groups()) > 1 and cm.group(2):
-                    bases.append(cm.group(2).strip())
-                if len(cm.groups()) > 2 and cm.group(3):
-                    bases.extend([b.strip() for b in cm.group(3).split(',')])
-                qual = f"{module_name}.{cname}"
-                result['classes'][qual] = ClassInfo(
-                    name=cname, qualified_name=qual, file=file_path,
-                    line=line_no, module=module_name, bases=bases,
-                    methods=[], docstring="",
-                )
-                result['module'].classes.append(qual)
-                stats['classes_found'] += 1
-                current_class = qual
-                class_brace_depth = brace_depth
-                pending_decorators.clear()
-                continue
+        # Process classes and interfaces
+        current_class, class_brace_depth, pending_decorators = _process_classes(
+            class_re, interface_re, line, line_no, file_path, module_name,
+            result, stats, current_class, class_brace_depth, pending_decorators
+        )
         
-        if interface_re:
-            imt = interface_re.match(line)
-            if imt:
-                cname = imt.group(1)
-                qual = f"{module_name}.{cname}"
-                result['classes'][qual] = ClassInfo(
-                    name=cname, qualified_name=qual, file=file_path,
-                    line=line_no, module=module_name, bases=[],
-                    methods=[], docstring="",
-                )
-                result['module'].classes.append(qual)
-                stats['classes_found'] += 1
-                pending_decorators.clear()
-                continue
+        # Process functions
+        pending_decorators = _process_functions(
+            func_re, arrow_re, method_re, arrow_prop_re, line, line_no,
+            file_path, module_name, result, stats, current_class,
+            pending_decorators, reserved
+        )
         
-        if not current_class and (func_re or arrow_re):
-            fname = None
-            if func_re:
-                fm = func_re.match(line)
-                if fm:
-                    fname = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
-            if not fname and arrow_re:
-                am = arrow_re.match(line)
-                if am:
-                    fname = am.group(1)
-            if fname and fname not in reserved:
-                qual = f"{module_name}.{fname}"
-                result['functions'][qual] = FunctionInfo(
-                    name=fname, qualified_name=qual, file=file_path,
-                    line=line_no, column=0, module=module_name,
-                    class_name=None, is_method=False,
-                    is_private=fname.startswith('_'),
-                    is_property=False, docstring="", args=[],
-                    decorators=pending_decorators[:],
-                )
-                result['module'].functions.append(qual)
-                stats['functions_found'] += 1
-                pending_decorators.clear()
-                continue
-        
-        if current_class and (method_re or arrow_prop_re or func_re):
-            matched = False
-            mname = None
-            if arrow_prop_re:
-                apm = arrow_prop_re.match(line)
-                if apm:
-                    mname = apm.group(1)
-                    if mname not in reserved and mname != 'constructor':
-                        matched = True
-            if not matched and method_re:
-                mm = method_re.match(line)
-                if mm:
-                    mname = mm.group(1)
-                    if mname not in reserved:
-                        matched = True
-            if not matched and func_re:
-                fm = func_re.match(line)
-                if fm:
-                    fn = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
-                    if fn and fn not in reserved:
-                        mname = fn
-                        matched = True
-            if matched and mname:
-                qual = f"{current_class}.{mname}"
-                result['classes'][current_class].methods.append(qual)
-                result['functions'][qual] = FunctionInfo(
-                    name=mname, qualified_name=qual, file=file_path,
-                    line=line_no, column=0, module=module_name,
-                    class_name=current_class.split('.')[-1],
-                    is_method=True, is_private=mname.startswith(('_', '#')),
-                    is_property=False, docstring="", args=[],
-                    decorators=pending_decorators[:],
-                )
-                result['module'].functions.append(qual)
-                stats['functions_found'] += 1
-                pending_decorators.clear()
-                continue
-        
-        if pending_decorators:
-            all_patterns = [p for p in [func_re, arrow_re, class_re, interface_re, method_re] if p]
-            if not any(p and p.match(line) for p in all_patterns):
-                pending_decorators.clear()
+        # Clear orphaned decorators
+        pending_decorators = _clear_orphaned_decorators(
+            line, pending_decorators, func_re, arrow_re, class_re, interface_re, method_re
+        )
     
     return result
+
+
+def _update_brace_tracking(raw_line, brace_depth, current_class, class_brace_depth, track_braces):
+    """Update brace depth and track current class scope."""
+    if track_braces:
+        for ch in raw_line:
+            if ch == '{':
+                brace_depth += 1
+            elif ch == '}':
+                brace_depth -= 1
+        if current_class and brace_depth < class_brace_depth:
+            current_class = None
+            class_brace_depth = 0
+    return brace_depth, current_class, class_brace_depth
+
+
+def _process_decorators(decorator_re, line, pending_decorators):
+    """Process decorator patterns and update pending list."""
+    if decorator_re:
+        dm = decorator_re.match(line)
+        if dm:
+            pending_decorators.append(dm.group(1))
+            return pending_decorators
+    return pending_decorators
+
+
+def _process_classes(class_re, interface_re, line, line_no, file_path, module_name,
+                     result, stats, current_class, class_brace_depth, pending_decorators):
+    """Process class and interface declarations."""
+    from ..models import ClassInfo
+    
+    # Process classes
+    if class_re:
+        cm = class_re.match(line)
+        if cm:
+            cname = cm.group(1)
+            bases = []
+            if len(cm.groups()) > 1 and cm.group(2):
+                bases.append(cm.group(2).strip())
+            if len(cm.groups()) > 2 and cm.group(3):
+                bases.extend([b.strip() for b in cm.group(3).split(',')])
+            qual = f"{module_name}.{cname}"
+            result['classes'][qual] = ClassInfo(
+                name=cname, qualified_name=qual, file=file_path,
+                line=line_no, module=module_name, bases=bases,
+                methods=[], docstring="",
+            )
+            result['module'].classes.append(qual)
+            stats['classes_found'] += 1
+            current_class = qual
+            class_brace_depth = class_brace_depth  # Will be updated by caller
+            pending_decorators.clear()
+            return current_class, class_brace_depth, pending_decorators
+    
+    # Process interfaces
+    if interface_re:
+        imt = interface_re.match(line)
+        if imt:
+            cname = imt.group(1)
+            qual = f"{module_name}.{cname}"
+            result['classes'][qual] = ClassInfo(
+                name=cname, qualified_name=qual, file=file_path,
+                line=line_no, module=module_name, bases=[],
+                methods=[], docstring="",
+            )
+            result['module'].classes.append(qual)
+            stats['classes_found'] += 1
+            pending_decorators.clear()
+    
+    return current_class, class_brace_depth, pending_decorators
+
+
+def _process_functions(func_re, arrow_re, method_re, arrow_prop_re, line, line_no,
+                       file_path, module_name, result, stats, current_class,
+                       pending_decorators, reserved):
+    """Process function and method declarations."""
+    from ..models import FunctionInfo
+    
+    # Process standalone functions
+    if not current_class and (func_re or arrow_re):
+        fname = None
+        if func_re:
+            fm = func_re.match(line)
+            if fm:
+                fname = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
+        if not fname and arrow_re:
+            am = arrow_re.match(line)
+            if am:
+                fname = am.group(1)
+        if fname and fname not in reserved:
+            qual = f"{module_name}.{fname}"
+            result['functions'][qual] = FunctionInfo(
+                name=fname, qualified_name=qual, file=file_path,
+                line=line_no, column=0, module=module_name,
+                class_name=None, is_method=False,
+                is_private=fname.startswith('_'),
+                is_property=False, docstring="", args=[],
+                decorators=pending_decorators[:],
+            )
+            result['module'].functions.append(qual)
+            stats['functions_found'] += 1
+            pending_decorators.clear()
+            return pending_decorators
+    
+    # Process methods
+    if current_class and (method_re or arrow_prop_re or func_re):
+        matched = False
+        mname = None
+        if arrow_prop_re:
+            apm = arrow_prop_re.match(line)
+            if apm:
+                mname = apm.group(1)
+                if mname not in reserved and mname != 'constructor':
+                    matched = True
+        if not matched and method_re:
+            mm = method_re.match(line)
+            if mm:
+                mname = mm.group(1)
+                if mname not in reserved:
+                    matched = True
+        if not matched and func_re:
+            fm = func_re.match(line)
+            if fm:
+                fn = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
+                if fn and fn not in reserved:
+                    mname = fn
+                    matched = True
+        if matched and mname:
+            qual = f"{current_class}.{mname}"
+            result['classes'][current_class].methods.append(qual)
+            result['functions'][qual] = FunctionInfo(
+                name=mname, qualified_name=qual, file=file_path,
+                line=line_no, column=0, module=module_name,
+                class_name=current_class.split('.')[-1],
+                is_method=True, is_private=mname.startswith(('_', '#')),
+                is_property=False, docstring="", args=[],
+                decorators=pending_decorators[:],
+            )
+            result['module'].functions.append(qual)
+            stats['functions_found'] += 1
+            pending_decorators.clear()
+    
+    return pending_decorators
+
+
+def _clear_orphaned_decorators(line, pending_decorators, func_re, arrow_re, class_re, interface_re, method_re):
+    """Clear decorators that don't precede any declaration."""
+    if pending_decorators:
+        all_patterns = [p for p in [func_re, arrow_re, class_re, interface_re, method_re] if p]
+        if not any(p and p.match(line) for p in all_patterns):
+            pending_decorators.clear()
+    return pending_decorators

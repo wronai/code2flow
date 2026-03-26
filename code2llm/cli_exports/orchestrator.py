@@ -51,8 +51,8 @@ def _export_single_project(args, result, output_dir: Path, formats: list, source
     _export_context_fallback(args, result, output_dir, formats)
 
     if source_path is not None:
-        _export_code2logic(args, source_path, output_dir, formats)
-        _export_prompt_txt(args, output_dir, formats, source_path)
+        _export_code2logic(args, source_path, output_dir, args.format.split(','))
+        _export_prompt_txt(args, output_dir, args.format.split(','), source_path)
 
     if hasattr(args, 'refactor') and args.refactor:
         _export_refactor_prompts(args, result, output_dir)
@@ -75,8 +75,8 @@ def _export_chunked_results(args, result, output_dir: Path, source_path: Path, f
     _export_evolution(args, result, output_dir)
 
     if source_path is not None:
-        _export_code2logic(args, source_path, output_dir, formats)
-        _export_chunked_prompt_txt(args, output_dir, formats, source_path, subprojects)
+        _export_code2logic(args, source_path, output_dir, args.format.split(','))
+        _export_chunked_prompt_txt(args, output_dir, args.format.split(','), source_path, subprojects)
 
     _export_readme(args, result, output_dir)
 
