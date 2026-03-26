@@ -13,7 +13,7 @@
 
 version: '1.0'
 project:
-  name: code2flow
+  name: code2llm
   type:
   - python
   description: High-performance Python code flow analysis with NLP query processing
@@ -226,7 +226,7 @@ strategies:
   python:
     test: pytest tests/ -v
     build: python -m build
-    publish: twine upload dist/goal-{version}*
+    publish: twine upload dist/code2llm-{version}*
     publish_enabled: true
     dependencies:
       file: requirements.txt
@@ -234,7 +234,7 @@ strategies:
   nodejs:
     test: npm test
     build: npm run build
-    publish: npm publish
+    publish: twine upload dist/code2llm-{version}*
     publish_enabled: true
     dependencies:
       file: package-lock.json
@@ -242,7 +242,7 @@ strategies:
   rust:
     test: cargo test
     build: cargo build --release
-    publish: cargo publish
+    publish: twine upload dist/code2llm-{version}*
     publish_enabled: true
     dependencies:
       file: Cargo.lock

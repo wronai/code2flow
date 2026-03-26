@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 import os
 
 # Read version
-version = "0.1.0"
+version = "0.5.80"
 
 # Read long description
 def read_readme():
@@ -15,7 +15,7 @@ def read_readme():
     return "Python code flow analysis tool"
 
 setup(
-    name='code2llm',
+    name="code2llm",
     version=version,
     description='Python code flow analysis tool - CFG, DFG, and call graph extraction',
     long_description=read_readme(),

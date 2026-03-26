@@ -1,5 +1,20 @@
 ## [Unreleased]
 
+## [0.5.81] - 2026-03-26
+
+### Other
+- Update analysis.toon.yaml
+- Update batch_1/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/flow.mmd
+- Update project/index.html
+- Update project/project.toon
+- Update project/prompt.txt
+- ... and 2 more files
+
 ## [0.5.80] - 2026-03-25
 
 ### Other
