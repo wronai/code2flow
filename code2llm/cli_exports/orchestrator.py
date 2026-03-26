@@ -10,6 +10,7 @@ from .formats import (
     _export_evolution,
     _export_data_structures,
     _export_context_fallback,
+    _export_project_toon,
     _export_readme,
     _export_refactor_prompts,
     _export_index_html,
@@ -61,6 +62,9 @@ def _export_single_project(
     _export_data_structures(args, result, output_dir)
     _export_context_fallback(args, result, output_dir, formats)
 
+    if 'all' in requested_formats:
+        _export_project_toon(args, result, output_dir)
+
     if source_path is not None:
         _export_code2logic(args, source_path, output_dir, formats)
         _export_prompt_txt(args, output_dir, requested_formats, source_path)
@@ -94,6 +98,9 @@ def _export_chunked_results(
     # Also create merged summary in root output dir
     _export_simple_formats(args, result, output_dir, ['toon', 'context'])
     _export_evolution(args, result, output_dir)
+
+    if 'all' in requested_formats:
+        _export_project_toon(args, result, output_dir)
 
     if source_path is not None:
         _export_code2logic(args, source_path, output_dir, formats)

@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.87] - 2026-03-26
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_exports/formats.py
+- Update code2llm/cli_exports/orchestrator.py
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 3 more files
+
 ## [0.5.86] - 2026-03-26
 
 ### Docs

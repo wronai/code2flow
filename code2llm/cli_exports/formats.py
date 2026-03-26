@@ -69,6 +69,21 @@ def _export_project_yaml(args, result, output_dir: Path):
     return filepath
 
 
+def _export_project_toon(args, result, output_dir: Path):
+    """Export project.toon.yaml directly from the current analysis result."""
+    project_yaml_exporter = ProjectYAMLExporter()
+    data = project_yaml_exporter._build_project_yaml(result, [])
+
+    exporter = ToonViewGenerator()
+    filepath = output_dir / 'project.toon.yaml'
+    exporter.generate(data, str(filepath))
+
+    if getattr(args, 'verbose', False):
+        print(f"  - PROJECT-TOON (project overview): {filepath}")
+
+    return filepath
+
+
 def _run_report(args, project_yaml_path: str, output_dir: Path) -> None:
     """Generate views from project.yaml.
 

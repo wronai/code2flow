@@ -6,10 +6,10 @@
 - **Primary Language**: python
 - **Languages**: python: 114, shell: 2, php: 1
 - **Analysis Mode**: static
-- **Total Functions**: 932
+- **Total Functions**: 933
 - **Total Classes**: 106
 - **Modules**: 117
-- **Entry Points**: 695
+- **Entry Points**: 696
 
 ## Architecture by Module
 
@@ -487,12 +487,12 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
-- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
-
 ### benchmarks.benchmark_format_quality._generate_format_outputs
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
+
+### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
+- **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
 
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
@@ -502,13 +502,13 @@ Checks:
 > Process Python files directly in level1 directory.
 - **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
 
-### code2llm.core.repo_files._get_gitignore_parser
-> Load gitignore parser for project if available.
-- **Output to**: code2llm.core.gitignore.load_gitignore_patterns
-
 ### code2llm.analysis.cfg.CFGExtractor._format_except
 > Format except handler.
 - **Output to**: self._expr_to_str
+
+### code2llm.core.repo_files._get_gitignore_parser
+> Load gitignore parser for project if available.
+- **Output to**: code2llm.core.gitignore.load_gitignore_patterns
 
 ### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
 > Parse a single gitignore pattern into regex.

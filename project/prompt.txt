@@ -10,7 +10,7 @@ Note: project/validation.toon.yaml and project/duplication.toon.yaml are generat
 - project/map.toon.yaml  (Structural map - files, sizes, imports, exports, signatures, project header) [41KB]
 - project/evolution.toon.yaml  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history) [2KB]
 - project/context.md  (LLM narrative - architecture summary and project context) [37KB]
-- project/README.md  (Generated documentation - overview and usage guide) [8KB]
+- project/README.md  (Generated documentation - overview and usage guide) [9KB]
 
 Source files:
 

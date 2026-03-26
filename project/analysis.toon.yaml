@@ -1,5 +1,5 @@
-# code2llm | 113f 21434L | python:105,shell:2,php:1 | 2026-03-26
-# CC̄=4.6 | critical:10/932 | dups:0 | cycles:0
+# code2llm | 113f 21449L | python:105,shell:2,php:1 | 2026-03-26
+# CC̄=4.6 | critical:10/933 | dups:0 | cycles:0
 
 HEALTH[10]:
   🟡 CC    main CC=17 (limit:15)
@@ -16,14 +16,14 @@ HEALTH[10]:
 REFACTOR[1]:
   1. split 10 high-CC methods  (CC>15)
 
-PIPELINES[637]:
-  [1] Src [run_benchmark]: run_benchmark → load_previous
+PIPELINES[638]:
+  [1] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [2] Src [read_readme]: read_readme
+  [2] Src [save_report]: save_report
       PURITY: 100% pure
-  [3] Src [main]: main → load_file → is_toon_file
+  [3] Src [run_benchmark]: run_benchmark → load_previous
       PURITY: 100% pure
-  [4] Src [save_report]: save_report
+  [4] Src [main]: main → load_file → is_toon_file
       PURITY: 100% pure
   [5] Src [main]: main → create_html → get_shield_url
       PURITY: 100% pure
@@ -56,9 +56,9 @@ LAYERS:
   │ intent_matching            297L  3C   15m  CC=7      ←0
   │ cfg                        293L  1C   17m  CC=5      ←0
   │ data_analysis              286L  1C   18m  CC=14     ←0
+  │ !! formats                    286L  0C   12m  CC=16     ←3
   │ llm_task                   284L  0C   15m  CC=14     ←0
   │ cli_parser                 277L  0C    1m  CC=1      ←1
-  │ !! formats                    271L  0C   11m  CC=16     ←3
   │ toon_size_manager          265L  0C    8m  CC=10     ←1
   │ context_exporter           248L  1C   15m  CC=10     ←0
   │ dfg                        224L  1C   12m  CC=7      ←0
