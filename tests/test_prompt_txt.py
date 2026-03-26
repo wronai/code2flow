@@ -121,8 +121,42 @@ class TestPromptTxtGeneration:
         # Check for key sections
         assert "You are an AI assistant" in content, "Main instruction should be present"
         assert "Task:" in content, "Task section should be present"
+        assert "refactoring brief" in content, "Task section should instruct refactoring"
+        assert "Priority Order:" in content, "Priority section should be present"
         assert "Constraints:" in content, "Constraints section should be present"
         assert "we are in project path:" in content, "Project path should be present"
+
+    def test_prompt_txt_prioritizes_blockers_when_validation_and_duplication_exist(self, temp_output_dir, mock_args):
+        """Test that prompt.txt orders blockers first when validation and duplication outputs exist."""
+        formats = ['all']
+        source_path = Path('/home/user/myproject')
+
+        # Create the main generated files plus blocker files
+        generated_files = [
+            'analysis.toon',
+            'map.toon.yaml',
+            'evolution.toon.yaml',
+            'project.toon.yaml',
+            'context.md',
+            'README.md',
+        ]
+        for f in generated_files:
+            (temp_output_dir / f).write_text('test')
+
+        (temp_output_dir / 'project').mkdir(parents=True, exist_ok=True)
+        (temp_output_dir / 'project' / 'validation.toon.yaml').write_text('validation')
+        (temp_output_dir / 'project' / 'duplication.toon.yaml').write_text('duplication')
+
+        _export_prompt_txt(mock_args, temp_output_dir, formats, source_path)
+
+        prompt_file = temp_output_dir / 'prompt.txt'
+        content = prompt_file.read_text()
+
+        assert "Priority Order:" in content, "Priority section should be present"
+        assert "P0 — Fix validation issues" in content, "Validation issues should be first priority"
+        assert "P0/P1 — Remove duplicated logic" in content, "Duplication issues should be prioritized next"
+        assert "P1 — Split or simplify the highest-CC / god modules" in content, "Analysis-driven refactoring should follow blockers"
+        assert "P2 — Keep the compact project overview" in content, "Project overview should be preserved as a later priority"
 
     def test_prompt_txt_includes_orchestrator_source_file_description(self, temp_output_dir, temp_source_dir, mock_args):
         """Test that prompt.txt includes the orchestrator.py source file description."""

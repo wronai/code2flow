@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.5.93] - 2026-03-26
+
+### Test
+- Update tests/test_prompt_txt.py
+
+### Other
+- Update code2llm/cli_exports/prompt.py
+- Update code2llm/exporters/readme_exporter.py
+
 ## [0.5.92] - 2026-03-26
 
 ### Docs
