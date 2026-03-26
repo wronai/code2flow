@@ -27,7 +27,7 @@ Examples:
   code2llm ./ -m static -v -o ./analysis            # Static mode, verbose
   code2llm ./ --no-readme                           # Disable README generation
   code2llm ./ -f project-yaml                       # Legacy project.yaml export (opt-in)
-  code2llm report --format toon                     # Generate analysis_view.toon from existing project.yaml
+  code2llm report --format toon                     # Generate project.toon.yaml from existing project.yaml
   code2llm report --format all                      # All legacy views from existing project.yaml
   code2llm llm-flow                                 # Generate LLM flow summary
   code2llm llm-context ./                           # Generate LLM context only

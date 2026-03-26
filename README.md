@@ -127,17 +127,17 @@ cat map.toon.yaml | head -50
 grep "SIGNATURES" map.toon.yaml
 ```
 
-### `analysis_view.toon` - Compact Analysis View
+### `project.toon.yaml` - Compact Analysis View
 **Purpose**: Compact module view generated from project.yaml data
 **Status**: Legacy view generated on demand from unified project.yaml
 
 **Example usage**:
 ```bash
 # View compact project structure
-cat analysis_view.toon | head -30
+cat project.toon.yaml | head -30
 
 # Find largest files
-grep -E "^  .*[0-9]{3,}$" analysis_view.toon | sort -t',' -k2 -n -r | head -10
+grep -E "^  .*[0-9]{3,}$" project.toon.yaml | sort -t',' -k2 -n -r | head -10
 ```
 
 ### `prompt.txt` - Ready-to-Send LLM Prompt

@@ -1,8 +1,8 @@
-# code2llm | 113f 21241L | python:108,shell:4,php:1 | 2026-03-26
-# CC̄=4.6 | critical:10/923 | dups:0 | cycles:0
+# code2llm | 113f 21404L | python:108,shell:4,php:1 | 2026-03-26
+# CC̄=4.6 | critical:10/931 | dups:0 | cycles:0
 
 HEALTH[10]:
-  🟡 CC    _extract_declarations CC=65 (limit:15)
+  🟡 CC    _process_functions CC=34 (limit:15)
   🟡 CC    export_to_yaml CC=25 (limit:15)
   🟡 CC    export_flow_detailed CC=25 (limit:15)
   🟡 CC    export_flow_compact CC=23 (limit:15)
@@ -19,13 +19,13 @@ REFACTOR[1]:
 PIPELINES[637]:
   [1] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [2] Src [run_benchmark]: run_benchmark → load_previous
+  [2] Src [save_report]: save_report
       PURITY: 100% pure
-  [3] Src [main]: main → load_file → is_toon_file
+  [3] Src [run_benchmark]: run_benchmark → load_previous
       PURITY: 100% pure
-  [4] Src [save_report]: save_report
+  [4] Src [main]: main → load_file → is_toon_file
       PURITY: 100% pure
-  [5] Src [__init__]: __init__
+  [5] Src [main]: main → create_html → get_shield_url
       PURITY: 100% pure
 
 LAYERS:
@@ -46,13 +46,13 @@ LAYERS:
   │ file_analyzer              398L  1C   17m  CC=12     ←0
   │ flow_exporter              391L  1C   14m  CC=10     ←0
   │ pipeline                   388L  3C   20m  CC=10     ←0
+  │ prompt                     383L  0C   16m  CC=13     ←1
+  │ !! base                       370L  0C    9m  CC=34     ←8
   │ analyzer                   333L  1C    9m  CC=14     ←0
   │ entity_resolution          326L  3C   16m  CC=13     ←0
   │ side_effects               324L  2C   17m  CC=14     ←0
   │ cli_analysis               323L  0C   11m  CC=14     ←1
   │ type_inference             321L  1C   19m  CC=9      ←0
-  │ !! base                       312L  0C    4m  CC=65     ←8
-  │ prompt                     299L  0C   13m  CC=12     ←1
   │ intent_matching            297L  3C   15m  CC=7      ←0
   │ cfg                        293L  1C   17m  CC=5      ←0
   │ data_analysis              286L  1C   18m  CC=14     ←0
@@ -80,13 +80,13 @@ LAYERS:
   │ toon_view                  157L  1C    9m  CC=6      ←0
   │ prompt_engine              150L  1C    7m  CC=12     ←0
   │ toon_parser                147L  0C   10m  CC=8      ←1
+  │ orchestrator               142L  0C    5m  CC=11     ←1
   │ context_view               140L  1C    8m  CC=11     ←0
   │ gitignore                  139L  1C    6m  CC=10     ←2
   │ !! ruby                       135L  0C    2m  CC=17     ←1
   │ prioritizer                131L  2C    4m  CC=9      ←0
   │ code2logic                 127L  0C    8m  CC=6      ←1
   │ normalization              122L  2C   13m  CC=6      ←0
-  │ orchestrator               121L  0C    5m  CC=11     ←1
   │ helpers                    120L  0C    8m  CC=8      ←3
   │ validate_project           118L  0C    3m  CC=11     ←1
   │ yaml_exporter              108L  1C    7m  CC=8      ←0
@@ -152,7 +152,7 @@ LAYERS:
   │ sample.go                   46L  0C    4m  CC=3      ←0
   │ sample.php                  44L  2C    4m  CC=2      ←2
   │ sample                      40L  1C    4m  CC=3      ←0
-  │ sample.ts                   26L  0C    1m  CC=1      ←0
+  │ sample.ts                   26L  1C    1m  CC=1      ←0
   │
   ── zero ──
      code2llm/patterns/__init__.py             0L

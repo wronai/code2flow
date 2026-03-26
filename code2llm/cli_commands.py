@@ -24,7 +24,7 @@ def handle_report_command(args_list) -> int:
     """Generate views from an existing project.yaml (legacy).
 
     Usage:
-        code2llm report --format toon    # → analysis_view.toon (legacy)
+        code2llm report --format toon    # → project.toon.yaml (legacy)
         code2llm report --format context # → context.md
         code2llm report --format article # → status.md
         code2llm report --format html    # → dashboard.html

@@ -1,5 +1,26 @@
 ## [Unreleased]
 
+## [0.5.83] - 2026-03-26
+
+### Docs
+- Update README.md
+- Update context.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update analysis.toon.yaml
+- Update batch_1/analysis.toon.yaml
+- Update code2llm/cli_commands.py
+- Update code2llm/cli_parser.py
+- Update code2llm/exporters/project_yaml_exporter.py
+- Update code2llm/exporters/readme_exporter.py
+- Update code2llm/exporters/report_generators.py
+- Update project/analysis.toon.yaml
+- Update project/batch_1/analysis.toon.yaml
+- Update project/root/analysis.toon.yaml
+- ... and 1 more files
+
 ## [0.5.82] - 2026-03-26
 
 ### Other
