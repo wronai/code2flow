@@ -1,0 +1,983 @@
+# vallm batch | 257f | 94✓ 163✗
+
+SUMMARY:
+  total: 257
+  passed: 94
+  failed: 163
+  success: 36.6%
+
+FILES:
+  [bash]
+    ✓ orchestrator.sh
+      verdict: pass
+      score: 1.00
+    ✓ project.sh
+      verdict: pass
+      score: 1.00
+  [yaml]
+    ✓ goal.yaml
+      verdict: pass
+      score: 1.00
+    ✗ analysis.toon.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 1 parse error(s) in yaml
+    ✗ batch_1/analysis.toon.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 1 parse error(s) in yaml
+    ✗ project/analysis.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 1 parse error(s) in yaml
+    ✗ project/map.toon.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 8 parse error(s) in yaml
+    ✗ project/evolution.toon.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 1 parse error(s) in yaml
+    ✗ project/analysis.toon.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 1 parse error(s) in yaml
+    ✗ root/analysis.toon.yaml
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 1 parse error(s) in yaml
+    ✓ code2llm/nlp/config.yaml
+      verdict: pass
+      score: 1.00
+  [python]
+    ✓ setup.py
+      verdict: pass
+      score: 1.00
+    ✓ validate_toon.py
+      verdict: pass
+      score: 0.97
+      issues: 2
+        [warning] complexity.cyclomatic: main has cyclomatic complexity 17 (max: 15)@297
+        [warning] complexity.lizard_cc: main: CC=17 exceeds limit 15@297
+    ✗ examples/functional_refactoring_example.py
+      verdict: fail
+      score: 0.91
+      issues: 5
+        [error] python.import.resolvable: Module 'entities.preparer' not found@354
+        [error] python.import.resolvable: Module 'templates.loader' not found@355
+        [error] python.import.resolvable: Module 'templates.renderer' not found@356
+        [error] python.import.resolvable: Module 'domain.command_generation.generator' not found@560
+        [error] python.import.resolvable: Module 'infrastructure.caching.evolutionary_cache' not found@561
+    ✓ benchmarks/test_performance.py
+      verdict: pass
+      score: 1.00
+    ✓ benchmarks/benchmark_evolution.py
+      verdict: pass
+      score: 1.00
+    ✗ benchmarks/reporting.py
+      verdict: fail
+      score: 0.86
+      issues: 2
+        [error] python.import.resolvable: Module 'benchmark_constants' not found@12
+        [error] python.import.resolvable: Module 'format_evaluator' not found@13
+    ✗ benchmarks/format_evaluator.py
+      verdict: fail
+      score: 0.91
+      issues: 1
+        [error] python.import.resolvable: Module 'benchmark_constants' not found@12
+    ✗ benchmarks/benchmark_format_quality.py
+      verdict: fail
+      score: 0.84
+      issues: 4
+        [error] python.import.resolvable: Module 'benchmarks.benchmark_constants' not found@24
+        [error] python.import.resolvable: Module 'benchmarks.format_evaluator' not found@25
+        [error] python.import.resolvable: Module 'benchmarks.project_generator' not found@26
+        [error] python.import.resolvable: Module 'benchmarks.reporting' not found@27
+    ✓ benchmarks/benchmark_performance.py
+      verdict: pass
+      score: 1.00
+    ✓ benchmarks/project_generator.py
+      verdict: pass
+      score: 1.00
+    ✓ benchmarks/benchmark_constants.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_multilanguage_e2e.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_nonpython_cc_calls.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_edge_cases.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_flow_exporter.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_pipeline_detector.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_advanced_analysis.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_refactoring_engine.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_nlp_pipeline.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_prompt_engine.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_prompt_txt.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_toon_v2.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_format_quality.py
+      verdict: pass
+      score: 0.97
+      issues: 1
+        [warning] complexity.lizard_length: ground_truth_project: 116 lines exceeds limit 100@25
+    ✓ tests/test_deep_analysis.py
+      verdict: pass
+      score: 1.00
+    ✓ tests/test_analyzer.py
+      verdict: pass
+      score: 1.00
+    ✓ scripts/benchmark_badges.py
+      verdict: pass
+      score: 1.00
+    ✓ scripts/bump_version.py
+      verdict: pass
+      score: 1.00
+    ✗ badges/server.py
+      verdict: fail
+      score: 0.93
+      issues: 1
+        [error] python.import.resolvable: Module 'flask' not found@6
+    ✗ code2llm/cli.py
+      verdict: fail
+      score: 0.66
+      issues: 4
+        [error] python.import.resolvable: Module 'cli_parser' not found@10
+        [error] python.import.resolvable: Module 'cli_commands' not found@11
+        [error] python.import.resolvable: Module 'cli_exports' not found@18
+        [error] python.import.resolvable: Module 'cli_analysis' not found@24
+    ✗ code2llm/cli_analysis.py
+      verdict: fail
+      score: 0.66
+      issues: 11
+        [error] python.import.resolvable: Module 'core.large_repo' not found@17
+        [error] python.import.resolvable: Module 'core.config' not found@36
+        [error] python.import.resolvable: Module 'core.analyzer' not found@37
+        [error] python.import.resolvable: Module 'core.config' not found@60
+        [error] python.import.resolvable: Module 'core.large_repo' not found@106
+        [error] python.import.resolvable: Module 'core.analyzer' not found@191
+        [error] python.import.resolvable: Module 'core.config' not found@192
+        [error] python.import.resolvable: Module 'cli_exports' not found@193
+        [error] python.import.resolvable: Module 'core.models' not found@244
+        [error] python.import.resolvable: Module 'core.analyzer' not found@277
+        [error] python.import.resolvable: Module 'core.streaming_analyzer' not found@278
+    ✗ code2llm/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 3
+        [error] python.import.resolvable: Module 'core.config' not found@15
+        [error] python.import.resolvable: Module 'core.models' not found@16
+        [error] python.import.resolvable: Module 'core.analyzer' not found@41
+    ✗ code2llm/__main__.py
+      verdict: fail
+      score: 0.57
+      issues: 1
+        [error] python.import.resolvable: Module 'cli' not found@3
+    ✗ code2llm/api.py
+      verdict: fail
+      score: 0.74
+      issues: 3
+        [error] python.import.resolvable: Module 'core.config' not found@10
+        [error] python.import.resolvable: Module 'core.models' not found@11
+        [error] python.import.resolvable: Module 'core.analyzer' not found@37
+    ✗ code2llm/cli_parser.py
+      verdict: fail
+      score: 0.79
+      issues: 1
+        [error] python.import.resolvable: Module 'core.config' not found@5
+    ✗ code2llm/cli_commands.py
+      verdict: fail
+      score: 0.87
+      issues: 3
+        [error] python.import.resolvable: Module 'cli_exports' not found@8
+        [error] python.import.resolvable: Module 'exporters' not found@195
+        [error] python.import.resolvable: Module 'generators.llm_flow' not found@14
+    ✓ demo_langs/valid/sample.py
+      verdict: pass
+      score: 1.00
+    ✗ demo_langs/invalid/sample_bad.py
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.parse: SyntaxError: expected ':'@7
+    ✓ code2llm/analysis/data_analysis.py
+      verdict: pass
+      score: 0.98
+      issues: 1
+        [warning] complexity.maintainability: Low maintainability index: 7.1 (threshold: 20)
+    ✗ code2llm/analysis/pipeline_detector.py
+      verdict: fail
+      score: 0.89
+      issues: 2
+        [error] python.import.resolvable: Module 'side_effects' not found@21
+        [error] python.import.resolvable: Module 'type_inference' not found@22
+    ✓ code2llm/analysis/type_inference.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/__init__.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/dfg.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/call_graph.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/coupling.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/cfg.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/side_effects.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/analysis/smells.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/config.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/file_cache.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/core/analyzer.py
+      verdict: fail
+      score: 0.72
+      issues: 9
+        [error] python.import.resolvable: Module 'config' not found@8
+        [error] python.import.resolvable: Module 'models' not found@9
+        [error] python.import.resolvable: Module 'file_cache' not found@12
+        [error] python.import.resolvable: Module 'file_filter' not found@13
+        [error] python.import.resolvable: Module 'file_analyzer' not found@14
+        [error] python.import.resolvable: Module 'refactoring' not found@15
+        [error] python.import.resolvable: Module 'file_cache' not found@331
+        [error] python.import.resolvable: Module 'file_filter' not found@332
+        [error] python.import.resolvable: Module 'file_analyzer' not found@333
+    ✗ code2llm/core/large_repo.py
+      verdict: fail
+      score: 0.83
+      issues: 2
+        [error] python.import.resolvable: Module 'repo_files' not found@14
+        [error] python.import.resolvable: Module 'repo_files' not found@323
+    ✗ code2llm/core/repo_files.py
+      verdict: fail
+      score: 0.86
+      issues: 1
+        [error] python.import.resolvable: Module 'gitignore' not found@6
+    ✗ code2llm/core/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 7
+        [error] python.import.resolvable: Module 'config' not found@3
+        [error] python.import.resolvable: Module 'models' not found@4
+        [error] python.import.resolvable: Module 'analyzer' not found@32
+        [error] python.import.resolvable: Module 'file_analyzer' not found@35
+        [error] python.import.resolvable: Module 'refactoring' not found@38
+        [error] python.import.resolvable: Module 'file_cache' not found@41
+        [error] python.import.resolvable: Module 'file_filter' not found@42
+    ✗ code2llm/core/streaming_analyzer.py
+      verdict: fail
+      score: 0.79
+      issues: 3
+        [error] python.import.resolvable: Module 'config' not found@15
+        [error] python.import.resolvable: Module 'streaming' not found@16
+        [error] python.import.resolvable: Module 'streaming' not found@178
+    ✓ code2llm/core/gitignore.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/toon_size_manager.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/models.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/core/refactoring.py
+      verdict: fail
+      score: 0.82
+      issues: 6
+        [error] python.import.resolvable: Module 'config' not found@6
+        [error] python.import.resolvable: Module 'models' not found@7
+        [error] python.import.resolvable: Module 'file_filter' not found@8
+        [error] python.import.resolvable: Module 'analysis.call_graph' not found@24
+        [error] python.import.resolvable: Module 'analysis.coupling' not found@125
+        [error] python.import.resolvable: Module 'analysis.smells' not found@131
+    ✗ code2llm/core/file_analyzer.py
+      verdict: fail
+      score: 0.86
+      issues: 4
+        [error] python.import.resolvable: Module 'config' not found@10
+        [error] python.import.resolvable: Module 'models' not found@11
+        [error] python.import.resolvable: Module 'file_filter' not found@17
+        [error] python.import.resolvable: Module 'lang' not found@18
+    ✗ code2llm/core/file_filter.py
+      verdict: fail
+      score: 0.79
+      issues: 2
+        [error] python.import.resolvable: Module 'config' not found@5
+        [error] python.import.resolvable: Module 'gitignore' not found@6
+    ✓ code2llm/nlp/config.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/nlp/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 5
+        [error] python.import.resolvable: Module 'pipeline' not found@9
+        [error] python.import.resolvable: Module 'normalization' not found@10
+        [error] python.import.resolvable: Module 'intent_matching' not found@11
+        [error] python.import.resolvable: Module 'entity_resolution' not found@12
+        [error] python.import.resolvable: Module 'config' not found@13
+    ✗ code2llm/nlp/intent_matching.py
+      verdict: fail
+      score: 0.91
+      issues: 1
+        [error] python.import.resolvable: Module 'config' not found@15
+    ✗ code2llm/nlp/entity_resolution.py
+      verdict: fail
+      score: 0.91
+      issues: 1
+        [error] python.import.resolvable: Module 'config' not found@15
+    ✗ code2llm/nlp/pipeline.py
+      verdict: fail
+      score: 0.76
+      issues: 5
+        [error] python.import.resolvable: Module 'config' not found@14
+        [error] python.import.resolvable: Module 'normalization' not found@15
+        [error] python.import.resolvable: Module 'intent_matching' not found@16
+        [error] python.import.resolvable: Module 'entity_resolution' not found@17
+        [error] python.import.resolvable: Module 'intent_matching' not found@308
+    ✗ code2llm/nlp/normalization.py
+      verdict: fail
+      score: 0.91
+      issues: 1
+        [error] python.import.resolvable: Module 'config' not found@15
+    ✗ code2llm/exporters/readme_exporter.py
+      verdict: fail
+      score: 0.91
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@12
+    ✓ code2llm/exporters/base.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/exporters/map_exporter.py
+      verdict: fail
+      score: 0.95
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@18
+    ✗ code2llm/exporters/project_yaml_exporter.py
+      verdict: fail
+      score: 0.90
+      issues: 2
+        [error] python.import.resolvable: Module 'base' not found@18
+        [error] python.import.resolvable: Module 'toon.helpers' not found@20
+    ✗ code2llm/exporters/mermaid_exporter.py
+      verdict: fail
+      score: 0.91
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@17
+    ✗ code2llm/exporters/toon.py
+      verdict: fail
+      score: 0.57
+      issues: 1
+        [error] python.import.resolvable: Module 'toon' not found@8
+    ✗ code2llm/exporters/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 14
+        [error] python.import.resolvable: Module 'base' not found@17
+        [error] python.import.resolvable: Module 'json_exporter' not found@18
+        [error] python.import.resolvable: Module 'yaml_exporter' not found@19
+        [error] python.import.resolvable: Module 'mermaid_exporter' not found@20
+        [error] python.import.resolvable: Module 'context_exporter' not found@21
+        [error] python.import.resolvable: Module 'llm_exporter' not found@22
+        [error] python.import.resolvable: Module 'toon' not found@23
+        [error] python.import.resolvable: Module 'map_exporter' not found@24
+        [error] python.import.resolvable: Module 'flow_exporter' not found@25
+        [error] python.import.resolvable: Module 'evolution_exporter' not found@26
+        [error] python.import.resolvable: Module 'readme_exporter' not found@27
+        [error] python.import.resolvable: Module 'project_yaml_exporter' not found@28
+        [error] python.import.resolvable: Module 'report_generators' not found@29
+        [error] python.import.resolvable: Module 'index_generator' not found@34
+    ✗ code2llm/exporters/json_exporter.py
+      verdict: fail
+      score: 0.89
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@5
+    ✗ code2llm/exporters/report_generators.py
+      verdict: fail
+      score: 0.71
+      issues: 4
+        [error] python.import.resolvable: Module 'toon_view' not found@13
+        [error] python.import.resolvable: Module 'context_view' not found@14
+        [error] python.import.resolvable: Module 'article_view' not found@15
+        [error] python.import.resolvable: Module 'html_dashboard' not found@16
+    ✗ code2llm/exporters/yaml_exporter.py
+      verdict: fail
+      score: 0.94
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@6
+    ✓ code2llm/exporters/context_view.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/exporters/article_view.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/exporters/evolution_exporter.py
+      verdict: fail
+      score: 0.94
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@16
+    ✗ code2llm/exporters/context_exporter.py
+      verdict: fail
+      score: 0.93
+      issues: 1
+        [error] python.import.resolvable: Module 'base' not found@10
+    ✗ code2llm/exporters/llm_exporter.py
+      verdict: fail
+      score: 0.57
+      issues: 1
+        [error] python.import.resolvable: Module 'context_exporter' not found@7
+    ✓ code2llm/exporters/validate_project.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/exporters/flow_constants.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/exporters/html_dashboard.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/exporters/flow_renderer.py
+      verdict: fail
+      score: 0.83
+      issues: 2
+        [error] python.import.resolvable: Module 'flow_constants' not found@9
+        [error] python.import.resolvable: Module 'core.models' not found@19
+    ✓ code2llm/exporters/toon_view.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/exporters/flow_exporter.py
+      verdict: fail
+      score: 0.89
+      issues: 3
+        [error] python.import.resolvable: Module 'base' not found@19
+        [error] python.import.resolvable: Module 'flow_constants' not found@20
+        [error] python.import.resolvable: Module 'flow_renderer' not found@21
+    ✓ code2llm/exporters/index_generator.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/generators/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 2
+        [error] python.import.resolvable: Module 'llm_flow' not found@6
+        [error] python.import.resolvable: Module 'mermaid' not found@7
+    ✓ code2llm/generators/llm_flow.py
+      verdict: pass
+      score: 0.98
+      issues: 1
+        [warning] complexity.maintainability: Low maintainability index: 15.9 (threshold: 20)
+    ✓ code2llm/generators/llm_task.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/generators/mermaid.py
+      verdict: pass
+      score: 0.97
+      issues: 1
+        [warning] complexity.lizard_length: generate_single_png: 102 lines exceeds limit 100@287
+    ✗ code2llm/cli_exports/formats.py
+      verdict: fail
+      score: 0.86
+      issues: 3
+        [error] python.import.resolvable: Module 'refactor.prompt_engine' not found@235
+        [error] python.import.resolvable: Module 'exporters.validate_project' not found@134
+        [error] python.import.resolvable: Module 'generators.mermaid' not found@211
+    ✗ code2llm/cli_exports/code2logic.py
+      verdict: fail
+      score: 0.94
+      issues: 1
+        [error] python.import.resolvable: Module 'core.toon_size_manager' not found@120
+    ✗ code2llm/cli_exports/__init__.py
+      verdict: fail
+      score: 0.68
+      issues: 3
+        [error] python.import.resolvable: Module 'formats' not found@6
+        [error] python.import.resolvable: Module 'prompt' not found@18
+        [error] python.import.resolvable: Module 'orchestrator' not found@25
+    ✓ code2llm/cli_exports/prompt.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/cli_exports/orchestrator.py
+      verdict: fail
+      score: 0.82
+      issues: 3
+        [error] python.import.resolvable: Module 'formats' not found@7
+        [error] python.import.resolvable: Module 'prompt' not found@18
+        [error] python.import.resolvable: Module 'core.large_repo' not found@89
+    ✓ code2llm/refactor/__init__.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/refactor/prompt_engine.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/parsers/toon_parser.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/patterns/detector.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/patterns/__init__.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/exporters/toon/helpers.py
+      verdict: fail
+      score: 0.89
+      issues: 1
+        [error] python.import.resolvable: Module 'core.config' not found@101
+    ✗ code2llm/exporters/toon/__init__.py
+      verdict: fail
+      score: 0.82
+      issues: 3
+        [error] python.import.resolvable: Module 'metrics' not found@9
+        [error] python.import.resolvable: Module 'renderer' not found@10
+        [error] python.import.resolvable: Module 'helpers' not found@11
+    ✗ code2llm/exporters/toon/metrics.py
+      verdict: fail
+      score: 0.82
+      issues: 3
+        [error] python.import.resolvable: Module 'helpers' not found@9
+        [error] python.import.resolvable: Module 'helpers' not found@480
+        [error] python.import.resolvable: Module 'helpers' not found@198
+    ✗ code2llm/exporters/toon/module_detail.py
+      verdict: fail
+      score: 0.86
+      issues: 1
+        [error] python.import.resolvable: Module 'helpers' not found@7
+    ✗ code2llm/exporters/toon/renderer.py
+      verdict: fail
+      score: 0.88
+      issues: 2
+        [error] python.import.resolvable: Module 'helpers' not found@10
+        [error] python.import.resolvable: Module 'helpers' not found@49
+    ✓ code2llm/core/streaming/incremental.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/streaming/strategies.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/core/streaming/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 5
+        [error] python.import.resolvable: Module 'strategies' not found@3
+        [error] python.import.resolvable: Module 'cache' not found@4
+        [error] python.import.resolvable: Module 'prioritizer' not found@5
+        [error] python.import.resolvable: Module 'scanner' not found@6
+        [error] python.import.resolvable: Module 'incremental' not found@7
+    ✗ code2llm/core/streaming/prioritizer.py
+      verdict: fail
+      score: 0.93
+      issues: 1
+        [error] python.import.resolvable: Module 'strategies' not found@9
+    ✗ code2llm/core/streaming/scanner.py
+      verdict: fail
+      score: 0.82
+      issues: 3
+        [error] python.import.resolvable: Module 'cache' not found@9
+        [error] python.import.resolvable: Module 'prioritizer' not found@10
+        [error] python.import.resolvable: Module 'strategies' not found@11
+    ✓ code2llm/core/streaming/cache.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/rust.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/ruby.py
+      verdict: pass
+      score: 0.97
+      issues: 2
+        [warning] complexity.cyclomatic: analyze_ruby has cyclomatic complexity 17 (max: 15)@52
+        [warning] complexity.lizard_cc: analyze_ruby: CC=17 exceeds limit 15@52
+    ✗ code2llm/core/lang/base.py
+      verdict: fail
+      score: 0.79
+      issues: 3
+        [error] python.import.resolvable: Module 'models' not found@140
+        [error] python.import.resolvable: Module 'models' not found@248
+        [error] python.import.resolvable: Module 'models' not found@295
+    ✓ code2llm/core/lang/cpp.py
+      verdict: pass
+      score: 1.00
+    ✗ code2llm/core/lang/__init__.py
+      verdict: fail
+      score: 0.57
+      issues: 9
+        [error] python.import.resolvable: Module 'typescript' not found@3
+        [error] python.import.resolvable: Module 'go_lang' not found@4
+        [error] python.import.resolvable: Module 'rust' not found@5
+        [error] python.import.resolvable: Module 'java' not found@6
+        [error] python.import.resolvable: Module 'cpp' not found@7
+        [error] python.import.resolvable: Module 'csharp' not found@8
+        [error] python.import.resolvable: Module 'php' not found@9
+        [error] python.import.resolvable: Module 'ruby' not found@10
+        [error] python.import.resolvable: Module 'generic' not found@11
+    ✓ code2llm/core/lang/php.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/csharp.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/go_lang.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/java.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/generic.py
+      verdict: pass
+      score: 1.00
+    ✓ code2llm/core/lang/typescript.py
+      verdict: pass
+      score: 1.00
+    ✓ test_python_only/valid/__init__.py
+      verdict: pass
+      score: 1.00
+    ✓ test_python_only/valid/sample.py
+      verdict: pass
+      score: 1.00
+    ✓ test_python_only/invalid/__init__.py
+      verdict: pass
+      score: 1.00
+    ✗ test_python_only/invalid/sample_bad.py
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.parse: SyntaxError: invalid syntax@3
+    ✗ examples/litellm/run.py
+      verdict: fail
+      score: 0.93
+      issues: 1
+        [error] python.import.resolvable: Module 'litellm' not found@21
+    ✓ examples/streaming-analyzer/demo.py
+      verdict: pass
+      score: 1.00
+    ✓ examples/streaming-analyzer/test_example.py
+      verdict: pass
+      score: 1.00
+    ✓ examples/streaming-analyzer/sample_project/auth.py
+      verdict: pass
+      score: 1.00
+    ✓ examples/streaming-analyzer/sample_project/__init__.py
+      verdict: pass
+      score: 1.00
+    ✗ examples/streaming-analyzer/sample_project/api.py
+      verdict: fail
+      score: 0.86
+      issues: 1
+        [error] python.import.resolvable: Module 'database' not found@5
+    ✓ examples/streaming-analyzer/sample_project/database.py
+      verdict: pass
+      score: 1.00
+    ✓ examples/streaming-analyzer/sample_project/utils.py
+      verdict: pass
+      score: 1.00
+    ✗ examples/streaming-analyzer/sample_project/main.py
+      verdict: fail
+      score: 0.76
+      issues: 4
+        [error] python.import.resolvable: Module 'auth' not found@7
+        [error] python.import.resolvable: Module 'database' not found@8
+        [error] python.import.resolvable: Module 'api' not found@9
+        [error] python.import.resolvable: Module 'utils' not found@10
+    ✓ test_langs/valid/sample.py
+      verdict: pass
+      score: 1.00
+    ✗ test_langs/invalid/sample_bad.py
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.parse: SyntaxError: invalid syntax@3
+  [toml]
+    ✓ pyproject.toml
+      verdict: pass
+      score: 1.00
+  [json]
+    ✓ project/analysis.json
+      verdict: pass
+      score: 1.00
+  [go]
+    ✓ demo_langs/valid/sample.go
+      verdict: pass
+      score: 1.00
+    ✗ demo_langs/invalid/sample_bad.go
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 3 parse error(s) in go
+    ✓ test_langs/valid/sample.go
+      verdict: pass
+      score: 1.00
+    ✗ test_langs/invalid/sample_bad.go
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 3 parse error(s) in go
+  [typescript]
+    ✓ demo_langs/valid/sample.ts
+      verdict: pass
+      score: 1.00
+    ✗ demo_langs/invalid/sample_bad.ts
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 3 parse error(s) in typescript
+    ✓ test_langs/valid/sample.ts
+      verdict: pass
+      score: 1.00
+    ✗ test_langs/invalid/sample_bad.ts
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 3 parse error(s) in typescript
+  [rust]
+    ✓ demo_langs/valid/sample.rs
+      verdict: pass
+      score: 1.00
+    ✗ demo_langs/invalid/sample_bad.rs
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 7 parse error(s) in rust
+    ✓ test_langs/valid/sample.rs
+      verdict: pass
+      score: 1.00
+    ✗ test_langs/invalid/sample_bad.rs
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 7 parse error(s) in rust
+  [php]
+    ✓ demo_langs/valid/sample.php
+      verdict: pass
+      score: 1.00
+    ✗ demo_langs/invalid/sample_bad.php
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 10 parse error(s) in php
+    ✓ test_langs/valid/sample.php
+      verdict: pass
+      score: 1.00
+    ✗ test_langs/invalid/sample_bad.php
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 10 parse error(s) in php
+  [java]
+    ✓ demo_langs/valid/sample.java
+      verdict: pass
+      score: 1.00
+    ✗ demo_langs/invalid/sample_bad.java
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 7 parse error(s) in java
+    ✓ test_langs/valid/sample.java
+      verdict: pass
+      score: 1.00
+    ✗ test_langs/invalid/sample_bad.java
+      verdict: fail
+      score: 0.00
+      issues: 1
+        [error] syntax.tree_sitter: tree-sitter found 7 parse error(s) in java
+
+FAILED:
+  ✗ Makefile: Unsupported file type
+  ✗ context.md: Unsupported file type
+  ✗ VERSION: Unsupported file type
+  ✗ TICKET: Unsupported file type
+  ✗ requirements.txt: Unsupported file type
+  ✗ LICENSE: Unsupported file type
+  ✗ TODO.md: Unsupported file type
+  ✗ REFACTORING_PLAN.md: Unsupported file type
+  ✗ CHANGELOG.md: Unsupported file type
+  ✗ ROADMAP.md: Unsupported file type
+  ✗ .env.example: Unsupported file type
+  ✗ README.md: Unsupported file type
+  ✗ analysis.toon: Unsupported file type
+  ✗ analysis.toon.yaml: Validation fail
+  ✗ test_prompt/project.toon: Unsupported file type
+  ✗ test_prompt/context.md: Unsupported file type
+  ✗ test_prompt/prompt.txt: Unsupported file type
+  ✗ test_prompt/evolution.toon: Unsupported file type
+  ✗ test_prompt/README.md: Unsupported file type
+  ✗ test_prompt/analysis.toon: Unsupported file type
+  ✗ test_metrics/project.toon: Unsupported file type
+  ✗ test_metrics/context.md: Unsupported file type
+  ✗ test_metrics/prompt.txt: Unsupported file type
+  ✗ test_metrics/evolution.toon: Unsupported file type
+  ✗ test_metrics/README.md: Unsupported file type
+  ✗ test_metrics/analysis.toon: Unsupported file type
+  ✗ docs/LLM_USAGE.md: Unsupported file type
+  ✗ docs/API.md: Unsupported file type
+  ✗ docs/PROJECT_SUMMARY.md: Unsupported file type
+  ✗ docs/COMPARISON_AND_OPTIMIZATION.md: Unsupported file type
+  ✗ docs/METHODOLOGY.md: Unsupported file type
+  ✗ docs/README.md: Unsupported file type
+  ✗ examples/functional_refactoring_example.py: Validation fail
+  ✗ benchmarks/reporting.py: Validation fail
+  ✗ benchmarks/format_evaluator.py: Validation fail
+  ✗ benchmarks/benchmark_format_quality.py: Validation fail
+  ✗ test_dynamic2/project.toon: Unsupported file type
+  ✗ test_dynamic2/context.md: Unsupported file type
+  ✗ test_dynamic2/prompt.txt: Unsupported file type
+  ✗ test_dynamic2/evolution.toon: Unsupported file type
+  ✗ test_dynamic2/README.md: Unsupported file type
+  ✗ test_dynamic2/analysis.toon: Unsupported file type
+  ✗ test_dynamic/context.md: Unsupported file type
+  ✗ test_dynamic/evolution.toon: Unsupported file type
+  ✗ test_dynamic/README.md: Unsupported file type
+  ✗ test_dynamic/analysis.toon: Unsupported file type
+  ✗ batch_1/analysis.toon: Unsupported file type
+  ✗ batch_1/analysis.toon.yaml: Validation fail
+  ✗ badges/index.html: Unsupported file type
+  ✗ badges/server.py: Validation fail
+  ✗ project/project.toon: Unsupported file type
+  ✗ project/compact_flow.mmd: Unsupported file type
+  ✗ project/calls.mmd: Unsupported file type
+  ✗ project/index.html: Unsupported file type
+  ✗ project/analysis.yaml: Validation fail
+  ✗ project/context.md: Unsupported file type
+  ✗ project/prompt.txt: Unsupported file type
+  ✗ project/map.toon.yaml: Validation fail
+  ✗ project/flow.mmd: Unsupported file type
+  ✗ project/evolution.toon.yaml: Validation fail
+  ✗ project/README.md: Unsupported file type
+  ✗ project/analysis.toon.yaml: Validation fail
+  ✗ root/analysis.toon: Unsupported file type
+  ✗ root/analysis.toon.yaml: Validation fail
+  ✗ code2llm/cli.py: Validation fail
+  ✗ code2llm/cli_analysis.py: Validation fail
+  ✗ code2llm/__init__.py: Validation fail
+  ✗ code2llm/__main__.py: Validation fail
+  ✗ code2llm/api.py: Validation fail
+  ✗ code2llm/cli_parser.py: Validation fail
+  ✗ code2llm/cli_commands.py: Validation fail
+  ✗ demo_langs/invalid/sample_bad.java: Validation fail
+  ✗ demo_langs/invalid/sample_bad.php: Validation fail
+  ✗ demo_langs/invalid/sample_bad.go: Validation fail
+  ✗ demo_langs/invalid/sample_bad.rs: Validation fail
+  ✗ demo_langs/invalid/sample_bad.ts: Validation fail
+  ✗ demo_langs/invalid/sample_bad.py: Validation fail
+  ✗ code2llm/templates/extract_method.md: Unsupported file type
+  ✗ code2llm/templates/move_method.md: Unsupported file type
+  ✗ code2llm/analysis/pipeline_detector.py: Validation fail
+  ✗ code2llm/core/analyzer.py: Validation fail
+  ✗ code2llm/core/large_repo.py: Validation fail
+  ✗ code2llm/core/repo_files.py: Validation fail
+  ✗ code2llm/core/__init__.py: Validation fail
+  ✗ code2llm/core/streaming_analyzer.py: Validation fail
+  ✗ code2llm/core/refactoring.py: Validation fail
+  ✗ code2llm/core/file_analyzer.py: Validation fail
+  ✗ code2llm/core/file_filter.py: Validation fail
+  ✗ code2llm/nlp/__init__.py: Validation fail
+  ✗ code2llm/nlp/intent_matching.py: Validation fail
+  ✗ code2llm/nlp/entity_resolution.py: Validation fail
+  ✗ code2llm/nlp/pipeline.py: Validation fail
+  ✗ code2llm/nlp/normalization.py: Validation fail
+  ✗ code2llm/exporters/readme_exporter.py: Validation fail
+  ✗ code2llm/exporters/map_exporter.py: Validation fail
+  ✗ code2llm/exporters/project_yaml_exporter.py: Validation fail
+  ✗ code2llm/exporters/mermaid_exporter.py: Validation fail
+  ✗ code2llm/exporters/toon.py: Validation fail
+  ✗ code2llm/exporters/__init__.py: Validation fail
+  ✗ code2llm/exporters/json_exporter.py: Validation fail
+  ✗ code2llm/exporters/report_generators.py: Validation fail
+  ✗ code2llm/exporters/yaml_exporter.py: Validation fail
+  ✗ code2llm/exporters/evolution_exporter.py: Validation fail
+  ✗ code2llm/exporters/context_exporter.py: Validation fail
+  ✗ code2llm/exporters/llm_exporter.py: Validation fail
+  ✗ code2llm/exporters/flow_renderer.py: Validation fail
+  ✗ code2llm/exporters/flow_exporter.py: Validation fail
+  ✗ code2llm/generators/__init__.py: Validation fail
+  ✗ code2llm/cli_exports/formats.py: Validation fail
+  ✗ code2llm/cli_exports/code2logic.py: Validation fail
+  ✗ code2llm/cli_exports/__init__.py: Validation fail
+  ✗ code2llm/cli_exports/orchestrator.py: Validation fail
+  ✗ code2llm/exporters/toon/helpers.py: Validation fail
+  ✗ code2llm/exporters/toon/__init__.py: Validation fail
+  ✗ code2llm/exporters/toon/metrics.py: Validation fail
+  ✗ code2llm/exporters/toon/module_detail.py: Validation fail
+  ✗ code2llm/exporters/toon/renderer.py: Validation fail
+  ✗ code2llm/core/streaming/__init__.py: Validation fail
+  ✗ code2llm/core/streaming/prioritizer.py: Validation fail
+  ✗ code2llm/core/streaming/scanner.py: Validation fail
+  ✗ code2llm/core/lang/base.py: Validation fail
+  ✗ code2llm/core/lang/__init__.py: Validation fail
+  ✗ test_python_only/invalid/sample_bad.py: Validation fail
+  ✗ test_dynamic/batch_1/context.md: Unsupported file type
+  ✗ test_dynamic/batch_1/evolution.toon: Unsupported file type
+  ✗ test_dynamic/batch_1/analysis.toon: Unsupported file type
+  ✗ test_dynamic/root/context.md: Unsupported file type
+  ✗ test_dynamic/root/evolution.toon: Unsupported file type
+  ✗ test_dynamic/root/analysis.toon: Unsupported file type
+  ✗ test_dynamic2/batch_1/context.md: Unsupported file type
+  ✗ test_dynamic2/batch_1/evolution.toon: Unsupported file type
+  ✗ test_dynamic2/batch_1/analysis.toon: Unsupported file type
+  ✗ test_dynamic2/root/context.md: Unsupported file type
+  ✗ test_dynamic2/root/evolution.toon: Unsupported file type
+  ✗ test_dynamic2/root/analysis.toon: Unsupported file type
+  ✗ examples/devops-workflow/README.md: Unsupported file type
+  ✗ examples/claude-code/README.md: Unsupported file type
+  ✗ examples/shell-llm/README.md: Unsupported file type
+  ✗ examples/basic-usage/README.md: Unsupported file type
+  ✗ examples/litellm/run.py: Validation fail
+  ✗ examples/litellm/README.md: Unsupported file type
+  ✗ examples/ci-cd/README.md: Unsupported file type
+  ✗ examples/streaming-analyzer/README.md: Unsupported file type
+  ✗ examples/streaming-analyzer/sample_project/api.py: Validation fail
+  ✗ examples/streaming-analyzer/sample_project/main.py: Validation fail
+  ✗ test_metrics/batch_1/context.md: Unsupported file type
+  ✗ test_metrics/batch_1/evolution.toon: Unsupported file type
+  ✗ test_metrics/batch_1/analysis.toon: Unsupported file type
+  ✗ test_metrics/root/context.md: Unsupported file type
+  ✗ test_metrics/root/evolution.toon: Unsupported file type
+  ✗ test_metrics/root/analysis.toon: Unsupported file type
+  ✗ test_langs/invalid/sample_bad.java: Validation fail
+  ✗ test_langs/invalid/sample_bad.php: Validation fail
+  ✗ test_langs/invalid/sample_bad.go: Validation fail
+  ✗ test_langs/invalid/sample_bad.rs: Validation fail
+  ✗ test_langs/invalid/sample_bad.ts: Validation fail
+  ✗ test_langs/invalid/sample_bad.py: Validation fail
+  ✗ test_prompt/batch_1/context.md: Unsupported file type
+  ✗ test_prompt/batch_1/evolution.toon: Unsupported file type
+  ✗ test_prompt/batch_1/analysis.toon: Unsupported file type
+  ✗ test_prompt/root/context.md: Unsupported file type
+  ✗ test_prompt/root/evolution.toon: Unsupported file type
+  ✗ test_prompt/root/analysis.toon: Unsupported file type
