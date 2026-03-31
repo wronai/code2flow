@@ -4,7 +4,7 @@
 
 - **Project**: .
 - **Primary Language**: python
-- **Languages**: python: 117, shell: 4, php: 1
+- **Languages**: python: 117, shell: 4, java: 1
 - **Analysis Mode**: static
 - **Total Functions**: 934
 - **Total Classes**: 106
@@ -78,15 +78,15 @@
 - **Classes**: 2
 - **File**: `side_effects.py`
 
-### code2llm.analysis.cfg
-- **Functions**: 17
-- **Classes**: 1
-- **File**: `cfg.py`
-
 ### code2llm.core.file_analyzer
 - **Functions**: 17
 - **Classes**: 1
 - **File**: `file_analyzer.py`
+
+### code2llm.analysis.cfg
+- **Functions**: 17
+- **Classes**: 1
+- **File**: `cfg.py`
 
 ### code2llm.exporters.evolution_exporter
 - **Functions**: 17
@@ -241,26 +241,33 @@ Sections: PIPELINES, TRANSFORMS, CONTRACTS, DATA_TY
 - **Key Methods**: code2llm.analysis.call_graph.CallGraphExtractor.__init__, code2llm.analysis.call_graph.CallGraphExtractor.extract, code2llm.analysis.call_graph.CallGraphExtractor._calculate_metrics, code2llm.analysis.call_graph.CallGraphExtractor.visit_Import, code2llm.analysis.call_graph.CallGraphExtractor.visit_ImportFrom, code2llm.analysis.call_graph.CallGraphExtractor.visit_ClassDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_FunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_AsyncFunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_Call, code2llm.analysis.call_graph.CallGraphExtractor._qualified_name
 - **Inherits**: ast.NodeVisitor
 
-### code2llm.nlp.normalization.QueryNormalizer
-> Normalize queries for consistent processing.
+### code2llm.nlp.intent_matching.IntentMatcher
+> Match queries to intents using fuzzy and keyword matching.
 - **Methods**: 13
-- **Key Methods**: code2llm.nlp.normalization.QueryNormalizer.__init__, code2llm.nlp.normalization.QueryNormalizer.normalize, code2llm.nlp.normalization.QueryNormalizer._unicode_normalize, code2llm.nlp.normalization.QueryNormalizer._lowercase, code2llm.nlp.normalization.QueryNormalizer._remove_punctuation, code2llm.nlp.normalization.QueryNormalizer._normalize_whitespace, code2llm.nlp.normalization.QueryNormalizer._remove_stopwords, code2llm.nlp.normalization.QueryNormalizer._tokenize, code2llm.nlp.normalization.QueryNormalizer.step_1a_lowercase, code2llm.nlp.normalization.QueryNormalizer.step_1b_remove_punctuation
+- **Key Methods**: code2llm.nlp.intent_matching.IntentMatcher.__init__, code2llm.nlp.intent_matching.IntentMatcher.match, code2llm.nlp.intent_matching.IntentMatcher._fuzzy_match, code2llm.nlp.intent_matching.IntentMatcher._keyword_match, code2llm.nlp.intent_matching.IntentMatcher._apply_context, code2llm.nlp.intent_matching.IntentMatcher._combine_matches, code2llm.nlp.intent_matching.IntentMatcher._resolve_multi_intent, code2llm.nlp.intent_matching.IntentMatcher._calculate_similarity, code2llm.nlp.intent_matching.IntentMatcher.step_2a_fuzzy_match, code2llm.nlp.intent_matching.IntentMatcher.step_2b_semantic_match
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### validate_toon.validate_toon_completeness
-> Validate toon format structure.
-- **Output to**: print, print, bool, bool, bool
-
 ### benchmarks.benchmark_evolution.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
 
+### validate_toon.validate_toon_completeness
+> Validate toon format structure.
+- **Output to**: print, print, bool, bool, bool
+
 ### benchmarks.format_evaluator.evaluate_format
 > Oceń pojedynczy format względem ground truth.
 - **Output to**: FormatScore, benchmarks.format_evaluator._detect_problems, sum, benchmarks.format_evaluator._detect_pipelines, sum
+
+### scripts.bump_version.parse_version
+> Parse version string into tuple of (major, minor, patch)
+- **Output to**: version_str.split, tuple, int
+
+### scripts.bump_version.format_version
+> Format version tuple as string
 
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
@@ -278,16 +285,12 @@ Key functions that process and transform data:
 > Generate badges from format quality scores.
 - **Output to**: enumerate, badges.append, sorted, badges.append, format_scores.items
 
-### scripts.bump_version.parse_version
-> Parse version string into tuple of (major, minor, patch)
-- **Output to**: version_str.split, tuple, int
-
-### scripts.bump_version.format_version
-> Format version tuple as string
-
 ### code2llm.cli_parser.create_parser
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
+
+### demo_langs.valid.sample.UserService.process_users
+- **Output to**: print
 
 ### code2llm.cli_commands.validate_and_setup
 > Validate source path and setup output directory.
@@ -300,23 +303,12 @@ Checks:
 1. All chunks have required files (analysis.toon, contex
 - **Output to**: print, print, sorted, print, print
 
-### demo_langs.valid.sample.UserService.process_users
-- **Output to**: print
-
 ### code2llm.analysis.data_analysis.DataAnalyzer._identify_process_patterns
 - **Output to**: result.functions.items, patterns.items, sorted, func.name.lower, indicators.items
 
 ### benchmarks.benchmark_format_quality._generate_format_outputs
 > Generate all format outputs and evaluate them.
 - **Output to**: format_configs.items, __import__, getattr, exporter_cls, time.time
-
-### code2llm.core.repo_files._get_gitignore_parser
-> Load gitignore parser for project if available.
-- **Output to**: code2llm.core.gitignore.load_gitignore_patterns
-
-### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
-> Parse a single gitignore pattern into regex.
-- **Output to**: pattern.startswith, pattern.endswith, pattern.startswith, self._wildcard_to_regex, re.compile
 
 ### code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs
 > Process large directories with file-level chunking.
@@ -326,15 +318,19 @@ Checks:
 > Process Python files directly in level1 directory.
 - **Output to**: code2llm.core.repo_files._get_gitignore_parser, len, chunks.append, self._chunk_by_files, chunks.extend
 
+### code2llm.core.repo_files._get_gitignore_parser
+> Load gitignore parser for project if available.
+- **Output to**: code2llm.core.gitignore.load_gitignore_patterns
+
+### code2llm.core.gitignore.GitIgnoreParser._parse_pattern
+> Parse a single gitignore pattern into regex.
+- **Output to**: pattern.startswith, pattern.endswith, pattern.startswith, self._wildcard_to_regex, re.compile
+
 ### code2llm.core.toon_size_manager._parse_modules
 > Parse module sections from TOON content.
 
 Returns list of (module_name, start_line, end_line).
 - **Output to**: content.split, enumerate, modules.append, line.startswith, line.endswith
-
-### code2llm.analysis.cfg.CFGExtractor._format_except
-> Format except handler.
-- **Output to**: self._expr_to_str
 
 ### code2llm.core.file_filter.FastFileFilter.should_process
 > Check if file should be processed.
@@ -351,6 +347,10 @@ Returns list of (module_name, start_line, end_line).
 ### code2llm.core.file_analyzer.FileAnalyzer._process_cfg_block
 > Process a block of statements for CFG with depth limiting.
 - **Output to**: None.append, isinstance, None.append, FlowEdge, self._process_if_stmt
+
+### code2llm.core.file_analyzer.FileAnalyzer._process_if_stmt
+> Process if statement for CFG.
+- **Output to**: FlowNode, func_info.cfg_nodes.append, None.append, self._process_cfg_block, FlowNode
 
 ## Public API Surface
 
@@ -380,8 +380,8 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.exporters.mermaid_exporter.MermaidExporter.export_compact` - 26 calls
 - `code2llm.exporters.toon.ToonExporter.export` - 26 calls
 - `benchmarks.benchmark_evolution.parse_evolution_metrics` - 25 calls
-- `code2llm.exporters.context_exporter.ContextExporter.export` - 25 calls
 - `code2llm.exporters.mermaid_exporter.MermaidExporter.export_call_graph` - 25 calls
+- `code2llm.exporters.context_exporter.ContextExporter.export` - 25 calls
 - `validate_toon.compare_functions` - 24 calls
 - `code2llm.generators.mermaid.generate_single_png` - 24 calls
 - `scripts.benchmark_badges.main` - 23 calls

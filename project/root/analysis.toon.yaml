@@ -1,4 +1,4 @@
-# code2llm | 113f 21502L | python:105,shell:2,java:1 | 2026-03-26
+# code2llm | 113f 21502L | python:105,shell:2,php:1 | 2026-03-31
 # CC̄=4.6 | critical:11/934 | dups:0 | cycles:0
 
 HEALTH[11]:
@@ -10,9 +10,9 @@ HEALTH[11]:
   🟡 CC    export_flow_full CC=23 (limit:15)
   🟡 CC    _export_mermaid CC=16 (limit:15)
   🟡 CC    _build_prompt_footer CC=16 (limit:15)
-  🟡 CC    analyze_ruby CC=17 (limit:15)
   🟡 CC    extract_calls_regex CC=16 (limit:15)
   🟡 CC    _process_functions CC=34 (limit:15)
+  🟡 CC    analyze_ruby CC=17 (limit:15)
 
 REFACTOR[1]:
   1. split 11 high-CC methods  (CC>15)
@@ -149,9 +149,9 @@ LAYERS:
   │
   demo_langs/                     CC̄=1.5    ←in:0  →out:0
   │ sample.rs                   47L  1C    5m  CC=2      ←0
-  │ sample.java                 47L  2C    7m  CC=3      ←1
+  │ sample.java                 47L  2C    4m  CC=2      ←0
   │ sample.go                   46L  0C    4m  CC=3      ←0
-  │ sample.php                  44L  1C    1m  CC=1      ←0
+  │ sample.php                  44L  2C    4m  CC=2      ←2
   │ sample                      40L  1C    4m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
   │

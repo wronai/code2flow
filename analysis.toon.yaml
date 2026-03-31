@@ -1,4 +1,4 @@
-# code2llm | 113f 21502L | python:108,shell:4,php:1 | 2026-03-26
+# code2llm | 113f 21502L | python:108,shell:4,java:1 | 2026-03-31
 # CC̄=4.6 | critical:11/934 | dups:0 | cycles:0
 
 HEALTH[11]:
@@ -18,15 +18,15 @@ REFACTOR[1]:
   1. split 11 high-CC methods  (CC>15)
 
 PIPELINES[638]:
-  [1] Src [main]: main → load_file → is_toon_file
+  [1] Src [run_benchmark]: run_benchmark → load_previous
       PURITY: 100% pure
-  [2] Src [save_report]: save_report
+  [2] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [3] Src [read_readme]: read_readme
+  [3] Src [save_report]: save_report
       PURITY: 100% pure
-  [4] Src [run_benchmark]: run_benchmark → load_previous
+  [4] Src [main]: main → load_file → is_toon_file
       PURITY: 100% pure
-  [5] Src [main]: main → create_html → get_shield_url
+  [5] Src [__init__]: __init__
       PURITY: 100% pure
 
 LAYERS:
@@ -149,9 +149,9 @@ LAYERS:
   │
   demo_langs/                     CC̄=1.5    ←in:0  →out:0
   │ sample.rs                   47L  1C    5m  CC=2      ←0
-  │ sample.java                 47L  2C    4m  CC=2      ←0
+  │ sample.java                 47L  2C    7m  CC=3      ←1
   │ sample.go                   46L  0C    4m  CC=3      ←0
-  │ sample.php                  44L  2C    4m  CC=2      ←2
+  │ sample.php                  44L  1C    1m  CC=1      ←0
   │ sample                      40L  1C    4m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
   │

@@ -1,5 +1,5 @@
-# code2llm | 108f 21305L | python:105,php:1,shell:2 | 2026-03-26
-# stats: 829 func | 0 cls | 108 mod | CC̄=4.6 | critical:11 | cycles:0
+# code2llm | 108f 21296L | python:105,php:1,shell:2 | 2026-03-30
+# stats: 830 func | 0 cls | 108 mod | CC̄=4.6 | critical:11 | cycles:0
 # alerts[5]: CC _process_functions=34; CC MapExporter.export_to_yaml=25; CC MermaidExporter.export_flow_detailed=25; fan-out analyze_rust=24; fan-out MapExporter.export_to_yaml=23
 # hotspots[5]: analyze_rust fan=24; MapExporter.export_to_yaml fan=23; analyze_go fan=22; MermaidExporter.export_flow_detailed fan=21; _summarize_functions fan=21
 # evolution: CC̄ 4.8→4.6 (improved -0.2)
@@ -79,7 +79,7 @@ M[108]:
   code2llm/exporters/json_exporter.py,17
   code2llm/exporters/llm_exporter.py,12
   code2llm/exporters/map_exporter.py,435
-  code2llm/exporters/mermaid_exporter.py,637
+  code2llm/exporters/mermaid_exporter.py,628
   code2llm/exporters/project_yaml_exporter.py,513
   code2llm/exporters/readme_exporter.py,496
   code2llm/exporters/report_generators.py,34
@@ -130,7 +130,7 @@ D:
     MapExporter(Exporter): export(2),export_to_yaml(2),_render_header(2),_render_stats_line(4),_render_alerts_line(1),_render_hotspots_line(1),_render_module_list(1),_render_details(1),_rank_modules(1),_render_map_module(3),_render_map_class(3),_function_signature(1),_is_excluded(1),_rel_path(2),_file_line_count(1),_count_total_lines(1),_detect_languages(1),_build_alerts(0),_build_hotspots(0),_load_evolution_trend(1),_read_previous_cc_avg(0)  # Export to map.toon.yaml — structural map with a compact proj...
   code2llm/exporters/mermaid_exporter.py:
     e: MermaidExporter
-    MermaidExporter(Exporter): export(2),_render_subgraphs(2),_render_edges(3),_render_cc_styles(2),_get_cc(0),export_call_graph(2),export_compact(2),_should_skip_module(2),_is_entry_point(3),_find_critical_path(2),export_flow_compact(3),export_flow_detailed(3),export_flow_full(3),_readable_id(1),_safe_module(1),_module_of(1),_resolve(2),_write(2)  # Export call graph to Mermaid format...
+    MermaidExporter(Exporter): export(2),_render_subgraphs(2),_render_edges(3),_render_cc_styles(2),_get_cc(0),export_call_graph(2),export_compact(2),_should_skip_module(2),_is_entry_point(3),_find_critical_path(2),export_flow_compact(3),export_flow_detailed(3),export_flow_full(3),_readable_id(1),_safe_module(1),_sanitize_identifier(1),_module_of(1),_resolve(2),_write(2)  # Export call graph to Mermaid format...
   validate_toon.py:
     e: load_yaml,load_file,extract_functions_from_yaml,extract_functions_from_toon,extract_classes_from_yaml,extract_classes_from_toon,analyze_class_differences,extract_modules_from_yaml,extract_modules_from_toon,compare_basic_stats,compare_functions,compare_classes,compare_modules,validate_toon_completeness,main
     load_yaml(filepath)
@@ -400,9 +400,6 @@ Sections: P...
   code2llm/analysis/call_graph.py:
     e: CallGraphExtractor
     CallGraphExtractor(ast.NodeVisitor): __init__(1),extract(3),_calculate_metrics(0),visit_Import(1),visit_ImportFrom(1),visit_ClassDef(1),visit_FunctionDef(1),visit_AsyncFunctionDef(1),visit_Call(1),_qualified_name(1),_resolve_call(1),_resolve_with_astroid(1),_expr_to_str(1)  # Extract call graph from AST...
-  code2llm/core/refactoring.py:
-    e: RefactoringAnalyzer
-    RefactoringAnalyzer: __init__(2),perform_refactoring_analysis(1),_build_call_graph(1),_calculate_centrality(2),_detect_cycles(2),_detect_communities(2),_analyze_coupling(1),_detect_smells(1),_detect_dead_code(1),_map_dead_code_to_items(2),_mark_reachable_items(1)  # Performs refactoring analysis on code...
   code2llm/core/large_repo.py:
     e: SubProject,HierarchicalRepoSplitter,should_use_chunking,get_analysis_plan
     SubProject:  # Represents a sub-project within a larger repository...
@@ -411,6 +408,9 @@ Sections: P...
 Stra...
     should_use_chunking(project_path;size_threshold_kb)
     get_analysis_plan(project_path;size_limit_kb)
+  code2llm/core/refactoring.py:
+    e: RefactoringAnalyzer
+    RefactoringAnalyzer: __init__(2),perform_refactoring_analysis(1),_build_call_graph(1),_calculate_centrality(2),_detect_cycles(2),_detect_communities(2),_analyze_coupling(1),_detect_smells(1),_detect_dead_code(1),_map_dead_code_to_items(2),_mark_reachable_items(1)  # Performs refactoring analysis on code...
   code2llm/exporters/toon/__init__.py:
     e: ToonExporter
     ToonExporter: __init__(0),export(2),export_to_yaml(2),_build_header_dict(1),_build_health_dict(1),_build_refactor_dict(1),_build_pipelines_dict(1),_build_layers_dict(1),_build_coupling_dict(1),_build_external_dict(1),_is_excluded(1)  # Export to toon v2 plain-text format — scannable, sorted by s...

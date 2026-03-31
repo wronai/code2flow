@@ -11,10 +11,11 @@ Used by FlowExporter to enrich CONTRACTS and SIDE_EFFECTS sections.
 
 import ast
 import logging
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from code2llm.core.models import FunctionInfo
+from code2llm.core.ast_registry import ASTRegistry
+from code2llm.analysis.utils.ast_helpers import find_function_node
 
 logger = logging.getLogger(__name__)
 
@@ -121,16 +122,16 @@ class SideEffectDetector:
     global references, and self-attribute mutations.
     """
 
-    def __init__(self):
-        self._ast_cache: Dict[str, Optional[ast.Module]] = {}
+    def __init__(self, registry: Optional[ASTRegistry] = None):
+        self._registry = registry or ASTRegistry.get_global()
 
     def analyze_function(self, fi: FunctionInfo) -> SideEffectInfo:
         """Analyze a single function for side effects."""
         info = SideEffectInfo(fi.name, fi.qualified_name)
 
-        tree = self._get_ast(fi.file)
+        tree = self._registry.get_ast(fi.file)
         if tree:
-            node = self._find_function_node(tree, fi.name, fi.line)
+            node = find_function_node(tree, fi.name, fi.line)
             if node:
                 self._scan_node(node, info)
                 self._classify(info)
@@ -281,37 +282,6 @@ class SideEffectDetector:
     # ------------------------------------------------------------------
     # AST helpers
     # ------------------------------------------------------------------
-    def _get_ast(self, file_path: str) -> Optional[ast.Module]:
-        """Parse and cache AST for a source file."""
-        if not file_path:
-            return None
-        if file_path in self._ast_cache:
-            return self._ast_cache[file_path]
-
-        try:
-            source = Path(file_path).read_text(encoding="utf-8", errors="replace")
-            tree = ast.parse(source, filename=file_path)
-            self._ast_cache[file_path] = tree
-        except (OSError, SyntaxError) as e:
-            logger.debug("Cannot parse %s: %s", file_path, e)
-            self._ast_cache[file_path] = None
-            tree = None
-        return tree
-
-    def _find_function_node(
-        self, tree: ast.Module, name: str, line: int
-    ) -> Optional[ast.FunctionDef]:
-        """Find function node by name and line number."""
-        for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                if node.name == name and node.lineno == line:
-                    return node
-        for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                if node.name == name:
-                    return node
-        return None
-
     def _get_call_name(self, node: ast.expr) -> Optional[str]:
         """Extract call name from AST node."""
         if isinstance(node, ast.Name):

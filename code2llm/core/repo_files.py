@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import List, Tuple, Optional
 
+from functools import lru_cache
 from .gitignore import load_gitignore_patterns, GitIgnoreParser
 
 # Directories to skip during analysis
@@ -25,8 +26,9 @@ SKIP_PATTERNS = [
 ]
 
 
+@lru_cache(maxsize=16)
 def _get_gitignore_parser(project_path: Path) -> Optional[GitIgnoreParser]:
-    """Load gitignore parser for project if available."""
+    """Load gitignore parser for project if available (cached per path)."""
     try:
         return load_gitignore_patterns(project_path)
     except Exception:

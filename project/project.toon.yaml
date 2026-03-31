@@ -1,23 +1,22 @@
-# code2llm | 829 func | 97f | 26477L | python | 2026-03-26
+# code2llm | 857 func | 98f | 26783L | python | 2026-03-31
 
 HEALTH:
-  CC̄=4.6  critical=73 (limit:10)  dup=1  cycles=0
+  CC̄=4.5  critical=70 (limit:10)  dup=1  cycles=0
 
 ALERTS[20]:
-  !!! cc_exceeded      _process_functions = 34 (limit:15)
-  !!! cc_exceeded      MapExporter.export_to_yaml = 25 (limit:15)
-  !!! cc_exceeded      MermaidExporter.export_flow_detailed = 25 (limit:15)
   !!! high_fan_out     analyze_rust = 24 (limit:10)
-  !!! high_fan_out     MapExporter.export_to_yaml = 23 (limit:10)
   !!! high_fan_out     analyze_go = 22 (limit:10)
-  !!! high_fan_out     MermaidExporter.export_flow_detailed = 21 (limit:10)
-  !!! high_fan_out     _summarize_functions = 21 (limit:10)
   !!! high_fan_out     analyze_php = 21 (limit:10)
-  !!! high_fan_out     MermaidExporter.export_flow_full = 20 (limit:10)
+  !!! high_fan_out     _summarize_functions = 21 (limit:10)
+  !!  high_fan_out     ProjectAnalyzer.analyze_project = 19 (limit:10)
+  !!  high_fan_out     run_benchmark = 18 (limit:10)
+  !!  high_fan_out     ProjectYAMLExporter._build_project_yaml = 18 (limit:10)
+  !!  high_fan_out     NLPPipeline.process = 17 (limit:10)
+  !!  high_fan_out     MermaidExporter.export_call_graph = 17 (limit:10)
+  !!  high_fan_out     run_benchmark = 16 (limit:10)
 
 MODULES[113] (top by size):
   M[code2llm/exporters/index_generator.py] 790L C:1 F:7 CC↑5 D:0 (python)
-  M[code2llm/exporters/mermaid_exporter.py] 637L C:1 F:18 CC↑25 D:0 (python)
   M[code2llm/exporters/project_yaml_exporter.py] 513L C:1 F:18 CC↑13 D:0 (python)
   M[code2llm/analysis/pipeline_detector.py] 506L C:3 F:18 CC↑13 D:0 (python)
   M[code2llm/exporters/html_dashboard.py] 504L C:1 F:14 CC↑7 D:0 (python)
@@ -25,12 +24,13 @@ MODULES[113] (top by size):
   M[code2llm/exporters/readme_exporter.py] 496L C:1 F:7 CC↑13 D:0 (python)
   M[code2llm/core/large_repo.py] 488L C:2 F:20 CC↑9 D:1 (python)
   M[code2llm/generators/mermaid.py] 485L C:0 F:16 CC↑13 D:1 (python)
+  M[code2llm/exporters/mermaid_exporter.py] 480L C:1 F:19 CC↑13 D:0 (python)
+  M[code2llm/cli_exports/prompt.py] 475L C:0 F:18 CC↑14 D:1 (python)
   M[code2llm/generators/llm_flow.py] 472L C:1 F:24 CC↑14 D:0 (python)
   M[code2llm/exporters/evolution_exporter.py] 471L C:1 F:17 CC↑11 D:0 (python)
   M[code2llm/exporters/toon/renderer.py] 471L C:1 F:26 CC↑11 D:0 (python)
-  M[code2llm/cli_exports/prompt.py] 464L C:0 F:17 CC↑16 D:1 (python)
-  M[code2llm/exporters/map_exporter.py] 435L C:1 F:21 CC↑25 D:4 (python)
-  M[code2llm/core/file_analyzer.py] 398L C:1 F:17 CC↑12 D:0 (python)
+  M[code2llm/exporters/map_exporter.py] 439L C:1 F:25 CC↑13 D:4 (python)
+  M[code2llm/core/lang/base.py] 412L C:0 F:13 CC↑14 D:8 (python)
   LANGS: python:106/shell:2/go:1/java:1/php:1/rust:1/typescript:1
 
 HOTSPOTS[10]:
@@ -44,8 +44,11 @@ REFACTOR[15]:
   [1] H/L Split MapExporter.export_to_yaml (CC=25 → target CC<10)
   [2] H/L Split MermaidExporter.export_flow_detailed (CC=25 → target CC<10)
   [3] H/L Split _process_functions (CC=34 → target CC<10)
-  [4] H/H Split god module code2llm/exporters/mermaid_exporter.py (637L, 1 classes)
-  [5] H/H Split god module code2llm/analysis/pipeline_detector.py (506L, 3 classes)
+  [1] H/H Split god module code2llm/analysis/pipeline_detector.py (506L, 3 classes)
+  [2] H/H Split god module code2llm/exporters/project_yaml_exporter.py (513L, 1 classes)
+  [3] H/H Split god module code2llm/exporters/toon/metrics.py (501L, 1 classes)
+  [4] H/H Split god module code2llm/exporters/html_dashboard.py (504L, 1 classes)
+  [5] H/H Split god module code2llm/exporters/index_generator.py (790L, 1 classes)
 
 EVOLUTION:
-  2026-03-26 CC̄=4.6 crit=73 26477L // Automated analysis
+  2026-03-31 CC̄=4.5 crit=70 26783L // Automated analysis

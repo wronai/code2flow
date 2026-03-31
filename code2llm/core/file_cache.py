@@ -1,10 +1,11 @@
 """File cache for parsed AST files."""
 
 import hashlib
+import os
 import pickle
 import time
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 import ast
 
 
@@ -16,8 +17,16 @@ class FileCache:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.ttl_seconds = ttl_hours * 3600
     
+    def _get_cache_key_stat(self, file_path: str) -> str:
+        """Generate cache key from file path, mtime and size (fast, no I/O on content)."""
+        try:
+            s = os.stat(file_path)
+            return f"{Path(file_path).stem}_{s.st_mtime_ns}_{s.st_size}"
+        except OSError:
+            return f"{Path(file_path).stem}_unknown"
+
     def _get_cache_key(self, file_path: str, content: str) -> str:
-        """Generate cache key from file path and content hash."""
+        """Generate cache key from file path and content hash (legacy)."""
         content_hash = hashlib.md5(content.encode()).hexdigest()[:16]
         return f"{Path(file_path).stem}_{content_hash}"
     
@@ -27,7 +36,7 @@ class FileCache:
     
     def get(self, file_path: str, content: str) -> Optional[Tuple[ast.AST, str]]:
         """Get cached AST if available and not expired."""
-        cache_key = self._get_cache_key(file_path, content)
+        cache_key = self._get_cache_key_stat(file_path)
         cache_path = self._get_cache_path(cache_key)
         
         if not cache_path.exists():
@@ -47,7 +56,7 @@ class FileCache:
     
     def put(self, file_path: str, content: str, data: Tuple[ast.AST, str]) -> None:
         """Store AST in cache."""
-        cache_key = self._get_cache_key(file_path, content)
+        cache_key = self._get_cache_key_stat(file_path)
         cache_path = self._get_cache_path(cache_key)
         
         try:
@@ -56,6 +65,38 @@ class FileCache:
         except Exception:
             pass
     
+    def get_fast(self, file_path: str) -> Optional[Any]:
+        """Get cached analysis result using mtime+size key (call before reading file)."""
+        cache_key = self._get_cache_key_stat(file_path)
+        cache_path = self._get_cache_path(cache_key)
+
+        if not cache_path.exists():
+            return None
+
+        age = time.time() - cache_path.stat().st_mtime
+        if age > self.ttl_seconds:
+            try:
+                cache_path.unlink()
+            except OSError:
+                pass
+            return None
+
+        try:
+            with open(cache_path, 'rb') as f:
+                return pickle.load(f)
+        except Exception:
+            return None
+
+    def put_fast(self, file_path: str, data: Any) -> None:
+        """Store full analysis result using mtime+size key."""
+        cache_key = self._get_cache_key_stat(file_path)
+        cache_path = self._get_cache_path(cache_key)
+        try:
+            with open(cache_path, 'wb') as f:
+                pickle.dump(data, f)
+        except Exception:
+            pass
+
     def clear(self) -> None:
         """Clear all cached files."""
         for f in self.cache_dir.glob("*.pkl"):

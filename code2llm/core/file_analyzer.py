@@ -36,63 +36,61 @@ class FileAnalyzer:
             'cache_hits': 0,
         }
     
+    def _route_to_language_analyzer(self, content: str, file_path: str,
+                                    module_name: str, ext: str) -> Dict:
+        """Dispatch file content to the correct language analyzer."""
+        if ext == '.py':
+            return self._analyze_python(content, file_path, module_name)
+        if ext in ('.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'):
+            return analyze_typescript_js(content, file_path, module_name, ext, self.stats)
+        if ext == '.go':
+            return analyze_go(content, file_path, module_name, ext, self.stats)
+        if ext == '.rs':
+            return analyze_rust(content, file_path, module_name, ext, self.stats)
+        if ext == '.java':
+            return analyze_java(content, file_path, module_name, ext, self.stats)
+        if ext in ('.c', '.cpp', '.cc', '.h', '.hpp', '.hh', '.cxx', '.hxx'):
+            return analyze_cpp(content, file_path, module_name, ext, self.stats)
+        if ext in ('.cs', '.csharp'):
+            return analyze_csharp(content, file_path, module_name, ext, self.stats)
+        if ext == '.php':
+            return analyze_php(content, file_path, module_name, ext, self.stats)
+        if ext in ('.rb', '.ruby'):
+            return analyze_ruby(content, file_path, module_name, ext, self.stats)
+        return analyze_generic(content, file_path, module_name, ext, self.stats)
+
     def analyze_file(self, file_path: str, module_name: str) -> Dict:
         """Analyze a single source file based on its language."""
         path = Path(file_path)
         if not path.exists():
             return {}
-        
-        # Detect language from extension
+
+        if self.cache and self.config.performance.enable_cache:
+            cached = self.cache.get_fast(file_path)
+            if cached:
+                self.stats['cache_hits'] += 1
+                return cached
+
         ext = path.suffix.lower()
-        
         try:
             content = path.read_text(encoding='utf-8', errors='ignore')
         except Exception:
             return {}
-        
-        # Route to appropriate analyzer based on language
-        if ext == '.py':
-            return self._analyze_python(content, file_path, module_name)
-        elif ext in ('.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'):
-            return analyze_typescript_js(content, file_path, module_name, ext, self.stats)
-        elif ext == '.go':
-            return analyze_go(content, file_path, module_name, ext, self.stats)
-        elif ext == '.rs':
-            return analyze_rust(content, file_path, module_name, ext, self.stats)
-        elif ext == '.java':
-            return analyze_java(content, file_path, module_name, ext, self.stats)
-        elif ext in ('.c', '.cpp', '.cc', '.h', '.hpp', '.hh', '.cxx', '.hxx'):
-            return analyze_cpp(content, file_path, module_name, ext, self.stats)
-        elif ext in ('.cs', '.csharp'):
-            return analyze_csharp(content, file_path, module_name, ext, self.stats)
-        elif ext == '.php':
-            return analyze_php(content, file_path, module_name, ext, self.stats)
-        elif ext in ('.rb', '.ruby'):
-            return analyze_ruby(content, file_path, module_name, ext, self.stats)
-        else:
-            # For unsupported languages, do basic structural analysis
-            return analyze_generic(content, file_path, module_name, ext, self.stats)
+
+        result = self._route_to_language_analyzer(content, file_path, module_name, ext)
+
+        if self.cache and self.config.performance.enable_cache and result:
+            self.cache.put_fast(file_path, result)
+
+        return result
     
     def _analyze_python(self, content: str, file_path: str, module_name: str) -> Dict:
         """Analyze Python file using AST."""
-        # Try cache
-        if self.cache and self.config.performance.enable_cache:
-            cached = self.cache.get(file_path, content)
-            if cached:
-                self.stats['cache_hits'] += 1
-                ast_tree, _ = cached
-            else:
-                try:
-                    ast_tree = ast.parse(content)
-                    self.cache.put(file_path, content, (ast_tree, content))
-                except SyntaxError:
-                    return {}
-        else:
-            try:
-                ast_tree = ast.parse(content)
-            except SyntaxError:
-                return {}
-        
+        try:
+            ast_tree = ast.parse(content)
+        except SyntaxError:
+            return {}
+
         result = self._analyze_ast(ast_tree, file_path, module_name, content)
         self.stats['files_processed'] += 1
         return result

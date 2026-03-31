@@ -14,9 +14,18 @@ New 3-level flow diagrams (Plan R1):
 from collections import defaultdict
 import re
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Set, Tuple
 from .base import Exporter
 from code2llm.core.models import AnalysisResult
+from .mermaid_flow_helpers import (
+    _entry_points,
+    _filtered_functions,
+    _group_functions_by_module,
+    _render_architecture_view,
+    _render_flow_edges,
+    _render_flow_styles,
+    _render_module_subgraphs,
+)
 
 
 class MermaidExporter(Exporter):
@@ -308,84 +317,23 @@ class MermaidExporter(Exporter):
         lines.append("    %% Entry points (blue)")
         lines.append("    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff")
         lines.append("")
-        
-        # Filter functions
-        filtered_funcs = {
-            name: fi for name, fi in result.functions.items()
-            if not self._should_skip_module(self._module_of(name), include_examples)
-        }
-        
-        # Identify entry points
-        entry_points = [
-            name for name, fi in filtered_funcs.items()
-            if self._is_entry_point(name, fi, result)
-        ]
-        
-        # Critical path (longest chain from entry)
+        filtered_funcs = _filtered_functions(
+            result,
+            self._module_of,
+            self._should_skip_module,
+            include_examples,
+        )
+        entry_points = _entry_points(filtered_funcs, result, self._is_entry_point)
         critical_path = self._find_critical_path(result, entry_points)
-        
-        # Top-level architecture nodes (CLI, Core, Exporters)
-        arch_modules: Dict[str, List[str]] = {
-            'CLI': [],
-            'Core': [],
-            'Exporters': [],
-        }
-        
-        for func_name in filtered_funcs:
-            module = self._module_of(func_name)
-            if 'cli' in module.lower():
-                arch_modules['CLI'].append(func_name)
-            elif 'exporter' in module.lower() or 'export' in func_name.lower():
-                arch_modules['Exporters'].append(func_name)
-            else:
-                arch_modules['Core'].append(func_name)
-        
-        # Render architecture subgraphs with key functions only
-        for arch_name, funcs in arch_modules.items():
-            if not funcs:
-                continue
-            lines.append(f"    subgraph {arch_name}")
-            
-            # Pick key functions: entry points + high CC + key pipeline functions
-            key_funcs = []
-            for fn in funcs:
-                fi = filtered_funcs.get(fn)
-                if not fi:
-                    continue
-                cc = self._get_cc(fi)
-                is_entry = fn in entry_points
-                is_critical = fn in critical_path
-                
-                if is_entry or is_critical or cc >= 15:
-                    key_funcs.append(fn)
-            
-            # Limit to avoid clutter
-            shown_funcs = key_funcs[:15]
-            for func_name in shown_funcs:
-                fi = filtered_funcs[func_name]
-                sid = self._readable_id(func_name)
-                short = fi.name[:30]
-                cc = self._get_cc(fi)
-                
-                if func_name in entry_points:
-                    lines.append(f'        {sid}["{short}"]')
-                elif cc >= 15:
-                    lines.append(f'        {sid}{{{{{short} CC={cc}}}}}')
-                elif cc >= 8:
-                    lines.append(f'        {sid}("{short} CC={cc}")')
-                else:
-                    lines.append(f'        {sid}["{short}"]')
-            
-            if len(key_funcs) > 15:
-                lines.append(f'        ...["+{len(key_funcs) - 15} more"]')
-            lines.append("    end")
-            lines.append("")
-        
-        # Entry point styling
-        if entry_points:
-            entry_ids = [self._readable_id(ep) for ep in entry_points[:10]]
-            lines.append(f"    class {','.join(entry_ids)} entry")
-        
+        _render_architecture_view(
+            lines,
+            filtered_funcs,
+            entry_points,
+            critical_path,
+            self._module_of,
+            self._readable_id,
+            self._get_cc,
+        )
         self._write(output_path, lines)
 
     def export_flow_detailed(self, result: AnalysisResult, output_path: str,
@@ -401,93 +349,36 @@ class MermaidExporter(Exporter):
         lines.append("    classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000")
         lines.append("    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff")
         lines.append("")
-        
-        # Filter functions
-        filtered_funcs = {
-            name: fi for name, fi in result.functions.items()
-            if not self._should_skip_module(self._module_of(name), include_examples)
-        }
-        
-        # Identify entry points
-        entry_points = [
-            name for name, fi in filtered_funcs.items()
-            if self._is_entry_point(name, fi, result)
-        ]
-        
-        # Group by module (2 levels deep)
-        modules: Dict[str, List[Tuple[str, Any]]] = defaultdict(list)
-        for name, fi in filtered_funcs.items():
-            mod = self._module_of(name)
-            modules[mod].append((name, fi))
-        
-        # Render subgraphs per module
-        for mod, funcs in sorted(modules.items()):
-            safe_mod = self._safe_module(mod)
-            lines.append(f"    subgraph {safe_mod}")
-            
-            # Sort by CC descending, then by name
-            funcs_sorted = sorted(
-                funcs,
-                key=lambda x: (-self._get_cc(x[1]), x[1].name)
-            )[:40]  # Max 40 per module
-            
-            for func_name, fi in funcs_sorted:
-                sid = self._readable_id(func_name)
-                short = fi.name[:35]
-                cc = self._get_cc(fi)
-                
-                if cc >= 15:
-                    lines.append(f'        {sid}{{{{{short} CC={cc}}}}}')
-                elif cc >= 8:
-                    lines.append(f'        {sid}("{short} CC={cc}")')
-                else:
-                    lines.append(f'        {sid}["{short}"]')
-            
-            if len(funcs) > 40:
-                lines.append(f'        ...["+{len(funcs) - 40} more"]')
-            lines.append("    end")
-            lines.append("")
-        
-        # Render edges (limit to avoid chaos)
-        seen_edges: Set[Tuple[str, str]] = set()
-        edge_count = 0
-        max_edges = 200
-        
-        for func_name, fi in filtered_funcs.items():
-            src = self._readable_id(func_name)
-            for callee in fi.calls[:10]:  # Limit calls per function
-                resolved = self._resolve(callee, filtered_funcs)
-                if resolved and resolved != func_name:
-                    dst = self._readable_id(resolved)
-                    edge = (src, dst)
-                    if edge not in seen_edges:
-                        seen_edges.add(edge)
-                        lines.append(f"    {src} --> {dst}")
-                        edge_count += 1
-                        if edge_count >= max_edges:
-                            break
-            if edge_count >= max_edges:
-                break
-        
-        # Apply styling
-        high_nodes = []
-        med_nodes = []
-        for func_name, fi in filtered_funcs.items():
-            cc = self._get_cc(fi)
-            sid = self._readable_id(func_name)
-            if cc >= 15:
-                high_nodes.append(sid)
-            elif cc >= 8:
-                med_nodes.append(sid)
-        
-        if high_nodes:
-            lines.append(f"    class {','.join(high_nodes[:30])} highCC")
-        if med_nodes:
-            lines.append(f"    class {','.join(med_nodes[:30])} medCC")
-        if entry_points:
-            entry_ids = [self._readable_id(ep) for ep in entry_points[:10]]
-            lines.append(f"    class {','.join(entry_ids)} entry")
-        
+        filtered_funcs = _filtered_functions(
+            result,
+            self._module_of,
+            self._should_skip_module,
+            include_examples,
+        )
+        entry_points = _entry_points(filtered_funcs, result, self._is_entry_point)
+        modules = _group_functions_by_module(filtered_funcs, self._module_of)
+        _render_module_subgraphs(
+            lines,
+            modules,
+            entry_points,
+            short_len=35,
+            readable_id=self._readable_id,
+            safe_module=self._safe_module,
+            get_cc=self._get_cc,
+            sort_funcs=True,
+            max_funcs=40,
+        )
+        _render_flow_edges(lines, filtered_funcs, self._readable_id, self._resolve, calls_per_function=10, limit=200)
+        _render_flow_styles(
+            lines,
+            filtered_funcs,
+            entry_points,
+            self._readable_id,
+            self._get_cc,
+            high_limit=30,
+            med_limit=30,
+            entry_limit=10,
+        )
         self._write(output_path, lines)
 
     def export_flow_full(self, result: AnalysisResult, output_path: str,
@@ -503,75 +394,36 @@ class MermaidExporter(Exporter):
         lines.append("    classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000")
         lines.append("    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff")
         lines.append("")
-        
-        # Filter functions if requested
-        filtered_funcs = result.functions
-        if not include_examples:
-            filtered_funcs = {
-                name: fi for name, fi in result.functions.items()
-                if not self._should_skip_module(self._module_of(name), include_examples)
-            }
-        
-        # Identify entry points
-        entry_points = [
-            name for name, fi in filtered_funcs.items()
-            if self._is_entry_point(name, fi, result)
-        ]
-        
-        # Subgraphs per module
-        modules: Dict[str, list] = {}
-        for func_name, fi in filtered_funcs.items():
-            module = self._module_of(func_name)
-            modules.setdefault(module, []).append((func_name, fi))
-        
-        for module, funcs in sorted(modules.items()):
-            safe_module = self._safe_module(module)
-            lines.append(f"    subgraph {safe_module}")
-            for func_name, fi in funcs:
-                sid = self._readable_id(func_name)
-                short = fi.name[:35]
-                cc = self._get_cc(fi)
-                if cc >= 15:
-                    lines.append(f'        {sid}{{{{{short} CC={cc}}}}}')
-                elif cc >= 8:
-                    lines.append(f'        {sid}("{short} CC={cc}")')
-                else:
-                    lines.append(f'        {sid}["{short}"]')
-            lines.append("    end")
-            lines.append("")
-        
-        # Edges — all cross-function calls
-        seen_edges: Set[Tuple[str, str]] = set()
-        for func_name, fi in filtered_funcs.items():
-            src = self._readable_id(func_name)
-            for callee in fi.calls[:15]:
-                resolved = self._resolve(callee, filtered_funcs)
-                if resolved and resolved != func_name:
-                    dst = self._readable_id(resolved)
-                    edge = (src, dst)
-                    if edge not in seen_edges:
-                        seen_edges.add(edge)
-                        lines.append(f"    {src} --> {dst}")
-        
-        # CC-based styling
-        high_nodes = []
-        med_nodes = []
-        for func_name, fi in filtered_funcs.items():
-            cc = self._get_cc(fi)
-            sid = self._readable_id(func_name)
-            if cc >= 15:
-                high_nodes.append(sid)
-            elif cc >= 8:
-                med_nodes.append(sid)
-        
-        if high_nodes:
-            lines.append(f"    class {','.join(high_nodes[:50])} highCC")
-        if med_nodes:
-            lines.append(f"    class {','.join(med_nodes[:50])} medCC")
-        if entry_points:
-            entry_ids = [self._readable_id(ep) for ep in entry_points[:15]]
-            lines.append(f"    class {','.join(entry_ids)} entry")
-        
+        filtered_funcs = _filtered_functions(
+            result,
+            self._module_of,
+            self._should_skip_module,
+            include_examples,
+        )
+        entry_points = _entry_points(filtered_funcs, result, self._is_entry_point)
+        modules = _group_functions_by_module(filtered_funcs, self._module_of)
+        _render_module_subgraphs(
+            lines,
+            modules,
+            entry_points,
+            short_len=35,
+            readable_id=self._readable_id,
+            safe_module=self._safe_module,
+            get_cc=self._get_cc,
+            sort_funcs=False,
+            max_funcs=None,
+        )
+        _render_flow_edges(lines, filtered_funcs, self._readable_id, self._resolve, calls_per_function=15, limit=None)
+        _render_flow_styles(
+            lines,
+            filtered_funcs,
+            entry_points,
+            self._readable_id,
+            self._get_cc,
+            high_limit=50,
+            med_limit=50,
+            entry_limit=15,
+        )
         self._write(output_path, lines)
 
     def _readable_id(self, name: str) -> str:

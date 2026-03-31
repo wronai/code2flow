@@ -1,9 +1,24 @@
 """Fast file filtering with pattern matching."""
 
 import fnmatch
+import re
 from pathlib import Path
 from .config import FilterConfig
 from .gitignore import load_gitignore_patterns
+
+
+_SKIP_DIR_NAMES = frozenset({
+    '.git', '.svn', '.hg',
+    '.vscode', '.idea', '.github',
+    '__pycache__', '.venv', 'venv', 'env', 'fresh_env', 'test-env',
+    '.tox', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.pyqual',
+    'node_modules',
+    'build', 'dist', 'target', 'out',
+    '.eggs', 'egg-info',
+    'htmlcov', '.coverage', '.cache',
+    'lib', 'lib64', 'site-packages', 'include', 'bin', 'share',
+    '.code2llm_cache',
+})
 
 
 class FastFileFilter:
@@ -12,36 +27,61 @@ class FastFileFilter:
     def __init__(self, config: FilterConfig, project_path: Path = None):
         self.config = config
         self.project_path = project_path
-        self._exclude_patterns = [p.lower() for p in config.exclude_patterns]
-        self._include_patterns = [p.lower() for p in config.include_patterns]
-        
+
+        # Split patterns into fast substring checks vs pre-compiled regex
+        self._simple_excludes = []
+        self._regex_excludes = []
+        for p in config.exclude_patterns:
+            p_lower = p.lower()
+            if any(c in p_lower for c in ('*', '?', '[')):
+                self._regex_excludes.append(re.compile(fnmatch.translate(p_lower)))
+            else:
+                self._simple_excludes.append(p_lower)
+
+        self._simple_includes = []
+        self._regex_includes = []
+        for p in config.include_patterns:
+            p_lower = p.lower()
+            if any(c in p_lower for c in ('*', '?', '[')):
+                self._regex_includes.append(re.compile(fnmatch.translate(p_lower)))
+            else:
+                self._simple_includes.append(p_lower)
+
         # Load gitignore patterns if enabled and project path is provided
         self._gitignore_parser = None
         if config.gitignore_enabled and project_path:
             self._gitignore_parser = load_gitignore_patterns(project_path)
     
+    def should_skip_dir(self, dirname: str) -> bool:
+        """Fast O(1) check: skip this directory entirely during tree walk?"""
+        return dirname.lower() in _SKIP_DIR_NAMES
+
     def should_process(self, file_path: str) -> bool:
         """Check if file should be processed."""
         path_lower = file_path.lower()
-        
+
         # Check gitignore patterns first
         if self._gitignore_parser and self.project_path:
-            file_path_obj = Path(file_path)
-            if self._gitignore_parser.is_ignored(file_path_obj, self.project_path):
+            if self._gitignore_parser.is_ignored(Path(file_path), self.project_path):
                 return False
-        
-        # Check exclude patterns
-        for pattern in self._exclude_patterns:
-            if fnmatch.fnmatch(path_lower, pattern) or pattern in path_lower:
+
+        # Fast substring excludes
+        for pattern in self._simple_excludes:
+            if pattern in path_lower:
                 return False
-        
+
+        # Pre-compiled wildcard excludes
+        for regex in self._regex_excludes:
+            if regex.match(path_lower):
+                return False
+
         # Check include patterns (if any)
-        if self._include_patterns:
-            return any(
-                fnmatch.fnmatch(path_lower, p) or p in path_lower
-                for p in self._include_patterns
+        if self._simple_includes or self._regex_includes:
+            return (
+                any(p in path_lower for p in self._simple_includes) or
+                any(r.match(path_lower) for r in self._regex_includes)
             )
-        
+
         return True
     
     def should_skip_function(self, line_count: int, is_private: bool = False, 

@@ -399,60 +399,71 @@ def _build_priority_order(file_analysis: dict) -> List[str]:
     return priorities
 
 
+def _build_strategy_section(file_analysis: dict) -> List[str]:
+    """Build the 'Analysis Strategy' block for the prompt footer."""
+    if not file_analysis.get('file_count', 0):
+        return []
+    lines = ["", "Analysis Strategy:"]
+    if file_analysis.get('has_analysis_toon') and file_analysis.get('has_map_toon'):
+        lines.append(
+            f"- Start with {file_analysis.get('analysis_file', 'analysis.toon')} for health"
+            f" metrics, then {file_analysis.get('map_file', 'map.toon.yaml')} for structure and signatures"
+        )
+        if file_analysis.get('has_evolution_toon'):
+            lines.append(
+                f"- Review {file_analysis.get('evolution_file', 'evolution.toon.yaml')}"
+                " for action priorities and next steps"
+            )
+    if file_analysis.get('has_project_toon_yaml'):
+        lines.append(
+            f"- Compare the compact project overview in"
+            f" {file_analysis.get('project_toon_file', 'project.toon.yaml')} with the main analysis files"
+        )
+    if file_analysis.get('has_project_logic'):
+        lines.append(
+            f"- Compare the compact project overview in"
+            f" {file_analysis.get('project_logic_file', 'project.toon')} with the main analysis files"
+        )
+    if file_analysis.get('has_validation_toon'):
+        lines.append(
+            f"- Check {file_analysis.get('validation_file', 'project/validation.toon.yaml')}"
+            " for validation issues (vallm tool output)"
+        )
+    if file_analysis.get('has_duplication_toon'):
+        lines.append(
+            f"- Examine {file_analysis.get('duplication_file', 'project/duplication.toon.yaml')}"
+            " for duplicate code patterns (redup tool output)"
+        )
+    return lines
+
+
 def _build_prompt_footer(chunked: bool = False, file_analysis: dict = None) -> List[str]:
     """Build dynamic footer section of prompt based on generated files."""
     if file_analysis is None:
         file_analysis = {}
-    
-    lines = [""]
-    
-    # Dynamic tasks
-    lines.append("Task:")
-    tasks = _build_dynamic_tasks(file_analysis)
-    for task in tasks:
-        lines.append(task)
 
-    # Priority order
+    lines = ["", "Task:"]
+    lines.extend(_build_dynamic_tasks(file_analysis))
+
     priorities = _build_priority_order(file_analysis)
     if priorities:
-        lines.append("")
-        lines.append("Priority Order:")
-        for priority in priorities:
-            lines.append(priority)
-    
-    # Dynamic focus areas
+        lines += ["", "Priority Order:"] + priorities
+
     focus_areas = _build_dynamic_focus_areas(file_analysis)
     if focus_areas:
-        lines.append("")
-        lines.append("Focus Areas for Analysis:")
-        for area in focus_areas:
-            lines.append(area)
-    
-    # File-specific recommendations
-    if file_analysis['file_count'] > 0:
-        lines.append("")
-        lines.append("Analysis Strategy:")
-        if file_analysis['has_analysis_toon'] and file_analysis['has_map_toon']:
-            lines.append(f"- Start with {file_analysis.get('analysis_file', 'analysis.toon')} for health metrics, then {file_analysis.get('map_file', 'map.toon.yaml')} for structure and signatures")
-            if file_analysis['has_evolution_toon']:
-                lines.append(f"- Review {file_analysis.get('evolution_file', 'evolution.toon.yaml')} for action priorities and next steps")
-        if file_analysis.get('has_project_toon_yaml'):
-            lines.append(f"- Compare the compact project overview in {file_analysis.get('project_toon_file', 'project.toon.yaml')} with the main analysis files")
-        if file_analysis.get('has_project_logic'):
-            lines.append(f"- Compare the compact project overview in {file_analysis.get('project_logic_file', 'project.toon')} with the main analysis files")
-        if file_analysis['has_validation_toon']:
-            lines.append(f"- Check {file_analysis.get('validation_file', 'project/validation.toon.yaml')} for validation issues (vallm tool output)")
-        if file_analysis['has_duplication_toon']:
-            lines.append(f"- Examine {file_analysis.get('duplication_file', 'project/duplication.toon.yaml')} for duplicate code patterns (redup tool output)")
-    
-    # Constraints
-    lines.append("")
-    lines.append("Constraints:")
-    lines.append("- Prefer minimal, incremental changes.")
-    lines.append("- Maintain full backward compatibility.")
-    lines.append("- Base recommendations on concrete metrics from the provided files.")
-    lines.append("- If uncertain, ask clarifying questions.")
-    
+        lines += ["", "Focus Areas for Analysis:"] + focus_areas
+
+    lines.extend(_build_strategy_section(file_analysis))
+
+    lines += [
+        "",
+        "Constraints:",
+        "- Prefer minimal, incremental changes.",
+        "- Maintain full backward compatibility.",
+        "- Base recommendations on concrete metrics from the provided files.",
+        "- If uncertain, ask clarifying questions.",
+    ]
+
     if chunked:
         lines.extend([
             "",
@@ -460,5 +471,5 @@ def _build_prompt_footer(chunked: bool = False, file_analysis: dict = None) -> L
             "      Start with the main files (analysis.toon, context.md) for overview,",
             "      then examine specific subproject directories as needed.",
         ])
-    
+
     return lines

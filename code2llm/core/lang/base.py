@@ -71,9 +71,42 @@ def calculate_complexity_regex(content: str, result: Dict,
         }
 
 
+_CALL_KEYWORDS = frozenset({
+    'if', 'for', 'while', 'switch', 'catch', 'return', 'throw', 'new',
+    'typeof', 'instanceof', 'import', 'export', 'require', 'console',
+    'super', 'class', 'function', 'async', 'await', 'delete', 'void',
+    'case', 'default',
+})
+
+
+def _resolve_call(
+    simple_call: str,
+    func_qname: str,
+    module_name: str,
+    known_simple: Dict[str, List[str]],
+    calls_seen: set,
+    func_info,
+) -> None:
+    """Resolve a single call name and append to func_info.calls if novel."""
+    if simple_call in known_simple:
+        candidates = known_simple[simple_call]
+        my_module = func_qname.rsplit('.', 1)[0]
+        resolved = next(
+            (c for c in candidates if c.rsplit('.', 1)[0] == my_module),
+            candidates[0],
+        )
+        if resolved != func_qname and resolved not in calls_seen:
+            func_info.calls.append(resolved)
+            calls_seen.add(resolved)
+    else:
+        ext_name = f"{module_name}.{simple_call}"
+        if ext_name not in calls_seen:
+            func_info.calls.append(ext_name)
+            calls_seen.add(ext_name)
+
+
 def extract_calls_regex(content: str, module_name: str, result: Dict) -> None:
     """Extract function calls from function bodies using regex."""
-    # Build set of known function simple names for resolution
     known_simple: Dict[str, List[str]] = {}
     for qname in result['functions']:
         simple = qname.rsplit('.', 1)[-1]
@@ -83,39 +116,12 @@ def extract_calls_regex(content: str, module_name: str, result: Dict) -> None:
         body = extract_function_body(content, func_info.line)
         if not body:
             continue
-        calls_seen = set()
+        calls_seen: set = set()
         for m in CALL_PATTERN_C_FAMILY.finditer(body):
             simple_call = m.group(1) or m.group(2) or m.group(4)
-            if not simple_call:
+            if not simple_call or simple_call in _CALL_KEYWORDS:
                 continue
-            # Skip language keywords
-            if simple_call in ('if', 'for', 'while', 'switch', 'catch',
-                               'return', 'throw', 'new', 'typeof', 'instanceof',
-                               'import', 'export', 'require', 'console',
-                               'super', 'class', 'function', 'async', 'await',
-                               'delete', 'void', 'case', 'default'):
-                continue
-            # Resolve to known qualified name
-            if simple_call in known_simple:
-                candidates = known_simple[simple_call]
-                # Prefer same-module match
-                resolved = None
-                my_module = func_qname.rsplit('.', 1)[0]
-                for cand in candidates:
-                    if cand.rsplit('.', 1)[0] == my_module:
-                        resolved = cand
-                        break
-                if resolved is None:
-                    resolved = candidates[0]
-                if resolved != func_qname and resolved not in calls_seen:
-                    func_info.calls.append(resolved)
-                    calls_seen.add(resolved)
-            else:
-                # External call — store as module.name for downstream
-                ext_name = f"{module_name}.{simple_call}"
-                if ext_name not in calls_seen:
-                    func_info.calls.append(ext_name)
-                    calls_seen.add(ext_name)
+            _resolve_call(simple_call, func_qname, module_name, known_simple, calls_seen, func_info)
 
 
 # Shared declaration extraction for language parsers
@@ -288,76 +294,112 @@ def _process_classes(class_re, interface_re, line, line_no, file_path, module_na
     return current_class, class_brace_depth, pending_decorators
 
 
+def _process_standalone_function(
+    func_re, arrow_re, line, line_no, file_path, module_name,
+    result, stats, pending_decorators, reserved,
+):
+    """Register a top-level (non-method) function declaration.
+
+    Returns (registered: bool, pending_decorators).
+    """
+    from ..models import FunctionInfo
+
+    fname = None
+    if func_re:
+        fm = func_re.match(line)
+        if fm:
+            fname = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
+    if not fname and arrow_re:
+        am = arrow_re.match(line)
+        if am:
+            fname = am.group(1)
+
+    if fname and fname not in reserved:
+        qual = f"{module_name}.{fname}"
+        result['functions'][qual] = FunctionInfo(
+            name=fname, qualified_name=qual, file=file_path,
+            line=line_no, column=0, module=module_name,
+            class_name=None, is_method=False,
+            is_private=fname.startswith('_'),
+            is_property=False, docstring="", args=[],
+            decorators=pending_decorators[:],
+        )
+        result['module'].functions.append(qual)
+        stats['functions_found'] += 1
+        pending_decorators.clear()
+        return True, pending_decorators
+
+    return False, pending_decorators
+
+
+def _match_method_name(arrow_prop_re, method_re, func_re, line, reserved):
+    """Return matched method name from any of the three patterns, or None."""
+    if arrow_prop_re:
+        apm = arrow_prop_re.match(line)
+        if apm:
+            mname = apm.group(1)
+            if mname not in reserved and mname != 'constructor':
+                return mname
+    if method_re:
+        mm = method_re.match(line)
+        if mm:
+            mname = mm.group(1)
+            if mname not in reserved:
+                return mname
+    if func_re:
+        fm = func_re.match(line)
+        if fm:
+            fn = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
+            if fn and fn not in reserved:
+                return fn
+    return None
+
+
+def _process_class_method(
+    method_re, arrow_prop_re, func_re, line, line_no, file_path, module_name,
+    result, stats, current_class, pending_decorators, reserved,
+):
+    """Register a method declaration inside a class scope."""
+    from ..models import FunctionInfo
+
+    mname = _match_method_name(arrow_prop_re, method_re, func_re, line, reserved)
+    if not mname:
+        return pending_decorators
+
+    qual = f"{current_class}.{mname}"
+    result['classes'][current_class].methods.append(qual)
+    result['functions'][qual] = FunctionInfo(
+        name=mname, qualified_name=qual, file=file_path,
+        line=line_no, column=0, module=module_name,
+        class_name=current_class.split('.')[-1],
+        is_method=True, is_private=mname.startswith(('_', '#')),
+        is_property=False, docstring="", args=[],
+        decorators=pending_decorators[:],
+    )
+    result['module'].functions.append(qual)
+    stats['functions_found'] += 1
+    pending_decorators.clear()
+    return pending_decorators
+
+
 def _process_functions(func_re, arrow_re, method_re, arrow_prop_re, line, line_no,
                        file_path, module_name, result, stats, current_class,
                        pending_decorators, reserved):
     """Process function and method declarations."""
-    from ..models import FunctionInfo
-    
-    # Process standalone functions
     if not current_class and (func_re or arrow_re):
-        fname = None
-        if func_re:
-            fm = func_re.match(line)
-            if fm:
-                fname = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
-        if not fname and arrow_re:
-            am = arrow_re.match(line)
-            if am:
-                fname = am.group(1)
-        if fname and fname not in reserved:
-            qual = f"{module_name}.{fname}"
-            result['functions'][qual] = FunctionInfo(
-                name=fname, qualified_name=qual, file=file_path,
-                line=line_no, column=0, module=module_name,
-                class_name=None, is_method=False,
-                is_private=fname.startswith('_'),
-                is_property=False, docstring="", args=[],
-                decorators=pending_decorators[:],
-            )
-            result['module'].functions.append(qual)
-            stats['functions_found'] += 1
-            pending_decorators.clear()
+        registered, pending_decorators = _process_standalone_function(
+            func_re, arrow_re, line, line_no, file_path, module_name,
+            result, stats, pending_decorators, reserved,
+        )
+        if registered:
             return pending_decorators
-    
-    # Process methods
+
     if current_class and (method_re or arrow_prop_re or func_re):
-        matched = False
-        mname = None
-        if arrow_prop_re:
-            apm = arrow_prop_re.match(line)
-            if apm:
-                mname = apm.group(1)
-                if mname not in reserved and mname != 'constructor':
-                    matched = True
-        if not matched and method_re:
-            mm = method_re.match(line)
-            if mm:
-                mname = mm.group(1)
-                if mname not in reserved:
-                    matched = True
-        if not matched and func_re:
-            fm = func_re.match(line)
-            if fm:
-                fn = fm.group(1) or (fm.group(2) if len(fm.groups()) > 1 else None)
-                if fn and fn not in reserved:
-                    mname = fn
-                    matched = True
-        if matched and mname:
-            qual = f"{current_class}.{mname}"
-            result['classes'][current_class].methods.append(qual)
-            result['functions'][qual] = FunctionInfo(
-                name=mname, qualified_name=qual, file=file_path,
-                line=line_no, column=0, module=module_name,
-                class_name=current_class.split('.')[-1],
-                is_method=True, is_private=mname.startswith(('_', '#')),
-                is_property=False, docstring="", args=[],
-                decorators=pending_decorators[:],
-            )
-            result['module'].functions.append(qual)
-            stats['functions_found'] += 1
-            pending_decorators.clear()
-    
+        pending_decorators = _process_class_method(
+            method_re, arrow_prop_re, func_re, line, line_no, file_path,
+            module_name, result, stats, current_class, pending_decorators, reserved,
+        )
+
     return pending_decorators
 
 

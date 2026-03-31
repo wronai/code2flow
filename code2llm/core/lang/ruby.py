@@ -49,6 +49,31 @@ _RUBY_CC_PATTERN = re.compile(
 )
 
 
+def _adjust_ruby_module_qualnames(result: Dict, module_name: str, current_module) -> None:
+    """Re-qualify class and function names when they live inside a Ruby module."""
+    if not current_module:
+        return
+    mod_prefix = f".{current_module}"
+    old_prefix = f"{module_name}."
+    new_prefix = f"{module_name}{mod_prefix}."
+
+    new_classes = {}
+    for qname, cls in list(result['classes'].items()):
+        new_qname = qname.replace(old_prefix, new_prefix, 1)
+        cls.qualified_name = new_qname
+        new_classes[new_qname] = cls
+    result['classes'] = new_classes
+    result['module'].classes = list(new_classes.keys())
+
+    new_functions = {}
+    for qname, func in list(result['functions'].items()):
+        new_qname = qname.replace(old_prefix, new_prefix, 1)
+        func.qualified_name = new_qname
+        new_functions[new_qname] = func
+    result['functions'] = new_functions
+    result['module'].functions = list(new_functions.keys())
+
+
 def analyze_ruby(content: str, file_path: str, module_name: str,
                  ext: str, stats: Dict) -> Dict:
     """Analyze Ruby files using shared extraction."""
@@ -97,24 +122,7 @@ def analyze_ruby(content: str, file_path: str, module_name: str,
                 if module_depth == 0:
                     current_module = None
     
-    # Adjust qualified names for modules
-    if current_module:
-        mod_prefix = f".{current_module}"
-        new_classes = {}
-        for qname, cls in list(result['classes'].items()):
-            new_qname = qname.replace(f"{module_name}.", f"{module_name}{mod_prefix}.", 1)
-            cls.qualified_name = new_qname
-            new_classes[new_qname] = cls
-        result['classes'] = new_classes
-        result['module'].classes = list(new_classes.keys())
-        
-        new_functions = {}
-        for qname, func in list(result['functions'].items()):
-            new_qname = qname.replace(f"{module_name}.", f"{module_name}{mod_prefix}.", 1)
-            func.qualified_name = new_qname
-            new_functions[new_qname] = func
-        result['functions'] = new_functions
-        result['module'].functions = list(new_functions.keys())
+    _adjust_ruby_module_qualnames(result, module_name, current_module)
     
     # Ruby-specific complexity calculation
     for func_info in result['functions'].values():

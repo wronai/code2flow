@@ -186,6 +186,33 @@ def _export_yaml(args, result, output_dir: Path):
             print(f"  - YAML: {filepath}")
 
 
+def _export_mermaid_pngs(args, output_dir: Path) -> None:
+    """Attempt PNG generation from .mmd files, with graceful fallback."""
+    if args.no_png:
+        if args.verbose:
+            print(f"  - PNG: Skipped (--no-png)")
+        return
+    try:
+        from ..generators.mermaid import generate_pngs
+        png_count = generate_pngs(output_dir, output_dir)
+        if args.verbose and png_count > 0:
+            print(f"  - PNG: {png_count} files generated")
+    except ImportError:
+        try:
+            import subprocess
+            script_path = Path(__file__).parent.parent.parent / 'mermaid_to_png.py'
+            if script_path.exists():
+                png_result = subprocess.run(
+                    ['python', str(script_path), '--batch', str(output_dir), str(output_dir)],
+                    capture_output=True, text=True, timeout=60,
+                )
+                if png_result.returncode == 0 and args.verbose:
+                    print(f"  - PNG: {output_dir / '*.png'}")
+        except Exception:
+            if args.verbose:
+                print(f"  - PNG: Skipped (install with: make install-mermaid)")
+
+
 def _export_mermaid(args, result, output_dir: Path):
     """Export Mermaid diagrams + optional PNG generation.
     
@@ -195,25 +222,17 @@ def _export_mermaid(args, result, output_dir: Path):
     - flow_full.mmd (all nodes) - debug view [with --flow-full]
     """
     exporter = MermaidExporter()
-    
-    # Get include_examples flag
     include_examples = getattr(args, 'flow_include_examples', False)
-    
-    # Default: export compact flow (architectural view, ~50 nodes)
+
     exporter.export_flow_compact(result, str(output_dir / 'flow.mmd'), include_examples)
-    
-    # Optional: detailed flow (per-module, ~150 nodes)
     if getattr(args, 'flow_detail', False):
         exporter.export_flow_detailed(result, str(output_dir / 'flow_detailed.mmd'), include_examples)
-    
-    # Optional: full flow (all nodes, debug view)
     if getattr(args, 'flow_full', False):
         exporter.export_flow_full(result, str(output_dir / 'flow_full.mmd'), include_examples)
-    
-    # Legacy exports (for backward compatibility)
+
     exporter.export_call_graph(result, str(output_dir / 'calls.mmd'))
     exporter.export_compact(result, str(output_dir / 'compact_flow.mmd'))
-    
+
     if args.verbose:
         files = ['flow.mmd']
         if getattr(args, 'flow_detail', False):
@@ -223,28 +242,7 @@ def _export_mermaid(args, result, output_dir: Path):
         files.extend(['calls.mmd', 'compact_flow.mmd'])
         print(f"  - Mermaid: {output_dir}/*.mmd ({', '.join(files)})")
 
-    if not args.no_png:
-        try:
-            from ..generators.mermaid import generate_pngs
-            png_count = generate_pngs(output_dir, output_dir)
-            if args.verbose and png_count > 0:
-                print(f"  - PNG: {png_count} files generated")
-        except ImportError:
-            try:
-                import subprocess
-                script_path = Path(__file__).parent.parent.parent / 'mermaid_to_png.py'
-                if script_path.exists():
-                    png_result = subprocess.run([
-                        'python', str(script_path),
-                        '--batch', str(output_dir), str(output_dir)
-                    ], capture_output=True, text=True, timeout=60)
-                    if png_result.returncode == 0 and args.verbose:
-                        print(f"  - PNG: {output_dir / '*.png'}")
-            except Exception:
-                if args.verbose:
-                    print(f"  - PNG: Skipped (install with: make install-mermaid)")
-    elif args.verbose:
-        print(f"  - PNG: Skipped (--no-png)")
+    _export_mermaid_pngs(args, output_dir)
 
 
 def _export_refactor_prompts(args, result, output_dir: Path):

@@ -55,62 +55,11 @@ class MapExporter(Exporter):
         included_files = [mi for mi in result.modules.values() if not self._is_excluded(mi.file)]
         total_lines = self._count_total_lines(result)
 
-        # Build modules data
-        modules_data = []
-        for mname, mi in sorted(result.modules.items()):
-            if self._is_excluded(mi.file):
-                continue
-            rel = self._rel_path(mi.file, result.project_path)
-            lc = self._file_line_count(mi.file)
-
-            # Get exports (classes and standalone functions)
-            exports = []
-            for cq in mi.classes:
-                ci = result.classes.get(cq)
-                if ci:
-                    exports.append({"type": "class", "name": ci.name})
-            for fq in mi.functions:
-                fi = result.functions.get(fq)
-                if fi and not fi.class_name:
-                    exports.append({"type": "function", "name": fi.name})
-
-            # Get classes with methods
-            classes_data = []
-            for cq in mi.classes:
-                ci = result.classes.get(cq)
-                if not ci:
-                    continue
-                methods = []
-                for mq in ci.methods:
-                    fi = result.functions.get(mq)
-                    if fi:
-                        arity = len(fi.args) - (1 if fi.is_method else 0)
-                        methods.append({"name": fi.name, "arity": arity})
-                classes_data.append({
-                    "name": ci.name,
-                    "bases": ci.bases,
-                    "methods": methods,
-                })
-
-            # Get standalone functions
-            functions_data = []
-            for fq in mi.functions:
-                fi = result.functions.get(fq)
-                if fi and not fi.class_name:
-                    functions_data.append({
-                        "name": fi.name,
-                        "args": [a for a in fi.args if a != "self"],
-                        "returns": fi.returns or None,
-                    })
-
-            modules_data.append({
-                "path": rel,
-                "lines": lc,
-                "imports": sorted(mi.imports) if mi.imports else [],
-                "exports": exports,
-                "classes": classes_data,
-                "functions": functions_data,
-            })
+        modules_data = [
+            self._build_module_entry(mi, result)
+            for _mname, mi in sorted(result.modules.items())
+            if not self._is_excluded(mi.file)
+        ]
 
         data = {
             "format": "map-toon-yaml",
@@ -128,6 +77,61 @@ class MapExporter(Exporter):
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             yaml.dump(data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+    def _build_module_entry(self, mi: "ModuleInfo", result: AnalysisResult) -> Dict[str, Any]:
+        """Build the YAML dict for a single module."""
+        rel = self._rel_path(mi.file, result.project_path)
+        lc = self._file_line_count(mi.file)
+        return {
+            "path": rel,
+            "lines": lc,
+            "imports": sorted(mi.imports) if mi.imports else [],
+            "exports": self._build_module_exports(mi, result),
+            "classes": self._build_module_classes_data(mi, result),
+            "functions": self._build_module_functions_data(mi, result),
+        }
+
+    def _build_module_exports(self, mi: "ModuleInfo", result: AnalysisResult) -> List[Dict]:
+        """Return export list (classes + standalone functions) for a module."""
+        exports: List[Dict] = []
+        for cq in mi.classes:
+            ci = result.classes.get(cq)
+            if ci:
+                exports.append({"type": "class", "name": ci.name})
+        for fq in mi.functions:
+            fi = result.functions.get(fq)
+            if fi and not fi.class_name:
+                exports.append({"type": "function", "name": fi.name})
+        return exports
+
+    def _build_module_classes_data(self, mi: "ModuleInfo", result: AnalysisResult) -> List[Dict]:
+        """Return class list with method arities for a module."""
+        classes_data: List[Dict] = []
+        for cq in mi.classes:
+            ci = result.classes.get(cq)
+            if not ci:
+                continue
+            methods = []
+            for mq in ci.methods:
+                fi = result.functions.get(mq)
+                if fi:
+                    arity = len(fi.args) - (1 if fi.is_method else 0)
+                    methods.append({"name": fi.name, "arity": arity})
+            classes_data.append({"name": ci.name, "bases": ci.bases, "methods": methods})
+        return classes_data
+
+    def _build_module_functions_data(self, mi: "ModuleInfo", result: AnalysisResult) -> List[Dict]:
+        """Return standalone function list for a module."""
+        functions_data: List[Dict] = []
+        for fq in mi.functions:
+            fi = result.functions.get(fq)
+            if fi and not fi.class_name:
+                functions_data.append({
+                    "name": fi.name,
+                    "args": [a for a in fi.args if a != "self"],
+                    "returns": fi.returns or None,
+                })
+        return functions_data
 
     # ------------------------------------------------------------------
     # header
