@@ -1,5 +1,26 @@
 ## [Unreleased]
 
+## [0.5.103] - 2026-03-31
+
+### Docs
+- Update README.md
+- Update context.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update analysis.toon.yaml
+- Update batch_1/analysis.toon.yaml
+- Update benchmarks/benchmark_optimizations.py
+- Update code2llm/.code2llm_incremental.json
+- Update code2llm/core/lang/base.py
+- Update code2llm/core/lang/cpp.py
+- Update code2llm/core/lang/csharp.py
+- Update code2llm/core/lang/go_lang.py
+- Update code2llm/core/lang/java.py
+- Update code2llm/core/lang/ts_extractors.py
+- ... and 5 more files
+
 ## [0.5.102] - 2026-03-31
 
 ## [0.5.101] - 2026-03-31

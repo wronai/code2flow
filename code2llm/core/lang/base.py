@@ -420,15 +420,34 @@ def analyze_c_family(
     patterns: Dict,
     lang_config: Dict,
     cc_lang: str = 'c_family',
+    ext: str = '',
 ) -> Dict:
     """Shared analyzer for C-family languages (Java, C#, C++, etc.).
 
-    Reduces boilerplate duplication across Java/C#/C++ analyzers.
+    Uses tree-sitter when available (10× faster), falls back to regex.
     """
-    result = _extract_declarations(
-        content, file_path, module_name,
-        patterns, stats, lang_config,
-    )
+    result = None
+
+    # Try tree-sitter first (much faster)
+    if ext:
+        try:
+            from .ts_parser import parse_source
+            from .ts_extractors import extract_declarations_ts
+            tree = parse_source(content, ext)
+            if tree:
+                result = extract_declarations_ts(
+                    tree, content.encode('utf-8'), ext, file_path, module_name
+                )
+        except ImportError:
+            pass  # tree-sitter not installed
+
+    # Fallback to regex
+    if result is None:
+        result = _extract_declarations(
+            content, file_path, module_name,
+            patterns, stats, lang_config,
+        )
+
     calculate_complexity_regex(content, result, lang=cc_lang)
     extract_calls_regex(content, module_name, result)
     stats['files_processed'] += 1

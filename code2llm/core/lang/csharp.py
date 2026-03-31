@@ -38,5 +38,5 @@ def analyze_csharp(content: str, file_path: str, module_name: str,
     """Analyze C# files using shared C-family extraction."""
     return analyze_c_family(
         content, file_path, module_name, stats,
-        _CSHARP_PATTERNS, _CSHARP_CONFIG,
+        _CSHARP_PATTERNS, _CSHARP_CONFIG, ext=ext,
     )

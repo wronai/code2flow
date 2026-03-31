@@ -39,5 +39,5 @@ def analyze_java(content: str, file_path: str, module_name: str,
     """Analyze Java files using shared C-family extraction."""
     return analyze_c_family(
         content, file_path, module_name, stats,
-        _JAVA_PATTERNS, _JAVA_CONFIG,
+        _JAVA_PATTERNS, _JAVA_CONFIG, ext=ext,
     )

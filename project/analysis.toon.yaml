@@ -1,5 +1,5 @@
-# code2llm | 114f 21782L | python:106,shell:2,php:1 | 2026-03-31
-# CC̄=4.5 | critical:2/962 | dups:0 | cycles:0
+# code2llm | 122f 22716L | python:117,shell:4,java:1 | 2026-03-31
+# CC̄=4.4 | critical:2/1006 | dups:0 | cycles:0
 
 HEALTH[2]:
   🟡 CC    main CC=17 (limit:15)
@@ -8,20 +8,20 @@ HEALTH[2]:
 REFACTOR[1]:
   1. split 2 high-CC methods  (CC>15)
 
-PIPELINES[645]:
-  [1] Src [run_benchmark]: run_benchmark → load_previous
+PIPELINES[672]:
+  [1] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [2] Src [save_report]: save_report
+  [2] Src [demo_quick_strategy]: demo_quick_strategy
       PURITY: 100% pure
-  [3] Src [read_readme]: read_readme
+  [3] Src [demo_standard_strategy]: demo_standard_strategy
       PURITY: 100% pure
-  [4] Src [main]: main → load_file → is_toon_file
+  [4] Src [demo_deep_strategy]: demo_deep_strategy
       PURITY: 100% pure
-  [5] Src [__init__]: __init__
+  [5] Src [demo_incremental_analysis]: demo_incremental_analysis
       PURITY: 100% pure
 
 LAYERS:
-  code2llm/                       CC̄=4.7    ←in:0  →out:5
+  code2llm/                       CC̄=4.5    ←in:0  →out:5
   │ !! index_generator            790L  1C    7m  CC=5      ←0
   │ !! project_yaml_exporter      513L  1C   18m  CC=13     ←0
   │ !! pipeline_detector          506L  3C   18m  CC=13     ←0
@@ -35,18 +35,18 @@ LAYERS:
   │ llm_flow                   472L  1C   24m  CC=14     ←0
   │ evolution_exporter         471L  1C   17m  CC=11     ←0
   │ renderer                   471L  1C   26m  CC=11     ←0
+  │ base                       454L  0C   14m  CC=14     ←8
   │ map_exporter               439L  1C   25m  CC=13     ←4
-  │ base                       412L  0C   13m  CC=14     ←8
   │ file_analyzer              396L  1C   18m  CC=12     ←0
   │ flow_exporter              391L  1C   14m  CC=10     ←0
   │ pipeline                   388L  3C   20m  CC=10     ←0
   │ analyzer                   355L  1C    9m  CC=14     ←0
   │ entity_resolution          326L  3C   16m  CC=13     ←1
-  │ side_effects               324L  2C   17m  CC=14     ←0
   │ cli_analysis               323L  0C   11m  CC=14     ←1
-  │ type_inference             321L  1C   19m  CC=9      ←0
   │ intent_matching            297L  3C   15m  CC=7      ←0
+  │ side_effects               294L  2C   15m  CC=14     ←0
   │ cfg                        293L  1C   17m  CC=5      ←0
+  │ type_inference             290L  1C   17m  CC=9      ←0
   │ data_analysis              286L  1C   18m  CC=14     ←0
   │ formats                    285L  0C   13m  CC=13     ←3
   │ llm_task                   284L  0C   15m  CC=14     ←0
@@ -65,12 +65,16 @@ LAYERS:
   │ smells                     192L  1C    9m  CC=7      ←0
   │ flow_renderer              188L  1C    6m  CC=14     ←0
   │ streaming_analyzer         181L  1C    6m  CC=12     ←0
+  │ ts_extractors              180L  0C    5m  CC=7      ←2
   │ config                     174L  5C    2m  CC=1      ←0
   │ repo_files                 173L  0C    8m  CC=8      ←1
   │ detector                   168L  1C    8m  CC=9      ←0
   │ article_view               163L  1C    9m  CC=7      ←0
   │ module_detail              162L  1C    9m  CC=7      ←0
+  │ ts_parser                  158L  1C    9m  CC=7      ←2
   │ toon_view                  157L  1C    9m  CC=6      ←0
+  │ export_pipeline            153L  2C    5m  CC=4      ←0
+  │ incremental                150L  1C   10m  CC=4      ←0
   │ prompt_engine              150L  1C    7m  CC=12     ←0
   │ orchestrator               149L  0C    5m  CC=11     ←1
   │ toon_parser                147L  0C   10m  CC=8      ←1
@@ -85,9 +89,10 @@ LAYERS:
   │ yaml_exporter              108L  1C    7m  CC=8      ←0
   │ php                        106L  0C    1m  CC=14     ←1
   │ file_cache                 103L  1C    9m  CC=5      ←0
+  │ ast_registry               102L  1C    9m  CC=5      ←4
+  │ go_lang                    102L  0C    2m  CC=10     ←1
   │ file_filter                 98L  1C    4m  CC=13     ←0
   │ rust                        94L  0C    1m  CC=9      ←1
-  │ go_lang                     87L  0C    1m  CC=10     ←1
   │ coupling                    77L  1C    5m  CC=7      ←0
   │ incremental                 75L  1C    5m  CC=5      ←0
   │ api                         73L  0C    2m  CC=2      ←0
@@ -96,13 +101,14 @@ LAYERS:
   │ strategies                  68L  1C    0m  CC=0.0    ←0
   │ typescript                  55L  0C    1m  CC=1      ←1
   │ __init__                    55L  0C    0m  CC=0.0    ←0
+  │ ast_helpers                 54L  0C    3m  CC=8      ←2
   │ __init__                    53L  0C    1m  CC=6      ←0
   │ __init__                    52L  0C    1m  CC=3      ←0
   │ cache                       51L  1C    5m  CC=4      ←0
-  │ java                        50L  0C    1m  CC=1      ←1
-  │ csharp                      49L  0C    1m  CC=1      ←1
   │ __init__                    48L  0C    0m  CC=0.0    ←0
-  │ cpp                         42L  0C    1m  CC=1      ←1
+  │ java                        43L  0C    1m  CC=1      ←1
+  │ csharp                      42L  0C    1m  CC=1      ←1
+  │ cpp                         35L  0C    1m  CC=1      ←1
   │ report_generators           34L  0C    1m  CC=3      ←1
   │ __init__                    33L  0C    1m  CC=2      ←0
   │ flow_constants              29L  0C    0m  CC=0.0    ←0
@@ -114,6 +120,7 @@ LAYERS:
   │ __init__                    11L  0C    0m  CC=0.0    ←0
   │ __init__                     7L  0C    0m  CC=0.0    ←0
   │ __main__                     6L  0C    0m  CC=0.0    ←0
+  │ __init__                     5L  0C    0m  CC=0.0    ←0
   │ __init__                     0L  0C    0m  CC=0.0    ←0
   │ __init__                     0L  0C    0m  CC=0.0    ←0
   │
@@ -127,10 +134,11 @@ LAYERS:
   │ benchmark_badges           392L  0C    9m  CC=13     ←0
   │ bump_version                96L  0C    7m  CC=4      ←0
   │
-  benchmarks/                     CC̄=3.1    ←in:0  →out:0
+  benchmarks/                     CC̄=3.0    ←in:0  →out:1
   │ benchmark_performance      306L  0C    7m  CC=6      ←0
   │ project_generator          233L  0C    6m  CC=1      ←1
   │ reporting                  179L  0C    9m  CC=6      ←1
+  │ benchmark_optimizations    157L  0C    5m  CC=7      ←0
   │ benchmark_format_quality   143L  0C    5m  CC=4      ←0
   │ format_evaluator           138L  1C    5m  CC=5      ←1
   │ benchmark_evolution        137L  0C    4m  CC=13     ←0
@@ -141,10 +149,10 @@ LAYERS:
   │
   demo_langs/                     CC̄=1.5    ←in:0  →out:0
   │ sample.rs                   47L  1C    4m  CC=2      ←0
-  │ sample.java                 47L  2C    4m  CC=2      ←0
-  │ sample.go                   46L  0C    5m  CC=3      ←0
-  │ sample.php                  44L  2C    4m  CC=2      ←2
-  │ sample                      40L  1C    4m  CC=3      ←0
+  │ sample.java                 47L  2C    7m  CC=3      ←2
+  │ sample.go                   46L  0C    4m  CC=3      ←0
+  │ sample.php                  44L  1C    1m  CC=1      ←0
+  │ sample                      40L  1C    5m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
   │
   ── zero ──
@@ -152,16 +160,19 @@ LAYERS:
      code2llm/refactor/__init__.py             0L
 
 COUPLING:
-                        code2llm.cli_exports              code2llm    code2llm.exporters         code2llm.core      code2llm.parsers         validate_toon   code2llm.generators          code2llm.nlp
-  code2llm.cli_exports                    ──                    ←4                     3                     1                                                                 1                      
-              code2llm                     4                    ──                                           1                                                                                        
-    code2llm.exporters                    ←3                                          ──                                                                                                             1
-         code2llm.core                    ←1                    ←1                                          ──                                                                                        
-      code2llm.parsers                                                                                                            ──                    ←2                                            
-         validate_toon                                                                                                             2                    ──                                            
-   code2llm.generators                    ←1                                                                                                                                  ──                      
-          code2llm.nlp                                                                ←1                                                                                                            ──
+                        code2llm.cli_exports         code2llm.core              code2llm    code2llm.exporters     code2llm.analysis      code2llm.parsers         validate_toon            benchmarks   code2llm.generators          code2llm.nlp
+  code2llm.cli_exports                    ──                     1                    ←4                     3                                                                                                             1                      
+         code2llm.core                    ←1                    ──                    ←1                                          ←3                                                                ←1                                              hub
+              code2llm                     4                     1                    ──                                                                                                                                                          
+    code2llm.exporters                    ←3                                                                ──                                                                                                                                   1
+     code2llm.analysis                                           3                                                                ──                                                                                                              
+      code2llm.parsers                                                                                                                                  ──                    ←2                                                                  
+         validate_toon                                                                                                                                   2                    ──                                                                  
+            benchmarks                                           1                                                                                                                                  ──                                            
+   code2llm.generators                    ←1                                                                                                                                                                              ──                      
+          code2llm.nlp                                                                                      ←1                                                                                                                                  ──
   CYCLES: none
+  HUB: code2llm.core/ (fan-in=6)
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

@@ -1,16 +1,14 @@
-"""Go analyzer (regex-based)."""
+"""Go analyzer (regex-based, with tree-sitter support)."""
 
 import re
-from pathlib import Path
 from typing import Dict
 
 from code2llm.core.models import ClassInfo, FunctionInfo, ModuleInfo
 from code2llm.core.lang.base import calculate_complexity_regex, extract_calls_regex
 
 
-def analyze_go(content: str, file_path: str, module_name: str,
-               ext: str, stats: Dict) -> Dict:
-    """Analyze Go files using regex-based parsing."""
+def _analyze_go_regex(content: str, file_path: str, module_name: str, stats: Dict) -> Dict:
+    """Regex fallback for Go analysis."""
     result = {
         'module': ModuleInfo(name=module_name, file=file_path, is_package=False),
         'functions': {},
@@ -20,7 +18,6 @@ def analyze_go(content: str, file_path: str, module_name: str,
     }
 
     lines = content.split('\n')
-
     import_pattern = re.compile(r'^\s*import\s+(?:\(\s*["\']([^"\']+)["\']|["\']([^"\']+)["\'])')
     func_pattern = re.compile(r'^\s*func\s+(?:\([^)]+\)\s+)?(\w+)\s*\(')
     struct_pattern = re.compile(r'^\s*type\s+(\w+)\s+struct')
@@ -31,14 +28,12 @@ def analyze_go(content: str, file_path: str, module_name: str,
         if not line or line.startswith('//'):
             continue
 
-        # Imports
         import_match = import_pattern.match(line)
         if import_match:
             imp = import_match.group(1) or import_match.group(2)
             if imp:
                 result['module'].imports.append(imp)
 
-        # Functions
         func_match = func_pattern.match(line)
         if func_match:
             func_name = func_match.group(1)
@@ -53,7 +48,6 @@ def analyze_go(content: str, file_path: str, module_name: str,
             result['module'].functions.append(qualified_name)
             stats['functions_found'] += 1
 
-        # Structs (treated as classes)
         struct_match = struct_pattern.match(line)
         if struct_match:
             class_name = struct_match.group(1)
@@ -66,7 +60,6 @@ def analyze_go(content: str, file_path: str, module_name: str,
             result['module'].classes.append(qualified_name)
             stats['classes_found'] += 1
 
-        # Interfaces
         interface_match = interface_pattern.match(line)
         if interface_match:
             class_name = interface_match.group(1)
@@ -79,9 +72,31 @@ def analyze_go(content: str, file_path: str, module_name: str,
             result['module'].classes.append(qualified_name)
             stats['classes_found'] += 1
 
-    # Regex-based complexity estimation and call extraction
+    return result
+
+
+def analyze_go(content: str, file_path: str, module_name: str,
+               ext: str, stats: Dict) -> Dict:
+    """Analyze Go files. Uses tree-sitter when available, regex fallback."""
+    result = None
+
+    # Try tree-sitter first
+    try:
+        from .ts_parser import parse_source
+        from .ts_extractors import extract_declarations_ts
+        tree = parse_source(content, ext)
+        if tree:
+            result = extract_declarations_ts(
+                tree, content.encode('utf-8'), ext, file_path, module_name
+            )
+    except ImportError:
+        pass
+
+    # Fallback to regex
+    if result is None:
+        result = _analyze_go_regex(content, file_path, module_name, stats)
+
     calculate_complexity_regex(content, result, lang='go')
     extract_calls_regex(content, module_name, result)
-
     stats['files_processed'] += 1
     return result

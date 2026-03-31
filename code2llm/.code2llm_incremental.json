@@ -1,0 +1,611 @@
+{
+  "cli.py": {
+    "mtime_ns": 1773088077730380516,
+    "size": 2044,
+    "result": {
+      "cached": true
+    }
+  },
+  "api.py": {
+    "mtime_ns": 1772907131724538272,
+    "size": 1779,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_parser.py": {
+    "mtime_ns": 1774514247599669063,
+    "size": 9205,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/data_analysis.py": {
+    "mtime_ns": 1774447472569485966,
+    "size": 15425,
+    "result": {
+      "cached": true
+    }
+  },
+  "__init__.py": {
+    "mtime_ns": 1774943631055833317,
+    "size": 1400,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/type_inference.py": {
+    "mtime_ns": 1774942894505983764,
+    "size": 10200,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/__init__.py": {
+    "mtime_ns": 1772652794708983914,
+    "size": 971,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/pipeline_detector.py": {
+    "mtime_ns": 1774454892766029394,
+    "size": 18211,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_commands.py": {
+    "mtime_ns": 1774512549574979105,
+    "size": 7388,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/coupling.py": {
+    "mtime_ns": 1774447449463151622,
+    "size": 3326,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_analysis.py": {
+    "mtime_ns": 1774512371880080793,
+    "size": 11539,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/dfg.py": {
+    "mtime_ns": 1774447430390872239,
+    "size": 8501,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/side_effects.py": {
+    "mtime_ns": 1774942819308946298,
+    "size": 11421,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/utils/ast_helpers.py": {
+    "mtime_ns": 1774942800515362274,
+    "size": 1771,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/smells.py": {
+    "mtime_ns": 1774447557329676708,
+    "size": 9200,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/file_cache.py": {
+    "mtime_ns": 1774941400215828034,
+    "size": 3451,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/ast_registry.py": {
+    "mtime_ns": 1774942777781865561,
+    "size": 3224,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/incremental.py": {
+    "mtime_ns": 1774943043980883259,
+    "size": 4982,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/call_graph.py": {
+    "mtime_ns": 1774447394241333788,
+    "size": 7713,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/analyzer.py": {
+    "mtime_ns": 1774941259309499229,
+    "size": 14749,
+    "result": {
+      "cached": true
+    }
+  },
+  "analysis/cfg.py": {
+    "mtime_ns": 1774447411345590048,
+    "size": 10730,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/__init__.py": {
+    "mtime_ns": 1774440603520635545,
+    "size": 1558,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/repo_files.py": {
+    "mtime_ns": 1774941323524115239,
+    "size": 5463,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/gitignore.py": {
+    "mtime_ns": 1774040435273231057,
+    "size": 5074,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/streaming_analyzer.py": {
+    "mtime_ns": 1772381170941020925,
+    "size": 6323,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/toon_size_manager.py": {
+    "mtime_ns": 1772536247917224373,
+    "size": 8724,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/large_repo.py": {
+    "mtime_ns": 1774034610751148971,
+    "size": 18010,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/file_analyzer.py": {
+    "mtime_ns": 1774941501032732617,
+    "size": 16789,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/file_filter.py": {
+    "mtime_ns": 1774941192705839160,
+    "size": 3588,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/export_pipeline.py": {
+    "mtime_ns": 1774943108215534641,
+    "size": 5189,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/models.py": {
+    "mtime_ns": 1772353981727992719,
+    "size": 6106,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/streaming/incremental.py": {
+    "mtime_ns": 1774447753292252366,
+    "size": 2700,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/streaming/scanner.py": {
+    "mtime_ns": 1774447772796497606,
+    "size": 7324,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/streaming/prioritizer.py": {
+    "mtime_ns": 1772381136737656555,
+    "size": 4472,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/streaming/cache.py": {
+    "mtime_ns": 1772381109150363138,
+    "size": 1919,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/rust.py": {
+    "mtime_ns": 1774446723075904371,
+    "size": 3514,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/ruby.py": {
+    "mtime_ns": 1774941236758278286,
+    "size": 4714,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/cpp.py": {
+    "mtime_ns": 1774943794802573490,
+    "size": 984,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/ts_extractors.py": {
+    "mtime_ns": 1774943723111832315,
+    "size": 6497,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/ts_parser.py": {
+    "mtime_ns": 1774943697513729154,
+    "size": 4786,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/php.py": {
+    "mtime_ns": 1774446817689806003,
+    "size": 3793,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/csharp.py": {
+    "mtime_ns": 1774943747605141738,
+    "size": 1244,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/go_lang.py": {
+    "mtime_ns": 1774943818784791363,
+    "size": 3910,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/java.py": {
+    "mtime_ns": 1774943742573095461,
+    "size": 1253,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/generic.py": {
+    "mtime_ns": 1774446932221899153,
+    "size": 2658,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/typescript.py": {
+    "mtime_ns": 1774446674539442421,
+    "size": 2402,
+    "result": {
+      "cached": true
+    }
+  },
+  "nlp/config.py": {
+    "mtime_ns": 1772353981728092125,
+    "size": 6189,
+    "result": {
+      "cached": true
+    }
+  },
+  "nlp/intent_matching.py": {
+    "mtime_ns": 1772353981728279082,
+    "size": 10894,
+    "result": {
+      "cached": true
+    }
+  },
+  "nlp/entity_resolution.py": {
+    "mtime_ns": 1772353981728405888,
+    "size": 12034,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/lang/base.py": {
+    "mtime_ns": 1774943735354028987,
+    "size": 15851,
+    "result": {
+      "cached": true
+    }
+  },
+  "nlp/normalization.py": {
+    "mtime_ns": 1772353981728682851,
+    "size": 4350,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/base.py": {
+    "mtime_ns": 1774447878434797592,
+    "size": 377,
+    "result": {
+      "cached": true
+    }
+  },
+  "core/refactoring.py": {
+    "mtime_ns": 1774440964909083903,
+    "size": 8453,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/readme_exporter.py": {
+    "mtime_ns": 1774515508267087402,
+    "size": 16887,
+    "result": {
+      "cached": true
+    }
+  },
+  "nlp/pipeline.py": {
+    "mtime_ns": 1772353981728540370,
+    "size": 13931,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/mermaid_flow_helpers.py": {
+    "mtime_ns": 1774941129463189792,
+    "size": 8441,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/json_exporter.py": {
+    "mtime_ns": 1774448174787248548,
+    "size": 664,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/report_generators.py": {
+    "mtime_ns": 1774512579256376711,
+    "size": 1126,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/yaml_exporter.py": {
+    "mtime_ns": 1774447991178139807,
+    "size": 5468,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/mermaid_exporter.py": {
+    "mtime_ns": 1774941093029804561,
+    "size": 19227,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/project_yaml_exporter.py": {
+    "mtime_ns": 1774512593126444455,
+    "size": 19467,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/context_view.py": {
+    "mtime_ns": 1772696104044293277,
+    "size": 5606,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/article_view.py": {
+    "mtime_ns": 1772696125851743810,
+    "size": 5992,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/validate_project.py": {
+    "mtime_ns": 1774512527726745668,
+    "size": 3766,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/context_exporter.py": {
+    "mtime_ns": 1774447897879032139,
+    "size": 11833,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/html_dashboard.py": {
+    "mtime_ns": 1773069482294337288,
+    "size": 21392,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/toon_view.py": {
+    "mtime_ns": 1774512533770810245,
+    "size": 6070,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/flow_renderer.py": {
+    "mtime_ns": 1772391170191202382,
+    "size": 6965,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/index_generator.py": {
+    "mtime_ns": 1774440394780651882,
+    "size": 26907,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/toon/helpers.py": {
+    "mtime_ns": 1774448354328515980,
+    "size": 3884,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/map_exporter.py": {
+    "mtime_ns": 1774941215822070866,
+    "size": 17919,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/toon/__init__.py": {
+    "mtime_ns": 1774448280020423984,
+    "size": 7336,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/toon/module_detail.py": {
+    "mtime_ns": 1774448421760978416,
+    "size": 6289,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/evolution_exporter.py": {
+    "mtime_ns": 1774454493648544252,
+    "size": 19248,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/toon/metrics.py": {
+    "mtime_ns": 1774448377128492057,
+    "size": 21293,
+    "result": {
+      "cached": true
+    }
+  },
+  "generators/llm_task.py": {
+    "mtime_ns": 1772391485924041693,
+    "size": 9269,
+    "result": {
+      "cached": true
+    }
+  },
+  "generators/llm_flow.py": {
+    "mtime_ns": 1772392140796532568,
+    "size": 13982,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_exports/formats.py": {
+    "mtime_ns": 1774941283326731831,
+    "size": 11279,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/toon/renderer.py": {
+    "mtime_ns": 1774448262080225019,
+    "size": 18918,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_exports/code2logic.py": {
+    "mtime_ns": 1772696869548384552,
+    "size": 4249,
+    "result": {
+      "cached": true
+    }
+  },
+  "exporters/flow_exporter.py": {
+    "mtime_ns": 1774448460407397491,
+    "size": 15094,
+    "result": {
+      "cached": true
+    }
+  },
+  "generators/mermaid.py": {
+    "mtime_ns": 1774040343417333056,
+    "size": 15945,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_exports/orchestrator.py": {
+    "mtime_ns": 1774514076818599993,
+    "size": 4958,
+    "result": {
+      "cached": true
+    }
+  },
+  "parsers/toon_parser.py": {
+    "mtime_ns": 1772534102880473442,
+    "size": 4211,
+    "result": {
+      "cached": true
+    }
+  },
+  "patterns/detector.py": {
+    "mtime_ns": 1774448544086299029,
+    "size": 6765,
+    "result": {
+      "cached": true
+    }
+  },
+  "refactor/prompt_engine.py": {
+    "mtime_ns": 1774448604036940543,
+    "size": 7745,
+    "result": {
+      "cached": true
+    }
+  },
+  "cli_exports/prompt.py": {
+    "mtime_ns": 1774941306768956296,
+    "size": 21487,
+    "result": {
+      "cached": true
+    }
+  }
+}
