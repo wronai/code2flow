@@ -1,0 +1,241 @@
+
+"""Project YAML Exporter — unified single source of truth for project diagnostics.
+
+Generates project.yaml with:
+  project:    — metadata, stats
+  health:     — CC avg, critical count, alerts
+  modules:    — per-file metrics, exports, methods
+  hotspots:   — high fan-out orchestrators
+  refactoring: — prioritized actions
+  evolution:  — append-only history log
+"""
+
+import yaml
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+from .base import Exporter
+from code2llm.core.models import AnalysisResult, FunctionInfo, ClassInfo
+from .toon.helpers import _is_excluded, _rel_path, _scan_line_counts
+from code2llm.core.config import LANGUAGE_EXTENSIONS
+
+
+# Thresholds
+CC_CRITICAL = 10
+CC_WARNING = 15
+CC_ERROR = 20
+CC_SEVERE = 25
+FAN_OUT_THRESHOLD = 10
+FAN_OUT_ERROR = 15
+FAN_OUT_SEVERE = 20
+GOD_MODULE_LINES = 500
+
+
+class ProjectYAMLExporter(Exporter):
+    """Export unified project.yaml — single source of truth for diagnostics.
+
+    Combines data from analysis.toon, project.toon.yaml, context.md, and evolution.toon.yaml
+    into one machine-parseable YAML file.
+    """
+
+    def export(self, result: AnalysisResult, output_path: str, **kwargs) -> None:
+        """Generate project.yaml from AnalysisResult.
+
+        If the file already exists, the evolution section is appended (not replaced).
+        """
+        output = Path(output_path)
+        output.parent.mkdir(parents=True, exist_ok=True)
+
+        # Load previous evolution entries if file exists
+        prev_evolution = self._load_previous_evolution(output)
+
+        data = self._build_project_yaml(result, prev_evolution)
+
+        with open(output, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+    # ------------------------------------------------------------------
+    # top-level builder
+    # ------------------------------------------------------------------
+    def _build_project_yaml(
+        self, result: AnalysisResult, prev_evolution: List[Dict]
+    ) -> Dict[str, Any]:
+        line_counts = _scan_line_counts(result.project_path)
+        filtered_lines = self._filter_excluded_lines(line_counts)
+        total_lines = sum(filtered_lines.values()) // 2
+
+        modules = self._build_modules(result, line_counts)
+        health = self._build_health(result, modules)
+        hotspots = self._build_hotspots(result)
+        refactoring = self._build_refactoring(result, modules, hotspots)
+        evolution = self._build_evolution(health, total_lines, prev_evolution)
+
+        return {
+            "version": "1",
+            "project": self._build_project_metadata(result, total_lines),
+            "health": health,
+            "modules": modules,
+            "hotspots": hotspots,
+            "refactoring": refactoring,
+            "evolution": evolution,
+        }
+
+    def _filter_excluded_lines(self, line_counts: Dict[str, int]) -> Dict[str, int]:
+        return {
+            k: v for k, v in line_counts.items()
+            if not _is_excluded(k)
+        }
+
+    def _build_project_metadata(self, result: AnalysisResult, total_lines: int) -> Dict[str, Any]:
+        return {
+            "name": Path(result.project_path).name if result.project_path else "unknown",
+            "repo": result.project_path or "",
+            "language": self._detect_primary_language(result),
+            "analyzed_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "tool": "code2llm",
+            "stats": {
+                "files": len(set(
+                    fi.file for fi in result.functions.values()
+                    if not _is_excluded(fi.file)
+                )) or len(result.modules),
+                "lines": total_lines,
+                "functions": len([
+                    f for f in result.functions.values()
+                    if not _is_excluded(f.file)
+                ]),
+                "classes": len([
+                    c for c in result.classes.values()
+                    if not _is_excluded(c.file)
+                ]),
+            },
+        }
+
+    # ------------------------------------------------------------------
+    # health
+    # ------------------------------------------------------------------
+    def _build_health(
+        self, result: AnalysisResult, modules: List[Dict]
+    ) -> Dict[str, Any]:
+        all_cc = self._collect_cyclomatic_complexities(result)
+
+        cc_avg = round(sum(all_cc) / len(all_cc), 1) if all_cc else 0.0
+        critical_count = sum(1 for c in all_cc if c >= CC_CRITICAL)
+
+        proj_metrics = result.metrics.get("project", {})
+        cycles = proj_metrics.get("circular_dependencies", [])
+
+        dup_count = self._count_duplicates(result)
+
+        alerts = self._build_alerts(result)
+
+        return {
+            "cc_avg": cc_avg,
+            "critical_count": critical_count,
+            "critical_limit": CC_CRITICAL,
+            "duplicates": dup_count,
+            "cycles": len(cycles),
+            "alerts": alerts if alerts else [],
+        }
+
+    def _collect_cyclomatic_complexities(self, result: AnalysisResult) -> List[int]:
+        return [
+            fi.complexity.get("cyclomatic_complexity", 0)
+            for fi in result.functions.values()
+            if not _is_excluded(fi.file)
+        ]
+
+    def _build_alerts(self, result: AnalysisResult) -> List[Dict[str, Any]]:
+        alerts = self._generate_cc_alerts(result)
+        fan_alerts = self._generate_fan_out_alerts(result)
+
+        sev_order = {"critical": 0, "error": 1, "warning": 2, "info": 3}
+        all_alerts = alerts + fan_alerts
+        all_alerts.sort(key=lambda a: (sev_order.get(a["severity"], 9), -a["value"]))
+        return all_alerts[:20]
+
+    def _generate_cc_alerts(self, result: AnalysisResult) -> List[Dict[str, Any]]:
+        alerts = []
+        for qname, fi in result.functions.items():
+            if _is_excluded(fi.file):
+                continue
+            cc = fi.complexity.get("cyclomatic_complexity", 0)
+            if cc >= CC_WARNING:
+                display = fi.name
+                if fi.class_name:
+                    display = f"{fi.class_name}.{fi.name}"
+                severity = self._determine_severity(cc)
+                alerts.append({
+                    "type": "cc_exceeded",
+                    "target": display,
+                    "value": cc,
+                    "limit": CC_WARNING,
+                    "severity": severity,
+                })
+        return alerts
+
+    def _generate_fan_out_alerts(self, result: AnalysisResult) -> List[Dict[str, Any]]:
+        fan_alerts = []
+        for qname, fi in result.functions.items():
+            if _is_excluded(fi.file):
+                continue
+            fan_out = len(set(fi.calls))
+            if fan_out >= FAN_OUT_THRESHOLD:
+                display = fi.name
+                if fi.class_name:
+                    display = f"{fi.class_name}.{fi.name}"
+                severity = self._determine_fan_out_severity(fan_out)
+                fan_alerts.append({
+                    "type": "high_fan_out",
+                    "target": display,
+                    "value": fan_out,
+                    "limit": FAN_OUT_THRESHOLD,
+                    "severity": severity,
+                })
+        return fan_alerts
+
+    def _determine_severity(self, cc: int) -> str:
+        if cc >= CC_SEVERE:
+            return "critical"
+        elif cc >= CC_ERROR:
+            return "error"
+        else:
+            return "warning"
+
+    def _determine_fan_out_severity(self, fan_out: int) -> str:
+        if fan_out >= FAN_OUT_SEVERE:
+            return "critical"
+        elif fan_out >= FAN_OUT_ERROR:
+            return "error"
+        else:
+            return "warning"
+
+    def _count_duplicates(self, result: AnalysisResult) -> int:
+        name_files: Dict[str, List[str]] = defaultdict(list)
+        for qname, ci in result.classes.items():
+            if not _is_excluded(ci.file):
+                name_files[ci.name].append(ci.file)
+        return sum(1 for files in name_files.values() if len(set(files)) > 1)
+
+    # ------------------------------------------------------------------
+    # modules
+    # ------------------------------------------------------------------
+    def _build_modules(
+        self, result: AnalysisResult, line_counts: Dict[str, int]
+    ) -> List[Dict[str, Any]]:
+        file_funcs, file_classes = self._group_by_file(result)
+
+        # Additional refactored code for modules would go here...
+
+    def _group_by_file(self, result: AnalysisResult) -> Tuple[Dict[str, List[FunctionInfo]], Dict[str, List[ClassInfo]]]:
+        file_funcs: Dict[str, List[FunctionInfo]] = defaultdict(list)
+        file_classes: Dict[str, List[ClassInfo]] = defaultdict(list)
+        for func in result.functions.values():
+            if not _is_excluded(func.file):
+                file_funcs[func.file].append(func)
+        for cls in result.classes.values():
+            if not _is_excluded(cls.file):
+                file_classes[cls.file].append(cls)
+        return file_funcs, file_classes
+

@@ -24,7 +24,7 @@ except ImportError:
     sys.exit(1)
 
 
-DEFAULT_MODEL = "gpt-4o-mini"
+DEFAULT_MODEL = "gpt-5.4-mini"
 
 
 def run_analysis(project_path: str) -> dict:

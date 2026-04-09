@@ -1,18 +1,10 @@
-"""TypeScript/JavaScript analyzer (regex-based)."""
-
 import re
 from typing import Dict
-
-from code2llm.core.models import ClassInfo, FunctionInfo, ModuleInfo
 from code2llm.core.lang.base import calculate_complexity_regex, extract_calls_regex, _extract_declarations
 
-
-def analyze_typescript_js(content: str, file_path: str, module_name: str,
-                          ext: str, stats: Dict) -> Dict:
-    """Analyze TypeScript/JavaScript files using shared extraction."""
-    
-    # TypeScript-specific patterns
-    patterns = {
+def get_typescript_patterns() -> Dict[str, re.Pattern]:
+    """Returns regex patterns for TypeScript/JavaScript parsing."""
+    return {
         'import': re.compile(r"^\s*import\s+.*?\s+from\s+['\"]([^'\"]+)['\"]"),
         'decorator': re.compile(r"^\s*@(\w+(?:\.\w+)?)(?:\([^)]*\))?"),
         'class': re.compile(
@@ -32,24 +24,30 @@ def analyze_typescript_js(content: str, file_path: str, module_name: str,
             r"^\s*(?:(?:public|private|protected|static|readonly)\s+)*(\w+)\s*(?::\s*[^=]+)?\s*=\s*(?:<[^>]+>\s*)?(?:async\s+)?(?:\([^)]*\)|[a-zA-Z_]\w*)\s*=>"
         ),
     }
-    
-    # Language configuration
-    lang_config = {
+
+def get_typescript_lang_config() -> Dict:
+    """Returns language configuration for TypeScript/JavaScript."""
+    return {
         'index_files': ('index.ts', 'index.js', 'index.tsx', 'index.jsx'),
         'brace_track': True,
         'reserved': {'if', 'for', 'while', 'switch', 'return', 'catch', 'constructor',
                      'class', 'import', 'export', 'new'},
     }
-    
-    # Use shared extraction
+
+def analyze_typescript_js(content: str, file_path: str, module_name: str,
+                          ext: str, stats: Dict) -> Dict:
+    """Analyze TypeScript/JavaScript files using shared extraction."""
+
+    patterns = get_typescript_patterns()
+    lang_config = get_typescript_lang_config()
+
     result = _extract_declarations(
         content, file_path, module_name,
         patterns, stats, lang_config
     )
-    
-    # Post-processing: calculate complexity and extract calls
+
     calculate_complexity_regex(content, result, lang='c_family')
     extract_calls_regex(content, module_name, result)
-    
+
     stats['files_processed'] += 1
     return result

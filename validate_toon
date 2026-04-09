@@ -1,0 +1,33 @@
+def validate_comparison(yaml_path: Path, toon_path: Path) -> int:
+    if not yaml_path.exists():
+        return handle_file_not_found(yaml_path)
+
+    if not toon_path.exists():
+        return handle_file_not_found(toon_path)
+
+    print(f"🔍 Validating: {yaml_path.name} vs {toon_path.name}")
+    print("=" * 60)
+
+    yaml_data = load_yaml(yaml_path)
+    toon_data = load_file(toon_path)
+
+    if not yaml_data or not toon_data:
+        return handle_load_failure()
+
+    results = compare_all(yaml_data, toon_data)
+
+    print_comparison_summary(results)
+
+    return 0 if all(result[1] for result in results) else 1
+
+def handle_file_not_found(filepath: Path) -> int:
+    print(f"Error: {filepath} not found")
+    sys.exit(1)
+
+    return 1
+
+def handle_load_failure() -> int:
+    print("Error: Could not load one or both files")
+    sys.exit(1)
+
+    return 1
