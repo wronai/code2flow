@@ -109,71 +109,101 @@ def print_start_info(args, source_path: Path, output_dir: Path) -> None:
 
 def validate_chunked_output(output_dir: Path, args) -> bool:
     """Validate generated chunked output.
-    
+
     Checks:
     1. All chunks have required files (analysis.toon, context.md, evolution.toon.yaml)
     2. Files are not empty
     3. Report summary
-    
+
     Returns True if valid, False otherwise.
     """
     if not output_dir.exists():
         print(f"✗ Output directory does not exist: {output_dir}", file=sys.stderr)
         return False
-    
-    # Find all chunk directories
-    chunk_dirs = [d for d in output_dir.iterdir() if d.is_dir()]
-    
+
+    chunk_dirs = _get_chunk_dirs(output_dir)
     if not chunk_dirs:
         print(f"✗ No chunk directories found in: {output_dir}", file=sys.stderr)
         return False
-    
+
     required_files = ['analysis.toon.yaml', 'context.md', 'evolution.toon.yaml']
+    issues, valid_chunks = _validate_chunks(chunk_dirs, required_files)
+
+    _print_validation_summary(chunk_dirs, valid_chunks, issues)
+    return len(issues) == 0
+
+
+def _get_chunk_dirs(output_dir: Path) -> list[Path]:
+    """Find all chunk directories in output directory."""
+    return [d for d in output_dir.iterdir() if d.is_dir()]
+
+
+def _validate_chunks(chunk_dirs: list[Path], required_files: list[str]) -> tuple:
+    """Validate all chunks and return issues and valid chunks."""
     issues = []
     valid_chunks = []
-    
-    print(f"\n🔍 Validating {len(chunk_dirs)} chunks in: {output_dir}")
+
+    print(f"\n🔍 Validating {len(chunk_dirs)} chunks")
     print("-" * 50)
-    
+
     for chunk_dir in sorted(chunk_dirs):
-        chunk_name = chunk_dir.name
-        chunk_issues = []
-        
-        for req_file in required_files:
-            file_path = chunk_dir / req_file
-            if not file_path.exists():
-                chunk_issues.append(f"  missing {req_file}")
-            elif file_path.stat().st_size == 0:
-                chunk_issues.append(f"  empty {req_file}")
-        
+        chunk_issues = _validate_single_chunk(chunk_dir, required_files)
+
         if chunk_issues:
-            issues.append((chunk_name, chunk_issues))
-            print(f"✗ {chunk_name}")
-            for issue in chunk_issues:
-                print(f"    {issue}")
+            issues.append((chunk_dir.name, chunk_issues))
+            _print_chunk_errors(chunk_dir.name, chunk_issues)
         else:
-            # Get file sizes
-            sizes = []
-            for req_file in required_files:
-                size = (chunk_dir / req_file).stat().st_size
-                sizes.append(f"{req_file}:{size//1024}KB" if size > 1024 else f"{req_file}:{size}B")
-            valid_chunks.append(chunk_name)
-            print(f"✓ {chunk_name} ({', '.join(sizes)})")
-    
+            sizes = _get_file_sizes(chunk_dir, required_files)
+            valid_chunks.append(chunk_dir.name)
+            print(f"✓ {chunk_dir.name} ({sizes})")
+
     print("-" * 50)
+    return issues, valid_chunks
+
+
+def _validate_single_chunk(chunk_dir: Path, required_files: list[str]) -> list[str]:
+    """Validate a single chunk directory. Returns list of issues."""
+    chunk_issues = []
+
+    for req_file in required_files:
+        file_path = chunk_dir / req_file
+        if not file_path.exists():
+            chunk_issues.append(f"  missing {req_file}")
+        elif file_path.stat().st_size == 0:
+            chunk_issues.append(f"  empty {req_file}")
+
+    return chunk_issues
+
+
+def _get_file_sizes(chunk_dir: Path, required_files: list[str]) -> str:
+    """Get formatted file sizes for a chunk."""
+    sizes = []
+    for req_file in required_files:
+        size = (chunk_dir / req_file).stat().st_size
+        sizes.append(f"{req_file}:{size//1024}KB" if size > 1024 else f"{req_file}:{size}B")
+    return ", ".join(sizes)
+
+
+def _print_chunk_errors(chunk_name: str, chunk_issues: list[str]) -> None:
+    """Print errors for a chunk."""
+    print(f"✗ {chunk_name}")
+    for issue in chunk_issues:
+        print(f"    {issue}")
+
+
+def _print_validation_summary(chunk_dirs: list, valid_chunks: list, issues: list) -> None:
+    """Print validation summary report."""
     print(f"\n📊 Validation Summary:")
     print(f"  Total chunks: {len(chunk_dirs)}")
     print(f"  Valid: {len(valid_chunks)}")
     print(f"  Issues: {len(issues)}")
-    
+
     if issues:
         print(f"\n⚠️  {len(issues)} chunk(s) have issues:")
-        for chunk_name, chunk_issues in issues:
+        for chunk_name, _ in issues:
             print(f"    - {chunk_name}")
-        return False
     else:
         print(f"\n✅ All {len(valid_chunks)} chunks are valid!")
-        return True
 
 
 def generate_llm_context(args_list):
