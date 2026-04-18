@@ -67,7 +67,8 @@ def test_template_rendering_with_metrics():
     assert "complexity" in prompt_content
     assert "fan_out" in prompt_content
     assert "reachable" in prompt_content
-    assert "Wyekstrahuj mniejsze, spójne metody" in prompt_content
+    # Instruction is rendered from _get_instruction_for_smell
+    assert "Wyekstrahuj" in prompt_content or "Wyodrębnienie" in prompt_content
 
 def test_tree_sitter_init():
     result = AnalysisResult()

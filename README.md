@@ -3,7 +3,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.105-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.106-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.50-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-53.7h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $7.5000 (154 commits)
@@ -199,6 +199,7 @@ cat context.md | xclip -sel clip  # Linux
 - `flow.mmd` - Detailed control flow with complexity colors
 - `calls.mmd` - Simple call graph
 - `compact_flow.mmd` - High-level module view
+- `calls.yaml` - Structured call graph data (YAML format)
 - `*.png` - Pre-rendered images
 
 **Example usage**:
@@ -209,6 +210,12 @@ xdg-open flow.png  # Linux
 
 # Edit in Mermaid Live Editor
 # Copy content of .mmd files to https://mermaid.live
+
+# Generate only call graph files (mermaid + YAML)
+code2llm ./ -f mermaid
+
+# Generate calls.yaml standalone (no visualization files)
+code2llm ./ -f calls
 ```
 
 ## 🔍 Common Analysis Patterns

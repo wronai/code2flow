@@ -1,8 +1,19 @@
 """CLI argument parser for code2llm."""
 
 import argparse
+import os
 
 from .core.config import ANALYSIS_MODES
+
+
+def get_version() -> str:
+    """Read version from VERSION file."""
+    version_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'VERSION')
+    try:
+        with open(version_file, 'r') as f:
+            return f.read().strip()
+    except Exception:
+        return 'unknown'
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -52,6 +63,13 @@ Strategy Options (--strategy):
         '''
     )
     
+    # Add version argument
+    parser.add_argument(
+        '--version', '-V',
+        action='version',
+        version=f'%(prog)s {get_version()}'
+    )
+
     # Add backward compatibility source argument first
     parser.add_argument(
         'source',

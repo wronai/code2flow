@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.5.106] - 2026-04-18
+
+### Test
+- Update tests/test_prompt_engine.py
+
+### Other
+- Update code2llm/cli_parser.py
+
 ## [0.5.105] - 2026-04-18
 
 ### Docs
