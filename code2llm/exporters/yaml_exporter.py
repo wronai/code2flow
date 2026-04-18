@@ -117,13 +117,24 @@ class YAMLExporter(Exporter):
         - modules: grouping of functions by module
         - stats: summary statistics
         """
-        # Collect connected nodes and edges
+        connected, edges = self._collect_edges(result, max_calls_per_func, max_edges)
+        nodes = self._build_nodes(result, connected)
+        modules = self._group_by_module(result, connected)
+        
+        calls_data = self._build_calls_data(result, nodes, edges, modules)
+        
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            yaml.dump(calls_data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+    def _collect_edges(self, result: AnalysisResult, max_calls: int, max_edges: int) -> Tuple[Set[str], List[Dict]]:
+        """Collect connected nodes and edges from function calls."""
         connected: Set[str] = set()
         edges: List[Dict] = []
         seen_pairs: Set[Tuple[str, str]] = set()
         
         for func_name, fi in result.functions.items():
-            for callee in fi.calls[:max_calls_per_func]:
+            for callee in fi.calls[:max_calls]:
                 resolved = self._resolve_callee(callee, result.functions)
                 if resolved and resolved != func_name:
                     connected.add(func_name)
@@ -131,39 +142,66 @@ class YAMLExporter(Exporter):
                     pair = (func_name, resolved)
                     if pair not in seen_pairs:
                         seen_pairs.add(pair)
-                        edges.append({
-                            'caller': func_name,
-                            'callee': resolved,
-                            'call_type': 'direct' if callee == resolved.split('.')[-1] else 'resolved'
-                        })
+                        edges.append(self._create_edge(func_name, resolved, callee))
                         if len(edges) >= max_edges:
-                            break
+                            return connected, edges
             if len(edges) >= max_edges:
-                break
+                return connected, edges
         
-        # Build nodes data
+        return connected, edges
+
+    @staticmethod
+    def _create_edge(caller: str, resolved: str, callee: str) -> Dict:
+        """Create edge dict with call type classification."""
+        return {
+            'caller': caller,
+            'callee': resolved,
+            'call_type': 'direct' if callee == resolved.split('.')[-1] else 'resolved'
+        }
+
+    def _build_nodes(self, result: AnalysisResult, connected: Set[str]) -> Dict[str, Dict]:
+        """Build node data for all connected functions."""
         nodes: Dict[str, Dict] = {}
         for fn in connected:
             fi = result.functions.get(fn)
             if fi:
-                cc = self._get_cc(fi)
-                nodes[fn] = {
-                    'name': fi.name,
-                    'module': fi.module,
-                    'line': fi.line,
-                    'cyclomatic_complexity': cc,
-                    'calls_out': len(fi.calls),
-                    'calls_in': sum(1 for f in result.functions.values() if fn in [self._resolve_callee(c, result.functions) for c in f.calls]),
-                }
-        
-        # Group by module
+                nodes[fn] = self._create_node(fi, fn, result)
+        return nodes
+
+    def _create_node(self, fi: FunctionInfo, fn: str, result: AnalysisResult) -> Dict:
+        """Create node dict with function metadata."""
+        return {
+            'name': fi.name,
+            'module': fi.module,
+            'line': fi.line,
+            'cyclomatic_complexity': self._get_cc(fi),
+            'calls_out': len(fi.calls),
+            'calls_in': self._count_calls_in(fn, result),
+        }
+
+    def _count_calls_in(self, fn: str, result: AnalysisResult) -> int:
+        """Count how many functions call the given function."""
+        count = 0
+        for f in result.functions.values():
+            for c in f.calls:
+                resolved = self._resolve_callee(c, result.functions)
+                if resolved == fn:
+                    count += 1
+                    break
+        return count
+
+    @staticmethod
+    def _group_by_module(result: AnalysisResult, connected: Set[str]) -> Dict[str, List[str]]:
+        """Group connected functions by their module."""
         modules: Dict[str, List[str]] = defaultdict(list)
         for fn in connected:
             fi = result.functions.get(fn)
             if fi:
                 modules[fi.module].append(fn)
-        
-        # Build output structure
+        return {mod: sorted(funcs) for mod, funcs in sorted(modules.items())}
+
+    def _build_calls_data(self, result: AnalysisResult, nodes: Dict, edges: List, modules: Dict) -> Dict:
+        """Build the final calls.yaml data structure."""
         calls_data = {
             'project': result.project_path,
             'generated_from': 'code2llm call graph analysis',
@@ -174,16 +212,13 @@ class YAMLExporter(Exporter):
             },
             'nodes': nodes,
             'edges': edges,
-            'modules': {mod: sorted(funcs) for mod, funcs in sorted(modules.items())},
+            'modules': modules,
         }
         
-        # Add entry points if available
         if result.entry_points:
             calls_data['entry_points'] = sorted(result.entry_points)
         
-        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            yaml.dump(calls_data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        return calls_data
 
     @staticmethod
     def _resolve_callee(callee: str, funcs: Dict[str, FunctionInfo]) -> Optional[str]:

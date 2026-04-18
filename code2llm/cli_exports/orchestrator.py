@@ -103,6 +103,9 @@ def _export_chunked_results(
     _export_simple_formats(args, result, output_dir, ['toon', 'context'])
     _export_evolution(args, result, output_dir)
 
+    if 'calls' in formats:
+        _export_calls(args, result, output_dir)
+
     if 'all' in requested_formats:
         _export_project_toon(args, result, output_dir)
 

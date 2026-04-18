@@ -1,5 +1,17 @@
 ## [Unreleased]
 
+## [0.5.108] - 2026-04-18
+
+### Test
+- Update test_calls_output/README.md
+- Update test_calls_output/analysis.toon.yaml
+- Update test_calls_output/context.md
+- Update test_calls_output/index.html
+
+### Other
+- Update code2llm/cli_exports/orchestrator.py
+- Update code2llm/exporters/yaml_exporter.py
+
 ## [0.5.107] - 2026-04-18
 
 ### Docs
