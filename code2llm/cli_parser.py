@@ -51,6 +51,8 @@ Format Options (-f):
   yaml         — Standard YAML format (legacy / explicit opt-in)
   json         — Machine-readable JSON (legacy / explicit opt-in)
   mermaid      — Flowchart diagrams (flow.mmd, calls.mmd, compact_flow.mmd)
+  calls        — Call graph (calls.yaml) — structured YAML format
+  calls_toon   — Call graph (calls.toon.yaml) — human-readable toon format
   flow         — Data-flow analysis (flow.toon) — legacy, explicit opt-in
   code2logic   — Generate project logic (legacy project.toon) via external code2logic
   project-yaml — Legacy project.yaml export (single source of truth) + generated views

@@ -8,6 +8,7 @@ from .formats import (
     _export_simple_formats,
     _export_mermaid,
     _export_calls,
+    _export_calls_toon,
     _export_evolution,
     _export_data_structures,
     _export_context_fallback,
@@ -61,6 +62,9 @@ def _export_single_project(
 
     if 'calls' in formats:
         _export_calls(args, result, output_dir)
+
+    if 'calls_toon' in formats:
+        _export_calls_toon(args, result, output_dir)
 
     _export_evolution(args, result, output_dir)
     _export_data_structures(args, result, output_dir)
