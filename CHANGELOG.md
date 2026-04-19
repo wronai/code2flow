@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+## [0.5.127] - 2026-04-19
+
+### Other
+- Update code2llm/exporters/evolution/__init__.py
+- Update code2llm/exporters/evolution/computation.py
+- Update code2llm/exporters/evolution/constants.py
+- Update code2llm/exporters/evolution/exclusion.py
+- Update code2llm/exporters/evolution/render.py
+- Update code2llm/exporters/evolution/yaml_export.py
+- Update code2llm/exporters/evolution_exporter.py
+
 ## [0.5.126] - 2026-04-19
 
 ### Other
