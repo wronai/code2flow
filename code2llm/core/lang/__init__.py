@@ -8,10 +8,8 @@ Provides:
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Callable, Set, Optional
+from typing import Dict, Any, Callable, Optional
 from pathlib import Path
-
-from code2llm.core.models import ModuleInfo, FunctionInfo, ClassInfo
 
 
 # Type alias for parser results

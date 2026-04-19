@@ -1,28 +1,18 @@
-# code2llm/evolution | 915 func | 95f | 2026-04-19
+# code2llm/evolution | 982 func | 119f | 2026-04-19
 
-NEXT[3] (ranked by impact):
-  [1] !! SPLIT           code2llm/analysis/pipeline_detector.py
-      WHY: 506L, 3 classes, max CC=13
-      EFFORT: ~4h  IMPACT: 6578
-
-  [2] !! SPLIT           code2llm/exporters/index_generator.py
-      WHY: 790L, 1 classes, max CC=5
-      EFFORT: ~4h  IMPACT: 3950
-
-  [3] !! SPLIT           code2llm/exporters/html_dashboard.py
-      WHY: 504L, 1 classes, max CC=7
-      EFFORT: ~4h  IMPACT: 3528
+NEXT[1] (ranked by impact):
+  [1] !! SPLIT           code2llm/exporters/index_generator/renderer.py
+      WHY: 637L, 1 classes, max CC=1
+      EFFORT: ~4h  IMPACT: 637
 
 
-RISKS[3]:
-  ⚠ Splitting code2llm/exporters/index_generator.py may break 7 import paths
-  ⚠ Splitting code2llm/analysis/pipeline_detector.py may break 18 import paths
-  ⚠ Splitting code2llm/exporters/html_dashboard.py may break 14 import paths
+RISKS[1]:
+  ⚠ Splitting code2llm/exporters/index_generator/renderer.py may break 1 import paths
 
 METRICS-TARGET:
-  CC̄:          4.3 → ≤3.0
+  CC̄:          4.1 → ≤2.9
   max-CC:      14 → ≤7
-  god-modules: 4 → 0
+  god-modules: 1 → 0
   high-CC(≥15): 0 → ≤0
   hub-types:   0 → ≤0
 
@@ -51,4 +41,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=4.3 → now CC̄=4.3
+  prev CC̄=4.3 → now CC̄=4.1

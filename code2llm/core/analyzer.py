@@ -7,9 +7,16 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+# Optional tqdm for progress bars
+try:
+    from tqdm import tqdm
+    _HAS_TQDM = True
+except ImportError:
+    _HAS_TQDM = False
+
 logger = logging.getLogger(__name__)
 
-from .config import Config, FAST_CONFIG, ALL_EXTENSIONS, LANGUAGE_EXTENSIONS
+from .config import Config, FAST_CONFIG, ALL_EXTENSIONS, LANGUAGE_EXTENSIONS, DEFAULT_PROGRESS_BAR_THRESHOLD
 from .models import AnalysisResult, FlowEdge, FlowNode, Pattern
 from code2llm.analysis.call_graph import CallGraphExtractor
 
@@ -41,24 +48,15 @@ class ProjectAnalyzer:
 
         if self.config.verbose:
             print(f"Found {len(files)} files to analyze")
-            print(f"  - Parallel: {self.config.performance.parallel_enabled}, Workers: {self.config.performance.parallel_workers}")
+            workers = self.config.performance.get_workers()
+            print(f"  - Parallel: {self.config.performance.parallel_enabled}, Workers: {workers}")
 
         pcache, cached_results, files_to_analyze = self._load_from_persistent_cache(files, project_path)
         fresh_results = self._run_analysis(files_to_analyze)
         self._store_to_persistent_cache(pcache, files_to_analyze, fresh_results)
 
         merged = self._merge_results(cached_results + fresh_results, str(project_path))
-        self._build_call_graph(merged)
-        if not self.config.performance.skip_pattern_detection:
-            self._detect_patterns(merged)
-        if self.config.verbose:
-            print(f"  - Running refactoring analysis...", flush=True)
-        self.refactoring_analyzer.perform_refactoring_analysis(merged)
-        if self.config.verbose:
-            print(f"  - Refactoring analysis complete", flush=True)
-        merged.stats = self._build_stats(files, cached_results + fresh_results, merged, start_time)
-        if self.config.verbose:
-            self._print_summary(merged)
+        self._post_process(merged, files, cached_results + fresh_results, start_time)
         return merged
 
     def _resolve_project_path(self, project_path: str) -> Path:
@@ -146,6 +144,26 @@ class ProjectAnalyzer:
         print(f"  Classes: {len(merged.classes)}")
         print(f"  CFG Nodes: {len(merged.nodes)}")
         print(f"  Patterns: {len(merged.patterns)}")
+
+    def _post_process(
+        self,
+        merged: AnalysisResult,
+        files: List,
+        results: List[Dict],
+        start_time: float,
+    ) -> None:
+        """Run post-processing: call graph, patterns, refactoring, stats."""
+        self._build_call_graph(merged)
+        if not self.config.performance.skip_pattern_detection:
+            self._detect_patterns(merged)
+        if self.config.verbose:
+            print("  - Running refactoring analysis...", flush=True)
+        self.refactoring_analyzer.perform_refactoring_analysis(merged)
+        if self.config.verbose:
+            print("  - Refactoring analysis complete", flush=True)
+        merged.stats = self._build_stats(files, results, merged, start_time)
+        if self.config.verbose:
+            self._print_summary(merged)
     
     def _collect_files(self, project_path: Path) -> List[Tuple[str, str]]:
         """Collect all source files with their module names for all supported languages.
@@ -197,7 +215,7 @@ class ProjectAnalyzer:
     def _analyze_parallel(self, files: List[Tuple[str, str]]) -> List[Dict]:
         """Analyze files in parallel."""
         results = []
-        workers = min(self.config.performance.parallel_workers, len(files))
+        workers = min(self.config.performance.get_workers(), len(files))
         
         # Convert config to dict for pickle compatibility
         config_dict = {
@@ -215,9 +233,13 @@ class ProjectAnalyzer:
                 for file_path, module_name in files
             }
             
-            # Collect results as they complete
+            # Collect results as they complete (with optional progress bar)
             completed = 0
-            for future in as_completed(future_to_file):
+            iterator = as_completed(future_to_file)
+            if not self.config.verbose and len(files) > DEFAULT_PROGRESS_BAR_THRESHOLD and _HAS_TQDM:
+                iterator = tqdm(iterator, total=len(files), desc="Analyzing")
+            
+            for future in iterator:
                 file_path, module_name = future_to_file[future]
                 try:
                     result = future.result()
@@ -238,7 +260,12 @@ class ProjectAnalyzer:
         analyzer = FileAnalyzer(self.config, self.cache)
         total = len(files)
         
-        for i, (file_path, module_name) in enumerate(files, 1):
+        # Use tqdm for large projects in non-verbose mode
+        file_iterator = enumerate(files, 1)
+        if not self.config.verbose and total > DEFAULT_PROGRESS_BAR_THRESHOLD and _HAS_TQDM:
+            file_iterator = tqdm(list(file_iterator), desc="Analyzing", total=total)
+        
+        for i, (file_path, module_name) in file_iterator:
             try:
                 result = analyzer.analyze_file(file_path, module_name)
                 if result:
@@ -355,47 +382,19 @@ class ProjectAnalyzer:
     
     def analyze_files(self, files: List[Tuple[str, str]], project_path: str) -> AnalysisResult:
         """Analyze specific list of files (for chunked analysis).
-        
+
         Args:
             files: List of (file_path, module_name) tuples
             project_path: Base project path for the result
         """
         start_time = time.time()
-        
+
         if self.config.verbose:
             print(f"Analyzing {len(files)} specific files")
-        
-        # Analyze files
-        if self.config.performance.parallel_enabled and len(files) > 1:
-            results = self._analyze_parallel(files)
-        else:
-            results = self._analyze_sequential(files)
-        
-        # Merge results
+
+        results = self._run_analysis(files)
         merged = self._merge_results(results, project_path)
-        
-        # Build call graph
-        self._build_call_graph(merged)
-        
-        if not self.config.performance.skip_pattern_detection:
-            self._detect_patterns(merged)
-        
-        # Refactoring analysis
-        self.refactoring_analyzer.perform_refactoring_analysis(merged)
-        
-        # Calculate stats
-        elapsed = time.time() - start_time
-        merged.stats = {
-            'files_processed': len(files),
-            'functions_found': len(merged.functions),
-            'classes_found': len(merged.classes),
-            'nodes_created': len(merged.nodes),
-            'edges_created': len(merged.edges),
-            'patterns_detected': len(merged.patterns),
-            'analysis_time_seconds': round(elapsed, 2),
-            'cache_hits': sum(r.get('cache_hits', 0) for r in results),
-        }
-        
+        self._post_process(merged, files, results, start_time)
         return merged
     
     def _detect_patterns(self, result: AnalysisResult) -> None:

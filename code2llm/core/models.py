@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Set, Optional, Any
-from pathlib import Path
 
 
 class BaseModel:

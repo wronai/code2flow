@@ -1,17 +1,13 @@
 """File analyzer for analyzing individual source files across multiple languages."""
 
 import ast
-import re
 from pathlib import Path
 from typing import Dict, List, Optional
 
 from radon.complexity import cc_visit, cc_rank
 
-from .config import Config, LANGUAGE_EXTENSIONS
-from .models import (
-    AnalysisResult, ClassInfo, FlowEdge, FlowNode,
-    FunctionInfo, ModuleInfo
-)
+from .config import Config
+from .models import ClassInfo, FlowEdge, FlowNode, FunctionInfo, ModuleInfo
 from code2llm.analysis.dfg import DFGExtractor
 from code2llm.analysis.call_graph import CallGraphExtractor
 from .file_filter import FastFileFilter

@@ -4,9 +4,17 @@ Refactored to use EXPORT_REGISTRY for core format dispatch.
 Maintains backward compatibility with all existing --format values.
 """
 
+import shutil
 import sys
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+
+# Optional progress bar support
+try:
+    from tqdm import tqdm
+    _HAS_TQDM = True
+except ImportError:
+    _HAS_TQDM = False
 
 from code2llm.exporters import (
     get_exporter,
@@ -17,6 +25,8 @@ from code2llm.exporters import (
     IndexHTMLGenerator,
 )
 from code2llm.exporters.project_yaml.evolution import load_previous_evolution
+from code2llm.core.persistent_cache import PersistentCache
+from code2llm.core.config import DEFAULT_PROGRESS_BAR_THRESHOLD
 
 
 # Format output filenames
@@ -46,24 +56,101 @@ FORMAT_LABELS: Dict[str, str] = {
 }
 
 
+def _build_export_config(args, formats: List[str]) -> Dict[str, Any]:
+    """Build config dict for export caching."""
+    return {
+        'formats': sorted(formats),
+        'png': getattr(args, 'png', False),
+        'no_png': getattr(args, 'no_png', False),
+        'flow_include_examples': getattr(args, 'flow_include_examples', False),
+        'full': getattr(args, 'full', False),
+        'refactor': getattr(args, 'refactor', False),
+        'data_structures': getattr(args, 'data_structures', False),
+    }
+
+
 def _run_exports(args, result, output_dir: Path, source_path: Optional[Path] = None):
     """Export analysis results in requested formats.
 
     Uses EXPORT_REGISTRY for core format dispatch.
     For chunked analysis, exports to subproject subdirectories.
+    Supports export-level caching for repeated runs.
     """
     requested_formats = [f.strip() for f in args.format.split(',')]
     formats = _expand_all_formats(requested_formats, getattr(args, 'png', False))
     is_chunked = getattr(args, 'chunk', False)
+
+    # Skip cache for chunked or when explicitly disabled
+    skip_cache = is_chunked or getattr(args, 'no_cache', False)
+
+    if not skip_cache and source_path:
+        cache = PersistentCache(str(source_path))
+        config_dict = _build_export_config(args, formats)
+        cached_export_dir = cache.get_export_cache_dir(config_dict)
+
+        if cached_export_dir:
+            if args.verbose:
+                print(f"  Using cached export from: {cached_export_dir}")
+            # Copy cached files to output_dir
+            _copy_cached_export(cached_export_dir, output_dir, verbose=args.verbose)
+            return
 
     try:
         if is_chunked and source_path:
             _export_chunked(args, result, output_dir, source_path, formats, requested_formats)
         else:
             _export_single(args, result, output_dir, formats, requested_formats, source_path)
+
+        # Mark export as complete in cache
+        if not skip_cache and source_path:
+            cache = PersistentCache(str(source_path))
+            config_dict = _build_export_config(args, formats)
+            export_cache_dir = cache.create_export_cache_dir(config_dict)
+            _copy_to_cache(output_dir, export_cache_dir, verbose=args.verbose)
+            cache.mark_export_complete(export_cache_dir)
+            cache.save()
+            if args.verbose:
+                print(f"  Export cached at: {export_cache_dir}")
+
     except Exception as e:
         print(f"Error during export: {e}", file=sys.stderr)
         sys.exit(1)
+
+
+def _copy_cached_export(cached_dir: Path, output_dir: Path, verbose: bool = False) -> None:
+    """Copy files from cached export to output directory."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    items = [item for item in cached_dir.iterdir() if item.name != '_complete']
+
+    # Progress bar for large cache restores
+    use_tqdm = _HAS_TQDM and not verbose and len(items) > DEFAULT_PROGRESS_BAR_THRESHOLD
+    item_iterator = tqdm(items, desc="Restoring from cache") if use_tqdm else items
+
+    for item in item_iterator:
+        dest = output_dir / item.name
+        if item.is_dir():
+            shutil.copytree(item, dest, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, dest)
+
+
+def _copy_to_cache(output_dir: Path, cache_dir: Path, verbose: bool = False) -> None:
+    """Copy export files to cache directory."""
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    if not output_dir.exists():
+        return
+
+    items = list(output_dir.iterdir())
+    # Progress bar for large cache saves
+    use_tqdm = _HAS_TQDM and not verbose and len(items) > DEFAULT_PROGRESS_BAR_THRESHOLD
+    item_iterator = tqdm(items, desc="Saving to cache") if use_tqdm else items
+
+    for item in item_iterator:
+        dest = cache_dir / item.name
+        if item.is_dir():
+            shutil.copytree(item, dest, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, dest)
 
 
 def _expand_all_formats(requested: List[str], include_png: bool = False) -> List[str]:
@@ -121,7 +208,18 @@ def _export_single(
 
 def _export_registry_formats(args, result, output_dir: Path, formats: List[str]):
     """Export core formats via EXPORT_REGISTRY lookup."""
-    for fmt in formats:
+    # Use progress bar when many formats and not in verbose mode
+    use_tqdm = (
+        _HAS_TQDM and
+        not args.verbose and
+        len(formats) > DEFAULT_PROGRESS_BAR_THRESHOLD
+    )
+
+    format_iterator = formats
+    if use_tqdm:
+        format_iterator = tqdm(formats, desc="Exporting formats")
+
+    for fmt in format_iterator:
         exporter_cls = get_exporter(fmt)
         if exporter_cls is None:
             continue

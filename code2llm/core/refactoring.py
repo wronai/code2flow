@@ -1,7 +1,6 @@
 """Refactoring analysis for code2llm."""
 
 from pathlib import Path
-from typing import Optional
 
 from .config import Config
 from .models import AnalysisResult

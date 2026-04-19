@@ -1,8 +1,40 @@
 """Configuration and constants for code2llm."""
 
+import os
+import psutil
 from dataclasses import dataclass, field
 from typing import List, Set
 from enum import Enum
+
+
+def _get_optimal_workers(default: int = 4, max_per_gb: float = 2.0) -> int:
+    """Calculate optimal parallel workers based on CPU and available RAM.
+
+    Args:
+        default: Default workers if detection fails
+        max_per_gb: Max workers per GB of RAM
+
+    Returns:
+        Optimal worker count (at least 1)
+    """
+    try:
+        cpu_count = os.cpu_count() or default
+        available_ram_gb = psutil.virtual_memory().available / (1024 ** 3)
+        # Limit workers by RAM (assume each worker needs ~500MB)
+        ram_limited = int(available_ram_gb * max_per_gb)
+        # Take minimum of CPU and RAM limits, but at least 1
+        return max(1, min(cpu_count, ram_limited))
+    except Exception:
+        return default
+
+
+# Performance limits (named constants for magic numbers)
+DEFAULT_MAX_NODES_PER_FILE = 1000
+DEFAULT_MAX_TOTAL_NODES = 10000
+DEFAULT_MAX_EDGES = 50000
+DEFAULT_CACHE_TTL_HOURS = 24
+DEFAULT_MAX_MEMORY_MB = 2048
+DEFAULT_PROGRESS_BAR_THRESHOLD = 50  # File count threshold for progress bar
 
 
 class AnalysisMode(str, Enum):
@@ -19,16 +51,22 @@ class PerformanceConfig:
     """Performance optimization settings."""
     enable_cache: bool = True
     cache_dir: str = ".code2llm_cache"
-    cache_ttl_hours: int = 24
-    parallel_workers: int = 4
+    cache_ttl_hours: int = DEFAULT_CACHE_TTL_HOURS
+    parallel_workers: int = 0  # 0 = auto-detect based on CPU/RAM
     parallel_enabled: bool = True
-    max_memory_mb: int = 2048
-    max_nodes_per_file: int = 1000
-    max_total_nodes: int = 10000
-    max_edges: int = 50000
+    max_memory_mb: int = DEFAULT_MAX_MEMORY_MB
+    max_nodes_per_file: int = DEFAULT_MAX_NODES_PER_FILE
+    max_total_nodes: int = DEFAULT_MAX_TOTAL_NODES
+    max_edges: int = DEFAULT_MAX_EDGES
     fast_mode: bool = False
     skip_data_flow: bool = False
     skip_pattern_detection: bool = False
+
+    def get_workers(self) -> int:
+        """Get effective worker count (auto-detect if set to 0)."""
+        if self.parallel_workers <= 0:
+            return _get_optimal_workers(default=4)
+        return self.parallel_workers
 
 
 @dataclass
@@ -120,7 +158,7 @@ FAST_CONFIG = Config(
         skip_data_flow=True,
         skip_pattern_detection=True,
         parallel_enabled=True,
-        parallel_workers=8,
+        parallel_workers=0,  # auto-detect
         max_nodes_per_file=500,
         max_total_nodes=5000,
     ),

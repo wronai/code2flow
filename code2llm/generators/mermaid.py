@@ -254,9 +254,23 @@ def _fix_class_line(line: str):
     return None
 
 
+def _is_png_fresh(mmd_file: Path, output_dir: Path) -> bool:
+    """Check if PNG exists and is newer than MMD source."""
+    png_file = output_dir / f"{mmd_file.stem}.png"
+    if not png_file.exists():
+        return False
+    # PNG is fresh if newer than MMD
+    return png_file.stat().st_mtime >= mmd_file.stat().st_mtime
+
+
 def _prepare_and_render(mmd_file: Path, output_dir: Path, timeout: int) -> bool:
     """Validate, optionally fix, then render a single .mmd file to PNG."""
     output_file = output_dir / f"{mmd_file.stem}.png"
+    
+    # Skip if PNG is already fresh
+    if _is_png_fresh(mmd_file, output_dir):
+        return True
+    
     errors = validate_mermaid_file(mmd_file)
     if errors:
         print(f"  Fixing {mmd_file.name}: {len(errors)} issues")
@@ -268,11 +282,21 @@ def _prepare_and_render(mmd_file: Path, output_dir: Path, timeout: int) -> bool:
     return generate_single_png(mmd_file, output_file, timeout)
 
 
-def generate_pngs(input_dir: Path, output_dir: Path, timeout: int = 60, max_workers: int = 4) -> int:
-    """Generate PNG files from all .mmd files in input_dir (parallel)."""
+def generate_pngs(
+    input_dir: Path, output_dir: Path, timeout: int = 60, max_workers: int = 0
+) -> int:
+    """Generate PNG files from all .mmd files in input_dir (parallel).
+
+    Args:
+        max_workers: Number of parallel workers (0 = auto-detect from CPU count)
+    """
     mmd_files = list(input_dir.glob('*.mmd'))
     if not mmd_files:
         return 0
+
+    # Auto-detect workers if not specified
+    if max_workers <= 0:
+        max_workers = os.cpu_count() or 4
 
     success_count = 0
     with ThreadPoolExecutor(max_workers=min(max_workers, len(mmd_files))) as pool:

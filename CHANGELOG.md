@@ -1,5 +1,25 @@
 ## [Unreleased]
 
+## [0.5.122] - 2026-04-19
+
+### Docs
+- Update docs/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_exports/orchestrator.py
+- Update code2llm/core/analyzer.py
+- Update code2llm/core/config.py
+- Update code2llm/core/file_analyzer.py
+- Update code2llm/core/gitignore.py
+- Update code2llm/core/lang/__init__.py
+- Update code2llm/core/models.py
+- Update code2llm/core/refactoring.py
+- Update code2llm/generators/mermaid.py
+- Update project/analysis.toon.yaml
+- ... and 7 more files
+
 ## [0.5.121] - 2026-04-19
 
 ### Docs

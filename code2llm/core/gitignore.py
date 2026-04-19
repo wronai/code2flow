@@ -1,7 +1,7 @@
 """Gitignore support for code2llm file filtering."""
 
 from pathlib import Path
-from typing import List, Set
+from typing import List
 import re
 
 
