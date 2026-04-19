@@ -1,43 +1,39 @@
-# code2llm | 145f 24326L | python:132,shell:9,typescript:1,java:1 | 2026-04-19
-# CC̄=4.2 | critical:1/1115 | dups:2 | cycles:0
+# code2llm | 131f 24005L | python:123,shell:3 | 2026-04-19
+# CC̄=4.2 | critical:0/1101 | dups:0 | cycles:0
 
-HEALTH[2]:
-  🔴 DUP   2 classes duplicated
-  🟡 CC    analyze_project CC=27 (limit:15)
+HEALTH[0]: ok
 
-REFACTOR[2]:
-  1. rm duplicates  (-2 dup classes)
-  2. split 1 high-CC methods  (CC>15)
+REFACTOR[0]: none needed
 
 PIPELINES[720]:
-  [1] Src [NewUserService]: NewUserService
+  [1] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [2] Src [AddUser]: AddUser
+  [2] Src [main]: main → _run_single_file_mode → load_file → is_toon_file
       PURITY: 100% pure
-  [3] Src [GetUser]: GetUser
+  [3] Src [__init__]: __init__
       PURITY: 100% pure
-  [4] Src [ProcessUsers]: ProcessUsers
+  [4] Src [_hash]: _hash
       PURITY: 100% pure
-  [5] Src [main]: main
+  [5] Src [authenticate]: authenticate
       PURITY: 100% pure
 
 LAYERS:
-  code2llm/                       CC̄=4.4    ←in:0  →out:8  !! split
+  code2llm/                       CC̄=4.3    ←in:0  →out:8  !! split
   │ !! index_generator            790L  1C    7m  CC=5      ←0
   │ !! pipeline_detector          506L  3C   18m  CC=13     ←0
   │ !! html_dashboard             504L  1C   14m  CC=7      ←0
   │ !! metrics                    501L  1C   27m  CC=12     ←0
   │ readme_exporter            499L  1C    7m  CC=13     ←0
+  │ mermaid_exporter           492L  1C   23m  CC=13     ←0
   │ large_repo                 488L  2C   20m  CC=9      ←1
   │ mermaid                    484L  0C   17m  CC=13     ←2
-  │ mermaid_exporter           483L  1C   19m  CC=13     ←0
   │ prompt                     475L  0C   18m  CC=14     ←1
   │ evolution_exporter         473L  1C   17m  CC=11     ←0
   │ llm_flow                   472L  1C   24m  CC=14     ←0
   │ renderer                   471L  1C   26m  CC=11     ←0
   │ base                       454L  0C   14m  CC=14     ←8
   │ map_exporter               442L  1C   25m  CC=13     ←7
-  │ !! analyzer                   409L  1C    9m  CC=27     ←0
+  │ analyzer                   433L  1C   19m  CC=11     ←0
   │ file_analyzer              396L  1C   18m  CC=12     ←0
   │ flow_exporter              393L  1C   14m  CC=10     ←0
   │ pipeline                   388L  3C   20m  CC=10     ←0
@@ -89,6 +85,7 @@ LAYERS:
   │ code2logic                 127L  0C    8m  CC=6      ←1
   │ helpers                    125L  0C    8m  CC=8      ←3
   │ normalization              122L  2C   13m  CC=6      ←0
+  │ file_filter                121L  1C    9m  CC=9      ←0
   │ core                       120L  1C    3m  CC=12     ←0
   │ validate_project           118L  0C    3m  CC=11     ←1
   │ hotspots                   106L  0C    3m  CC=13     ←1
@@ -96,17 +93,16 @@ LAYERS:
   │ health                     103L  0C    3m  CC=13     ←1
   │ ast_registry               102L  1C    9m  CC=5      ←4
   │ go_lang                    102L  0C    2m  CC=10     ←1
-  │ file_filter                100L  1C    4m  CC=14     ←0
   │ rust                        94L  0C    1m  CC=9      ←1
   │ __init__                    82L  0C    0m  CC=0.0    ←0
   │ coupling                    77L  1C    5m  CC=7      ←0
   │ incremental                 75L  1C    5m  CC=5      ←0
   │ api                         73L  0C    2m  CC=2      ←0
+  │ ast_helpers                 73L  0C    3m  CC=8      ←2
   │ generic                     71L  0C    1m  CC=12     ←1
   │ cli                         69L  0C    1m  CC=7      ←0
   │ strategies                  68L  1C    0m  CC=0.0    ←0
   │ php                         66L  0C    4m  CC=8      ←1
-  │ ast_helpers                 54L  0C    3m  CC=8      ←2
   │ __init__                    53L  0C    1m  CC=6      ←0
   │ typescript                  53L  0C    3m  CC=1      ←1
   │ __init__                    52L  0C    1m  CC=3      ←0
@@ -157,56 +153,35 @@ LAYERS:
   badges/                         CC̄=2.7    ←in:0  →out:0
   │ server                     110L  0C    3m  CC=4      ←0
   │
-  test_python_only/               CC̄=1.8    ←in:0  →out:0
-  │ sample                      40L  2C    5m  CC=3      ←0
-  │ __init__                     1L  0C    0m  CC=0.0    ←0
-  │ __init__                     1L  0C    0m  CC=0.0    ←0
-  │
-  demo_langs/                     CC̄=1.5    ←in:0  →out:0  ×DUP
-  │ sample.java                 47L  2C    7m  CC=3      ←1  ×DUP
+  demo_langs/                     CC̄=1.5    ←in:0  →out:0
   │ sample.rs                   47L  1C    4m  CC=2      ←0
+  │ sample.java                 47L  2C    7m  CC=3      ←0
   │ sample.go                   46L  0C    4m  CC=3      ←0
-  │ sample.php                  44L  1C    1m  CC=1      ←0
-  │ sample                      40L  1C    5m  CC=3      ←0
-  │ sample.ts                   26L  1C    1m  CC=1      ←0
-  │
-  test_langs/                     CC̄=1.4    ←in:0  →out:0  ×DUP
-  │ sample.java                 47L  2C    7m  CC=3      ←3  ×DUP
-  │ sample.rs                   47L  1C    4m  CC=2      ←0
-  │ sample.go                   46L  0C    4m  CC=3      ←0
-  │ sample.php                  44L  1C    1m  CC=1      ←0
+  │ sample.php                  44L  2C    4m  CC=2      ←1
   │ sample                      40L  2C    5m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
-  │ sample_bad.go               24L  0C    2m  CC=1      ←0
-  │ sample_bad.php              22L  1C    1m  CC=1      ←0
-  │ sample_bad.ts               20L  2C    3m  CC=1      ←0
-  │ sample_bad.java             18L  1C    1m  CC=1      ←0
-  │ sample_bad.rs               18L  1C    2m  CC=1      ←0
   │
   ── zero ──
      code2llm/patterns/__init__.py             0L
      code2llm/refactor/__init__.py             0L
 
 COUPLING:
-                            code2llm.cli_exports           code2llm.core      code2llm.exporters                code2llm       code2llm.analysis     code2llm.generators        code2llm.parsers        test_langs.valid           validate_toon              benchmarks            code2llm.nlp        demo_langs.valid  test_python_only.valid
-    code2llm.cli_exports                      ──                       1                       8                      ←4                                               2                                                                                                                                                                          !! fan-out
-           code2llm.core                      ←1                      ──                                              ←4                      ←3                                                                                                                      ←1                                                                          hub
-      code2llm.exporters                      ←8                                              ──                                                                                                                                                                                               1                                                  hub
-                code2llm                       4                       4                                              ──                                                                                                                                                                                                                          !! fan-out
-       code2llm.analysis                                               3                                                                      ──                                                                                                                                                                                                
-     code2llm.generators                      ←2                                                                                                                      ──                                                                                                                                                                        
-        code2llm.parsers                                                                                                                                                                      ──                                              ←2                                                                                                
-        test_langs.valid                                                                                                                                                                                              ──                                                                                              ←1                      ←1
-           validate_toon                                                                                                                                                                       2                                              ──                                                                                                
-              benchmarks                                               1                                                                                                                                                                                              ──                                                                        
-            code2llm.nlp                                                                      ←1                                                                                                                                                                                              ──                                                
-        demo_langs.valid                                                                                                                                                                                               1                                                                                              ──                        
-  test_python_only.valid                                                                                                                                                                                               1                                                                                                                      ──
+                        code2llm.cli_exports         code2llm.core    code2llm.exporters              code2llm     code2llm.analysis   code2llm.generators      code2llm.parsers         validate_toon            benchmarks          code2llm.nlp
+  code2llm.cli_exports                    ──                     1                     8                    ←4                                           2                                                                                          !! fan-out
+         code2llm.core                    ←1                    ──                                          ←4                    ←3                                                                                      ←1                        hub
+    code2llm.exporters                    ←8                                          ──                                                                                                                                                         1  hub
+              code2llm                     4                     4                                          ──                                                                                                                                      !! fan-out
+     code2llm.analysis                                           3                                                                ──                                                                                                              
+   code2llm.generators                    ←2                                                                                                            ──                                                                                        
+      code2llm.parsers                                                                                                                                                        ──                    ←2                                            
+         validate_toon                                                                                                                                                         2                    ──                                            
+            benchmarks                                           1                                                                                                                                                        ──                      
+          code2llm.nlp                                                                ←1                                                                                                                                                        ──
   CYCLES: none
-  HUB: code2llm.exporters/ (fan-in=8)
   HUB: code2llm.core/ (fan-in=9)
-  SMELL: code2llm/ fan-out=8 → split needed
+  HUB: code2llm.exporters/ (fan-in=8)
   SMELL: code2llm.cli_exports/ fan-out=11 → split needed
+  SMELL: code2llm/ fan-out=8 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

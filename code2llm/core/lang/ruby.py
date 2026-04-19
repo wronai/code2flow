@@ -138,6 +138,27 @@ def analyze_ruby(content: str, file_path: str, module_name: str,
         }
     
     extract_calls_regex(content, module_name, result)
-    
+
     stats['files_processed'] += 1
     return result
+
+
+# New LanguageParser ABC implementation (demonstrating the new pattern)
+# Note: Imports at the bottom to avoid circular imports
+# The __init__.py handles the actual registration
+class RubyParser:
+    """Ruby language parser - registered via @register_language in __init__.py."""
+
+    supported_extensions = ('.rb', '.rbw')
+    language_name = 'Ruby'
+
+    def analyze(
+        self,
+        content: str,
+        file_path: str,
+        module_name: str,
+        stats: Dict
+    ) -> Dict:
+        """Analyze Ruby file content."""
+        # Delegate to the existing legacy function for now
+        return analyze_ruby(content, file_path, module_name, '.rb', stats)

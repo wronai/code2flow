@@ -5,6 +5,7 @@ from typing import Optional, Set, List, Dict
 
 from code2llm.core.config import Config
 from code2llm.core.models import AnalysisResult, FlowEdge
+from code2llm.analysis.utils import ast_unparse
 
 
 class CallGraphExtractor(ast.NodeVisitor):
@@ -202,10 +203,4 @@ class CallGraphExtractor(ast.NodeVisitor):
         return None
         
     def _expr_to_str(self, node: ast.AST) -> str:
-        """Convert AST expression to string."""
-        if node is None:
-            return ""
-        try:
-            return ast.unparse(node) if hasattr(ast, 'unparse') else str(node)
-        except:
-            return str(node)
+        return ast_unparse(node, default_none="")

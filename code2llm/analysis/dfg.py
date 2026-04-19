@@ -6,6 +6,7 @@ from typing import Set, Dict, List
 
 from code2llm.core.config import Config
 from code2llm.core.models import AnalysisResult, FlowEdge, DataFlow, Mutation
+from code2llm.analysis.utils import ast_unparse
 
 
 class DFGExtractor(ast.NodeVisitor):
@@ -207,13 +208,7 @@ class DFGExtractor(ast.NodeVisitor):
         return names
         
     def _expr_to_str(self, node: ast.AST) -> str:
-        """Convert AST expression to string."""
-        if node is None:
-            return "None"
-        try:
-            return ast.unparse(node) if hasattr(ast, 'unparse') else str(node)
-        except:
-            return str(node)
+        return ast_unparse(node)
             
     def _build_data_flow_edges(self):
         """Build DFG edges from data flow records."""

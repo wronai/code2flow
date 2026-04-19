@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+## [0.5.116] - 2026-04-19
+
+### Docs
+- Update project/context.md
+
+### Other
+- Update code2llm/analysis/call_graph.py
+- Update code2llm/analysis/cfg.py
+- Update code2llm/analysis/dfg.py
+- Update code2llm/analysis/utils/__init__.py
+- Update code2llm/core/lang/__init__.py
+- Update code2llm/core/lang/ruby.py
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/compact_flow.mmd
+- Update project/flow.mmd
+- ... and 1 more files
+
 ## [0.5.115] - 2026-04-19
 
 ### Docs

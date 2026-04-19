@@ -6,6 +6,7 @@ from typing import Optional
 
 from code2llm.core.config import Config
 from code2llm.core.models import AnalysisResult, FlowNode, FlowEdge, FunctionInfo
+from code2llm.analysis.utils import ast_unparse
 
 
 class CFGExtractor(ast.NodeVisitor):
@@ -275,13 +276,7 @@ class CFGExtractor(ast.NodeVisitor):
             return str(node)[:50]
             
     def _expr_to_str(self, node: ast.AST) -> str:
-        """Convert AST expression to string."""
-        if node is None:
-            return "None"
-        try:
-            return ast.unparse(node) if hasattr(ast, 'unparse') else str(node)
-        except:
-            return str(node)
+        return ast_unparse(node)
             
     def _format_except(self, handler: ast.ExceptHandler) -> str:
         """Format except handler."""
