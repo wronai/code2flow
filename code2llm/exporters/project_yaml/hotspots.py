@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from code2llm.core.models import AnalysisResult, FunctionInfo
-from code2llm.exporters.toon.helpers import _is_excluded
+from code2llm.exporters.toon.helpers import _is_excluded, _rel_path
 from .constants import FAN_OUT_THRESHOLD, CC_WARNING, GOD_MODULE_LINES
 
 

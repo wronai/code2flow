@@ -261,9 +261,10 @@ def _export_mermaid(args, result, output_dir: Path):
     exporter.export_call_graph(result, str(output_dir / 'calls.mmd'))
     exporter.export_compact(result, str(output_dir / 'compact_flow.mmd'))
 
-    # Export calls.yaml (structured call graph data)
+    # Export calls.yaml (structured call graph data) and calls.toon.yaml (human-readable)
     yaml_exporter = YAMLExporter()
     yaml_exporter.export_calls(result, str(output_dir / 'calls.yaml'))
+    yaml_exporter.export_calls_toon(result, str(output_dir / 'calls.toon.yaml'))
 
     if args.verbose:
         files = ['flow.mmd']

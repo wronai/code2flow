@@ -1,12 +1,12 @@
-# code2llm | 129f 23037L | python:121,shell:2,java:1 | 2026-04-18
+# code2llm | 129f 23037L | python:121,shell:2,php:1 | 2026-04-18
 # CC̄=4.3 | critical:0/1041 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
-PIPELINES[671]:
-  [1] Src [read_readme]: read_readme
+PIPELINES[673]:
+  [1] Src [main]: main → run_analysis
       PURITY: 100% pure
   [2] Src [demo_quick_strategy]: demo_quick_strategy
       PURITY: 100% pure
@@ -152,11 +152,11 @@ LAYERS:
   │ server                     110L  0C    3m  CC=4      ←0
   │
   demo_langs/                     CC̄=1.5    ←in:0  →out:0
-  │ sample.rs                   47L  1C    5m  CC=2      ←0
-  │ sample.java                 47L  2C    7m  CC=3      ←1
+  │ sample.rs                   47L  1C    4m  CC=2      ←0
+  │ sample.java                 47L  2C    4m  CC=2      ←1
   │ sample.go                   46L  0C    4m  CC=3      ←0
-  │ sample.php                  44L  1C    1m  CC=1      ←0
-  │ sample                      40L  1C    4m  CC=3      ←0
+  │ sample.php                  44L  2C    4m  CC=2      ←2
+  │ sample                      40L  1C    5m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
   │
   ── zero ──

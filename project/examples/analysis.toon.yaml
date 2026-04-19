@@ -5,16 +5,16 @@ HEALTH[0]: ok
 
 REFACTOR[0]: none needed
 
-PIPELINES[671]:
-  [1] Src [read_readme]: read_readme
+PIPELINES[673]:
+  [1] Src [main]: main → _run_single_file_mode → load_file → is_toon_file
       PURITY: 100% pure
-  [2] Src [demo_quick_strategy]: demo_quick_strategy
+  [2] Src [read_readme]: read_readme
       PURITY: 100% pure
-  [3] Src [demo_standard_strategy]: demo_standard_strategy
+  [3] Src [demo_quick_strategy]: demo_quick_strategy
       PURITY: 100% pure
-  [4] Src [demo_deep_strategy]: demo_deep_strategy
+  [4] Src [demo_standard_strategy]: demo_standard_strategy
       PURITY: 100% pure
-  [5] Src [demo_incremental_analysis]: demo_incremental_analysis
+  [5] Src [demo_deep_strategy]: demo_deep_strategy
       PURITY: 100% pure
 
 LAYERS:
@@ -152,11 +152,11 @@ LAYERS:
   │ server                     110L  0C    3m  CC=4      ←0
   │
   demo_langs/                     CC̄=1.5    ←in:0  →out:0
-  │ sample.rs                   47L  1C    5m  CC=2      ←0
-  │ sample.java                 47L  2C    7m  CC=3      ←1
+  │ sample.rs                   47L  1C    4m  CC=2      ←0
+  │ sample.java                 47L  2C    7m  CC=3      ←2
   │ sample.go                   46L  0C    4m  CC=3      ←0
   │ sample.php                  44L  1C    1m  CC=1      ←0
-  │ sample                      40L  1C    4m  CC=3      ←0
+  │ sample                      40L  1C    5m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
   │
   ── zero ──

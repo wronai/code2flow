@@ -6,8 +6,8 @@
 - **Primary Language**: python
 - **Languages**: python: 136, shell: 6, java: 1
 - **Analysis Mode**: static
-- **Total Functions**: 1058
-- **Total Classes**: 112
+- **Total Functions**: 1041
+- **Total Classes**: 111
 - **Modules**: 143
 - **Entry Points**: 0
 
@@ -85,11 +85,6 @@
 - **Classes**: 1
 - **File**: `file_analyzer.py`
 
-### code2llm.exporters.project_yaml_exporter
-- **Functions**: 18
-- **Classes**: 1
-- **File**: `project_yaml_exporter.py`
-
 ### code2llm.cli_exports.prompt
 - **Functions**: 18
 - **File**: `prompt.py`
@@ -108,6 +103,11 @@
 - **Functions**: 17
 - **Classes**: 1
 - **File**: `evolution_exporter.py`
+
+### code2llm.nlp.entity_resolution
+- **Functions**: 16
+- **Classes**: 3
+- **File**: `entity_resolution.py`
 
 ## Key Entry Points
 
@@ -157,14 +157,6 @@ Strategy:
 2. 
 - **Methods**: 18
 - **Key Methods**: code2llm.core.large_repo.HierarchicalRepoSplitter.__init__, code2llm.core.large_repo.HierarchicalRepoSplitter.get_analysis_plan, code2llm.core.large_repo.HierarchicalRepoSplitter._split_hierarchically, code2llm.core.large_repo.HierarchicalRepoSplitter._merge_small_l1_dirs, code2llm.core.large_repo.HierarchicalRepoSplitter._split_level2_consolidated, code2llm.core.large_repo.HierarchicalRepoSplitter._categorize_subdirs, code2llm.core.large_repo.HierarchicalRepoSplitter._process_large_dirs, code2llm.core.large_repo.HierarchicalRepoSplitter._process_level1_files, code2llm.core.large_repo.HierarchicalRepoSplitter._merge_small_dirs, code2llm.core.large_repo.HierarchicalRepoSplitter._chunk_by_files
-
-### code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter
-> Export unified project.yaml — single source of truth for diagnostics.
-
-Combines data from analysis.t
-- **Methods**: 18
-- **Key Methods**: code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter.export, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_project_yaml, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_health, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_alerts, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._count_duplicates, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_modules, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._group_by_file, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._compute_module_entry, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._compute_inbound_deps, code2llm.exporters.project_yaml_exporter.ProjectYAMLExporter._build_exports
-- **Inherits**: Exporter
 
 ### code2llm.analysis.type_inference.TypeInferenceEngine
 > Extract and infer type information from Python source files.
@@ -245,6 +237,12 @@ Scans function bodies for IO operations,
 - **Methods**: 13
 - **Key Methods**: code2llm.analysis.side_effects.SideEffectDetector.__init__, code2llm.analysis.side_effects.SideEffectDetector.analyze_function, code2llm.analysis.side_effects.SideEffectDetector.analyze_all, code2llm.analysis.side_effects.SideEffectDetector.get_purity_score, code2llm.analysis.side_effects.SideEffectDetector._scan_node, code2llm.analysis.side_effects.SideEffectDetector._check_calls, code2llm.analysis.side_effects.SideEffectDetector._check_assignments, code2llm.analysis.side_effects.SideEffectDetector._check_globals, code2llm.analysis.side_effects.SideEffectDetector._check_yield, code2llm.analysis.side_effects.SideEffectDetector._check_delete
 
+### code2llm.analysis.call_graph.CallGraphExtractor
+> Extract call graph from AST.
+- **Methods**: 13
+- **Key Methods**: code2llm.analysis.call_graph.CallGraphExtractor.__init__, code2llm.analysis.call_graph.CallGraphExtractor.extract, code2llm.analysis.call_graph.CallGraphExtractor._calculate_metrics, code2llm.analysis.call_graph.CallGraphExtractor.visit_Import, code2llm.analysis.call_graph.CallGraphExtractor.visit_ImportFrom, code2llm.analysis.call_graph.CallGraphExtractor.visit_ClassDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_FunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_AsyncFunctionDef, code2llm.analysis.call_graph.CallGraphExtractor.visit_Call, code2llm.analysis.call_graph.CallGraphExtractor._qualified_name
+- **Inherits**: ast.NodeVisitor
+
 ## Data Transformation Functions
 
 Key functions that process and transform data:
@@ -261,6 +259,10 @@ Key functions that process and transform data:
 > Format API response.
 - **Output to**: json.dumps
 
+### validate_toon.validate_toon_completeness
+> Validate toon format structure.
+- **Output to**: print, print, bool, bool, bool
+
 ### examples.streaming-analyzer.sample_project.utils.validate_input
 > Validate input data.
 - **Output to**: isinstance, isinstance
@@ -272,10 +274,6 @@ Key functions that process and transform data:
 ### examples.streaming-analyzer.sample_project.utils.transform_data
 > Transform data fields.
 - **Output to**: item.copy, transformations.items, transformed.append, None.upper, None.lower
-
-### validate_toon.validate_toon_completeness
-> Validate toon format structure.
-- **Output to**: print, print, bool, bool, bool
 
 ### benchmarks.benchmark_evolution.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
@@ -384,8 +382,8 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.core.analyzer.ProjectAnalyzer.analyze_files` - 20 calls
 - `code2llm.core.lang.generic.analyze_generic` - 20 calls
 - `code2llm.exporters.project_yaml.hotspots.build_refactoring` - 20 calls
-- `examples.streaming-analyzer.demo.demo_incremental_analysis` - 19 calls
 - `validate_toon.compare_classes` - 19 calls
+- `examples.streaming-analyzer.demo.demo_incremental_analysis` - 19 calls
 - `scripts.benchmark_badges.parse_evolution_metrics` - 19 calls
 - `code2llm.core.streaming.prioritizer.SmartPrioritizer.prioritize_files` - 19 calls
 - `code2llm.core.streaming.scanner.StreamingScanner.quick_scan_file` - 19 calls

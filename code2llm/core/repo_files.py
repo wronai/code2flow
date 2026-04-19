@@ -18,11 +18,12 @@ SKIP_DIRS = {
 
 # Patterns that indicate a file should be skipped
 SKIP_PATTERNS = [
-    'test', '_test', 'conftest',
+    'conftest',
     '__pycache__', '.venv', 'venv', 'fresh_env', 'test-env',
     'node_modules', '.git',
     '/lib/', '/lib64/', '/site-packages/',  # venv internals
     '/include/', '/bin/python', '/share/',
+    '/tests/', '/test/',  # test directories (but not projects named *test*)
 ]
 
 

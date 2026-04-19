@@ -18,6 +18,7 @@ _SKIP_DIR_NAMES = frozenset({
     'htmlcov', '.coverage', '.cache',
     'lib', 'lib64', 'site-packages', 'include', 'bin', 'share',
     '.code2llm_cache',
+    'tests', 'test',
 })
 
 
@@ -59,6 +60,7 @@ class FastFileFilter:
     def should_process(self, file_path: str) -> bool:
         """Check if file should be processed."""
         path_lower = file_path.lower()
+        basename_lower = Path(file_path).name.lower()
 
         # Check gitignore patterns first
         if self._gitignore_parser and self.project_path:
@@ -70,9 +72,9 @@ class FastFileFilter:
             if pattern in path_lower:
                 return False
 
-        # Pre-compiled wildcard excludes
+        # Pre-compiled wildcard excludes — check both full path and basename
         for regex in self._regex_excludes:
-            if regex.match(path_lower):
+            if regex.match(path_lower) or regex.match(basename_lower):
                 return False
 
         # Check include patterns (if any)
