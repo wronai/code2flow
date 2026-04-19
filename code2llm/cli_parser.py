@@ -148,6 +148,18 @@ Strategy Options (--strategy):
     )
 
     parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Show what would be exported without writing files'
+    )
+
+    parser.add_argument(
+        '--watch',
+        action='store_true',
+        help='Auto-detect changed files and only re-analyze those (faster subsequent runs)'
+    )
+
+    parser.add_argument(
         '--strategy',
         choices=['quick', 'standard', 'deep'],
         default='standard',

@@ -36,6 +36,26 @@ DEFAULT_CACHE_TTL_HOURS = 24
 DEFAULT_MAX_MEMORY_MB = 2048
 DEFAULT_PROGRESS_BAR_THRESHOLD = 50  # File count threshold for progress bar
 
+# Complexity thresholds
+CC_LOW_THRESHOLD = 5      # Rank A
+CC_MEDIUM_THRESHOLD = 10  # Rank B
+CC_HIGH_THRESHOLD = 20    # Rank C
+CC_CRITICAL_THRESHOLD = 50  # For warnings
+
+# Size limits
+KB = 1024
+MB = 1024 * 1024
+MAX_FILE_SIZE_KB = 256
+CHUNK_SIZE_KB = 256
+
+# Timeouts
+DEFAULT_PNG_TIMEOUT = 60
+DEFAULT_MERMAID_MAX_TEXT_SIZE = 2_000_000
+DEFAULT_MERMAID_MAX_EDGES = 20_000
+
+# Cache settings
+DEFAULT_CACHE_MAX_AGE_DAYS = 30
+
 
 class AnalysisMode(str, Enum):
     """Available analysis modes."""

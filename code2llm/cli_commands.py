@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from .cli_exports import _run_report
+from .core.config import DEFAULT_CACHE_MAX_AGE_DAYS, KB
 
 
 def handle_special_commands() -> Optional[int]:
@@ -39,18 +40,18 @@ def handle_cache_command(args_list) -> int:
     parser.add_argument('action', choices=['status', 'clear', 'gc'], help='Cache action')
     parser.add_argument('--all', action='store_true', dest='all_projects',
                         help='Apply to all cached projects (clear only)')
-    parser.add_argument('--max-age', type=int, default=30, metavar='DAYS',
-                        help='Max age in days for gc (default: 30)')
+    parser.add_argument('--max-age', type=int, default=DEFAULT_CACHE_MAX_AGE_DAYS, metavar='DAYS',
+                        help=f'Max age in days for gc (default: {DEFAULT_CACHE_MAX_AGE_DAYS})')
     args = parser.parse_args(args_list)
 
     if args.action == 'status':
         projects = get_all_projects()
         root = _DEFAULT_ROOT
-        total_mb = sum(p.get('cache_size_bytes', 0) for p in projects) / (1024 * 1024)
+        total_mb = sum(p.get('cache_size_bytes', 0) for p in projects) / (KB * KB)
         print(f"Cache: {root}")
         print(f"  Projects: {len(projects)}   Total: {total_mb:.1f} MB")
         for p in projects:
-            size_mb = p.get('cache_size_bytes', 0) / (1024 * 1024)
+            size_mb = p.get('cache_size_bytes', 0) / (KB * KB)
             updated = p.get('updated_at', 0)
             age_min = int((time.time() - updated) / 60) if updated else 0
             age_str = f"{age_min}m ago" if age_min < 120 else f"{age_min//60}h ago"
@@ -246,7 +247,7 @@ def _get_file_sizes(chunk_dir: Path, required_files: list[str]) -> str:
     sizes = []
     for req_file in required_files:
         size = (chunk_dir / req_file).stat().st_size
-        sizes.append(f"{req_file}:{size//1024}KB" if size > 1024 else f"{req_file}:{size}B")
+        sizes.append(f"{req_file}:{size//KB}KB" if size > KB else f"{req_file}:{size}B")
     return ", ".join(sizes)
 
 

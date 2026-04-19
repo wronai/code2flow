@@ -12,6 +12,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+from code2llm.core.config import (
+    DEFAULT_PNG_TIMEOUT,
+    DEFAULT_MERMAID_MAX_TEXT_SIZE,
+    DEFAULT_MERMAID_MAX_EDGES,
+)
+
 
 def validate_mermaid_file(mmd_path: Path) -> List[str]:
     """Validate Mermaid file and return list of errors."""
@@ -283,7 +289,7 @@ def _prepare_and_render(mmd_file: Path, output_dir: Path, timeout: int) -> bool:
 
 
 def generate_pngs(
-    input_dir: Path, output_dir: Path, timeout: int = 60, max_workers: int = 0
+    input_dir: Path, output_dir: Path, timeout: int = DEFAULT_PNG_TIMEOUT, max_workers: int = 0
 ) -> int:
     """Generate PNG files from all .mmd files in input_dir (parallel).
 
@@ -310,14 +316,14 @@ def generate_pngs(
 def _setup_puppeteer_config() -> tuple[int, int, Optional[str]]:
     """Setup puppeteer config file and return (max_text_size, max_edges, cfg_path)."""
     try:
-        max_text_size = int(os.getenv('CODE2FLOW_MERMAID_MAX_TEXT_SIZE', '2000000'))
+        max_text_size = int(os.getenv('CODE2FLOW_MERMAID_MAX_TEXT_SIZE', str(DEFAULT_MERMAID_MAX_TEXT_SIZE)))
     except Exception:
-        max_text_size = 2000000
+        max_text_size = DEFAULT_MERMAID_MAX_TEXT_SIZE
 
     try:
-        max_edges = int(os.getenv('CODE2FLOW_MERMAID_MAX_EDGES', '20000'))
+        max_edges = int(os.getenv('CODE2FLOW_MERMAID_MAX_EDGES', str(DEFAULT_MERMAID_MAX_EDGES)))
     except Exception:
-        max_edges = 20000
+        max_edges = DEFAULT_MERMAID_MAX_EDGES
 
     cfg_path: Optional[str] = None
     try:
@@ -406,7 +412,7 @@ def _run_mmdc_subprocess(
     return False
 
 
-def generate_single_png(mmd_file: Path, output_file: Path, timeout: int = 60) -> bool:
+def generate_single_png(mmd_file: Path, output_file: Path, timeout: int = DEFAULT_PNG_TIMEOUT) -> bool:
     """Generate PNG from single Mermaid file using available renderers."""
     # Create output directory
     output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -431,9 +437,9 @@ def generate_single_png(mmd_file: Path, output_file: Path, timeout: int = 60) ->
 def generate_with_puppeteer(
     mmd_file: Path,
     output_file: Path,
-    timeout: int = 60,
-    max_text_size: int = 2000000,
-    max_edges: int = 20000,
+    timeout: int = DEFAULT_PNG_TIMEOUT,
+    max_text_size: int = DEFAULT_MERMAID_MAX_TEXT_SIZE,
+    max_edges: int = DEFAULT_MERMAID_MAX_EDGES,
 ) -> bool:
     """Generate PNG using Puppeteer with HTML template."""
     try:

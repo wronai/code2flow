@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.5.123] - 2026-04-19
+
+### Other
+- Update code2llm/cli_commands.py
+- Update code2llm/cli_parser.py
+- Update code2llm/core/config.py
+- Update code2llm/core/lang/base.py
+- Update code2llm/generators/mermaid.py
+
 ## [0.5.122] - 2026-04-19
 
 ### Docs

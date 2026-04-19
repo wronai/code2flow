@@ -3,6 +3,12 @@
 import re
 from typing import Dict, List
 
+from code2llm.core.config import (
+    CC_LOW_THRESHOLD,
+    CC_MEDIUM_THRESHOLD,
+    CC_HIGH_THRESHOLD,
+)
+
 
 # Branching keywords per language family
 CC_PATTERNS = {
@@ -64,7 +70,11 @@ def calculate_complexity_regex(content: str, result: Dict,
             cc = 1
         else:
             cc = 1 + len(pattern.findall(body))
-        rank = 'A' if cc <= 5 else ('B' if cc <= 10 else ('C' if cc <= 20 else 'D'))
+        rank = (
+            'A' if cc <= CC_LOW_THRESHOLD
+            else ('B' if cc <= CC_MEDIUM_THRESHOLD
+                  else ('C' if cc <= CC_HIGH_THRESHOLD else 'D'))
+        )
         func_info.complexity = {
             'cyclomatic_complexity': cc,
             'cc_rank': rank,
