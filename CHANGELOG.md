@@ -1,5 +1,20 @@
 ## [Unreleased]
 
+## [0.5.126] - 2026-04-19
+
+### Other
+- Update code2llm/cli_exports/__init__.py
+- Update code2llm/cli_exports/orchestrator.py
+- Update code2llm/cli_exports/orchestrator_chunked.py
+- Update code2llm/cli_exports/orchestrator_constants.py
+- Update code2llm/cli_exports/orchestrator_handlers.py
+- Update code2llm/exporters/map/__init__.py
+- Update code2llm/exporters/map/alerts.py
+- Update code2llm/exporters/map/details.py
+- Update code2llm/exporters/map/header.py
+- Update code2llm/exporters/map/module_list.py
+- ... and 31 more files
+
 ## [0.5.125] - 2026-04-19
 
 ## [0.5.124] - 2026-04-19

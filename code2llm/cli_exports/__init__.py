@@ -27,6 +27,10 @@ from .orchestrator import (
     _export_single_project,
     _export_chunked_results,
 )
+from .orchestrator_chunked import (
+    _get_filtered_subprojects,
+    _process_subproject,
+)
 
 __all__ = [
     "_export_simple_formats",
@@ -45,4 +49,6 @@ __all__ = [
     "_run_exports",
     "_export_single_project",
     "_export_chunked_results",
+    "_get_filtered_subprojects",
+    "_process_subproject",
 ]

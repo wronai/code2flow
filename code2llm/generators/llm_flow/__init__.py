@@ -1,18 +1,19 @@
-"""LLM Flow generator — backward compatibility shim.
+"""LLM Flow generator package — create compact LLM-friendly app flow summaries.
 
-This module re-exports from the llm_flow package.
-Implementation has been split into:
-  - llm_flow/utils.py - YAML reading and helpers
-  - llm_flow/parsing.py - Label parsing
-  - llm_flow/nodes.py - Node collection and entrypoints
-  - llm_flow/analysis.py - Function scoring and call graph
-  - llm_flow/generator.py - Flow generation and rendering
-  - llm_flow/cli.py - Command-line interface
+This package provides:
+- utils: YAML reading and type coercion helpers
+- parsing: Label parsing for CALL/FUNC nodes
+- nodes: Node collection and entrypoint detection
+- analysis: Function scoring, summarization, and call graph
+- generator: Main flow generation and markdown rendering
+- cli: Command-line interface
+
+All public names are re-exported here for backward compatibility
+with the original llm_flow.py module structure.
 """
 
-# Re-export all public names from the new package
-from .llm_flow import (
-    # Utils
+# Utils
+from .utils import (
     _FUNC_LABEL_PREFIX,
     _CALL_LABEL_PREFIX,
     _strip_bom,
@@ -20,10 +21,16 @@ from .llm_flow import (
     _as_dict,
     _as_list,
     _shorten,
-    # Parsing
+)
+
+# Parsing
+from .parsing import (
     _parse_call_label,
     _parse_func_label,
-    # Nodes
+)
+
+# Nodes
+from .nodes import (
     _collect_nodes,
     _group_nodes_by_file,
     _is_entrypoint_file,
@@ -31,17 +38,26 @@ from .llm_flow import (
     _deduplicate_entrypoints,
     _collect_entrypoints,
     _collect_functions,
-    # Analysis
+)
+
+# Analysis
+from .analysis import (
     FuncSummary,
     _node_counts_by_function,
     _pick_relevant_functions,
     _summarize_functions,
     _build_call_graph,
     _reachable,
-    # Generator
+)
+
+# Generator
+from .generator import (
     generate_llm_flow,
     render_llm_flow_md,
-    # CLI
+)
+
+# CLI
+from .cli import (
     create_parser,
     main,
 )
@@ -80,8 +96,3 @@ __all__ = [
     'create_parser',
     'main',
 ]
-
-
-if __name__ == "__main__":
-    from .llm_flow import main
-    raise SystemExit(main())
