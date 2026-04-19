@@ -212,13 +212,45 @@ def parse_llm_task_text(text: str) -> Dict[str, Any]:
 
 
 def load_input(path: Path) -> Dict[str, Any]:
-    raw = path.read_text(encoding="utf-8")
+    """Load input file with detailed YAML/JSON error reporting."""
+    from yaml.scanner import ScannerError
+    from yaml.parser import ParserError
+
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise ValueError(f"Input file not found: {path}")
+    except Exception as e:
+        raise ValueError(f"Cannot read input file {path}: {e}")
+
     raw = _strip_bom(raw)
 
+    if not raw.strip():
+        raise ValueError(f"Input file is empty: {path}")
+
     if path.suffix.lower() in {".yaml", ".yml"}:
-        loaded = yaml.safe_load(raw) or {}
+        try:
+            loaded = yaml.safe_load(raw)
+        except ScannerError as e:
+            line = e.problem_mark.line + 1 if e.problem_mark else "?"
+            col = e.problem_mark.column if e.problem_mark else "?"
+            raise ValueError(
+                f"YAML syntax error at line {line}, column {col}: {e.problem}\n"
+                f"Hint: Check indentation in {path}")
+        except ParserError as e:
+            line = e.problem_mark.line + 1 if e.problem_mark else "?"
+            raise ValueError(
+                f"YAML parse error at line {line}: {e.problem}\n"
+                f"Hint: Verify YAML structure in {path}")
+        except Exception as e:
+            raise ValueError(f"YAML error in {path}: {e}")
+
+        if loaded is None:
+            raise ValueError(f"YAML file is null/empty: {path}")
         if not isinstance(loaded, dict):
-            raise ValueError("YAML input must be a mapping/object at top level")
+            raise ValueError(
+                f"YAML must be a mapping/object, got {type(loaded).__name__} in {path}\n"
+                f"Hint: File should start with 'key: value' pairs")
         return loaded
 
     if path.suffix.lower() == ".json":

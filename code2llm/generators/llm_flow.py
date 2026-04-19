@@ -21,11 +21,42 @@ def _strip_bom(text: str) -> str:
 
 
 def _safe_read_yaml(path: Path) -> Dict[str, Any]:
-    """Read YAML file safely, handling BOM and type validation."""
-    raw = _strip_bom(path.read_text(encoding="utf-8"))
-    loaded = yaml.safe_load(raw) or {}
+    """Read YAML file safely, handling BOM and type validation with detailed errors."""
+    from yaml.scanner import ScannerError
+    from yaml.parser import ParserError
+
+    try:
+        raw = _strip_bom(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        raise ValueError(f"File not found: {path}")
+    except Exception as e:
+        raise ValueError(f"Cannot read file {path}: {e}")
+
+    if not raw.strip():
+        raise ValueError(f"File is empty: {path}")
+
+    try:
+        loaded = yaml.safe_load(raw)
+    except ScannerError as e:
+        line = e.problem_mark.line + 1 if e.problem_mark else "?"
+        col = e.problem_mark.column if e.problem_mark else "?"
+        raise ValueError(
+            f"YAML syntax error in {path} at line {line}, column {col}: {e.problem}\n"
+            f"Hint: Check indentation, avoid tabs, watch special characters (:, -, #)")
+    except ParserError as e:
+        line = e.problem_mark.line + 1 if e.problem_mark else "?"
+        raise ValueError(
+            f"YAML parse error in {path} at line {line}: {e.problem}\n"
+            f"Hint: Verify structure - are you using list where dict expected?")
+    except Exception as e:
+        raise ValueError(f"YAML error in {path}: {e}")
+
+    if loaded is None:
+        raise ValueError(f"File is null/empty YAML: {path}")
     if not isinstance(loaded, dict):
-        raise ValueError("analysis.yaml must be a mapping at top-level")
+        raise ValueError(
+            f"Expected YAML mapping (dict), got {type(loaded).__name__} in {path}\n"
+            f"Hint: File must start with 'key: value' pairs, not a list")
     return loaded
 
 

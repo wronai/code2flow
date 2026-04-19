@@ -1,12 +1,12 @@
-# redup/duplication | 5 groups | 145f 25779L | 2026-04-19
+# redup/duplication | 5 groups | 145f 26147L | 2026-04-19
 
 SUMMARY:
   files_scanned: 145
-  total_lines:   25779
+  total_lines:   26147
   dup_groups:    5
   dup_fragments: 15
   saved_lines:   293
-  scan_ms:       5414
+  scan_ms:       5981
 
 HOTSPOTS[7] (files with most duplication):
   benchmarks/project_generator.py  dup=187L  groups=1  frags=4  (0.7%)

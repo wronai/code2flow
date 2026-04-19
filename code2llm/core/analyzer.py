@@ -52,6 +52,16 @@ class ProjectAnalyzer:
             print(f"  - Parallel: {self.config.performance.parallel_enabled}, Workers: {workers}")
 
         pcache, cached_results, files_to_analyze = self._load_from_persistent_cache(files, project_path)
+
+        # Watch mode: show what changed
+        if getattr(self.config, 'watch', False) and files_to_analyze:
+            print(f"\n👁️  Watch mode: {len(files_to_analyze)} files changed since last run:")
+            for fp, _ in files_to_analyze[:10]:
+                print(f"   • {Path(fp).name}")
+            if len(files_to_analyze) > 10:
+                print(f"   ... and {len(files_to_analyze) - 10} more")
+            print()
+
         fresh_results = self._run_analysis(files_to_analyze)
         self._store_to_persistent_cache(pcache, files_to_analyze, fresh_results)
 

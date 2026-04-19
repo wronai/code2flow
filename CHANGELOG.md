@@ -1,5 +1,25 @@
 ## [Unreleased]
 
+## [0.5.124] - 2026-04-19
+
+### Docs
+- Update docs/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update code2llm/cli_analysis.py
+- Update code2llm/cli_exports/orchestrator.py
+- Update code2llm/core/analyzer.py
+- Update code2llm/exporters/report_generators.py
+- Update code2llm/generators/llm_flow.py
+- Update code2llm/generators/llm_task.py
+- Update demo_langs/valid/sample.py
+- Update examples/functional_refactoring/__init__.py
+- Update examples/functional_refactoring/cache.py
+- Update examples/functional_refactoring/cli.py
+- ... and 12 more files
+
 ## [0.5.123] - 2026-04-19
 
 ### Other

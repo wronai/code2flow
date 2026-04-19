@@ -42,6 +42,18 @@ FORMAT_FILENAMES: Dict[str, str] = {
     'project-yaml': 'project.yaml',
 }
 
+# Files produced per format in dry-run preview
+FORMAT_DRY_RUN_FILES: Dict[str, List[str]] = {
+    'toon':      ['analysis.toon'],
+    'map':       ['map.toon.yaml'],
+    'evolution': ['evolution.toon.yaml'],
+    'context':   ['context.md'],
+    'mermaid':   ['calls.mmd', 'calls.png'],
+    'yaml':      ['analysis.yaml'],
+    'json':      ['analysis.json'],
+    'readme':    ['README.md'],
+}
+
 # Human-readable labels
 FORMAT_LABELS: Dict[str, str] = {
     'toon': 'TOON (diagnostics)',
@@ -69,6 +81,41 @@ def _build_export_config(args, formats: List[str]) -> Dict[str, Any]:
     }
 
 
+def _collect_dry_run_files(formats: List[str], output_dir: Path) -> List[Path]:
+    """Return the list of files that would be written for the given formats."""
+    output_files: List[Path] = []
+    for fmt in formats:
+        for name in FORMAT_DRY_RUN_FILES.get(fmt, []):
+            output_files.append(output_dir / name)
+    output_files.append(output_dir / 'project.toon.yaml')
+    output_files.append(output_dir / 'prompt.txt')
+    return output_files
+
+
+def _show_dry_run_plan(formats: List[str], output_dir: Path, is_chunked: bool, result) -> None:
+    """Display what would be exported in dry-run mode."""
+    print("\n📋 DRY-RUN: Would export the following:\n")
+
+    output_files = _collect_dry_run_files(formats, output_dir)
+
+    size_hint = ""
+    func_count = len(getattr(result, 'functions', []))
+    if func_count > 0:
+        size_hint = f" (~{func_count * 50 // 1024}KB est.)"
+
+    for f in sorted(set(output_files)):
+        print(f"  📄 {f}{size_hint}")
+
+    stats = getattr(result, 'stats', {})
+    if stats:
+        print(f"\n📊 Based on analysis:")
+        print(f"  - Functions: {stats.get('functions_found', 'N/A')}")
+        print(f"  - Classes: {stats.get('classes_found', 'N/A')}")
+        print(f"  - Files: {stats.get('files_processed', 'N/A')}")
+
+    print(f"\n✅ Dry-run complete. Use without --dry-run to export.\n")
+
+
 def _run_exports(args, result, output_dir: Path, source_path: Optional[Path] = None):
     """Export analysis results in requested formats.
 
@@ -79,6 +126,12 @@ def _run_exports(args, result, output_dir: Path, source_path: Optional[Path] = N
     requested_formats = [f.strip() for f in args.format.split(',')]
     formats = _expand_all_formats(requested_formats, getattr(args, 'png', False))
     is_chunked = getattr(args, 'chunk', False)
+    dry_run = getattr(args, 'dry_run', False)
+
+    # Dry-run: show what would be exported without writing
+    if dry_run:
+        _show_dry_run_plan(formats, output_dir, is_chunked, result)
+        return
 
     # Skip cache for chunked or when explicitly disabled
     skip_cache = is_chunked or getattr(args, 'no_cache', False)

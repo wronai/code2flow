@@ -84,6 +84,10 @@ def _build_config(args, output_dir: Path):
     # Persistent cache flags (read via getattr with defaults in analyzer.py)
     no_cache = getattr(args, 'no_cache', False) or getattr(args, 'force', False)
     config.no_cache = no_cache
+    # Watch mode for auto-detecting changed files
+    config.watch = getattr(args, 'watch', False)
+    # Dry-run mode (handled in orchestrator, but stored for reference)
+    config.dry_run = getattr(args, 'dry_run', False)
     return config
 
 

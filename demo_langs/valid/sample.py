@@ -26,6 +26,19 @@ class UserService:
         for user in self.users:
             print(f"User: {user.name}")
 
+    def list_users(self) -> List[User]:
+        return list(self.users)
+
+    def remove_user(self, user_id: int) -> bool:
+        for i, user in enumerate(self.users):
+            if user.id == user_id:
+                del self.users[i]
+                return True
+        return False
+
+    def count(self) -> int:
+        return len(self.users)
+
 
 def main():
     service = UserService()

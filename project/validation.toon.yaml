@@ -6,7 +6,7 @@ SUMMARY:
 WARNINGS[4]{path,score}:
   code2llm/cli_parser.py,0.97
     issues[1]{rule,severity,message,line}:
-      complexity.lizard_length,warning,create_parser: 252 lines exceeds limit 100,19
+      complexity.lizard_length,warning,create_parser: 262 lines exceeds limit 100,19
   code2llm/analysis/data_analysis.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 11.3 (threshold: 20),
@@ -15,7 +15,7 @@ WARNINGS[4]{path,score}:
       complexity.maintainability,warning,Low maintainability index: 10.0 (threshold: 20),
   code2llm/generators/llm_flow.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 15.7 (threshold: 20),
+      complexity.maintainability,warning,Low maintainability index: 13.6 (threshold: 20),
 
 ERRORS[30]{path,score}:
   demo_langs/invalid/sample_bad.go,0.00

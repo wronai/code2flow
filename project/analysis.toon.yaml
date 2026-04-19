@@ -1,53 +1,55 @@
-# code2llm | 164f 26463L | python:145,shell:3,typescript:1,java:1 | 2026-04-19
-# CC̄=3.9 | critical:0/1168 | dups:1 | cycles:0
+# code2llm | 164f 26709L | python:146,shell:3,go:1 | 2026-04-19
+# CC̄=3.9 | critical:1/1176 | dups:1 | cycles:0
 
-HEALTH[2]:
+HEALTH[3]:
   🔴 DUP   1 classes duplicated
   🔴 GOD   examples/functional_refactoring_example.py = 644L, 15 classes, 50m, max CC=6
+  🟡 CC    _show_dry_run_plan CC=15 (limit:15)
 
-REFACTOR[2]:
+REFACTOR[3]:
   1. rm duplicates  (-1 dup classes)
   2. split examples/functional_refactoring_example.py  (god module)
+  3. split 1 high-CC methods  (CC>15)
 
-PIPELINES[758]:
-  [1] Src [NewUserService]: NewUserService
+PIPELINES[759]:
+  [1] Src [processUsers]: processUsers → getName
       PURITY: 100% pure
-  [2] Src [AddUser]: AddUser
+  [2] Src [service]: service → addUser
       PURITY: 100% pure
-  [3] Src [GetUser]: GetUser
+  [3] Src [NewUserService]: NewUserService
       PURITY: 100% pure
-  [4] Src [ProcessUsers]: ProcessUsers
+  [4] Src [AddUser]: AddUser
       PURITY: 100% pure
-  [5] Src [main]: main
+  [5] Src [GetUser]: GetUser
       PURITY: 100% pure
 
 LAYERS:
-  code2llm/                       CC̄=4.2    ←in:0  →out:8  !! split
+  code2llm/                       CC̄=4.3    ←in:0  →out:8  !! split
   │ !! renderer                   637L  1C    1m  CC=1      ←0
+  │ !! mermaid                    512L  0C   21m  CC=12     ←2
   │ readme_exporter            499L  1C    7m  CC=13     ←0
   │ mermaid_exporter           492L  1C   23m  CC=13     ←0
-  │ mermaid                    492L  0C   20m  CC=12     ←2
+  │ !! orchestrator               491L  0C   20m  CC=15     ←1
   │ large_repo                 488L  2C   20m  CC=9      ←1
   │ llm_flow                   476L  1C   23m  CC=14     ←0
   │ prompt                     475L  0C   18m  CC=14     ←1
   │ evolution_exporter         473L  1C   17m  CC=11     ←8
   │ renderer                   471L  1C   26m  CC=11     ←0
-  │ base                       454L  0C   14m  CC=14     ←8
-  │ analyzer                   433L  1C   19m  CC=11     ←0
+  │ base                       464L  0C   14m  CC=14     ←8
+  │ analyzer                   432L  1C   20m  CC=11     ←0
   │ map_exporter               432L  1C   24m  CC=13     ←5
-  │ file_analyzer              396L  1C   18m  CC=12     ←0
+  │ file_analyzer              392L  1C   18m  CC=12     ←0
   │ pipeline                   388L  3C   20m  CC=10     ←0
   │ flow_exporter              385L  1C   14m  CC=10     ←0
   │ data_analysis              375L  3C   28m  CC=14     ←0
   │ pipeline_detector          362L  3C    9m  CC=13     ←0
   │ dashboard_renderer         342L  1C    4m  CC=6      ←0
-  │ orchestrator               337L  0C   16m  CC=10     ←1
   │ yaml_exporter              335L  1C   24m  CC=8      ←0
+  │ cli_parser                 327L  0C    2m  CC=2      ←1
   │ cli_analysis               327L  0C   11m  CC=14     ←1
   │ entity_resolution          326L  3C   16m  CC=13     ←0
   │ persistent_cache           322L  1C   18m  CC=10     ←1
-  │ cli_commands               316L  0C   13m  CC=12     ←1
-  │ cli_parser                 315L  0C    2m  CC=2      ←1
+  │ cli_commands               317L  0C   13m  CC=12     ←1
   │ formats                    315L  0C   16m  CC=13     ←3
   │ metrics_core               305L  1C   16m  CC=12     ←0
   │ intent_matching            297L  3C   15m  CC=7      ←0
@@ -55,24 +57,24 @@ LAYERS:
   │ type_inference             290L  1C   17m  CC=9      ←0
   │ cfg                        280L  1C   16m  CC=5      ←0
   │ llm_task                   277L  0C   14m  CC=14     ←0
+  │ config                     269L  6C    2m  CC=3      ←0
   │ toon_size_manager          265L  0C    8m  CC=10     ←1
   │ mermaid_flow_helpers       262L  0C   12m  CC=10     ←1
   │ context_exporter           250L  1C   15m  CC=10     ←0
   │ dfg                        219L  1C   12m  CC=7      ←0
-  │ config                     211L  6C    0m  CC=0.0    ←0
   │ scanner                    201L  1C    6m  CC=14     ←0
   │ __init__                   199L  1C   11m  CC=9      ←0
   │ call_graph                 198L  1C   12m  CC=9      ←0
-  │ refactoring                196L  1C   11m  CC=9      ←0
-  │ models                     194L  11C    6m  CC=8      ←0
+  │ refactoring                195L  1C   11m  CC=9      ←0
+  │ models                     193L  11C    6m  CC=8      ←0
   │ smells                     192L  1C    9m  CC=7      ←0
   │ flow_renderer              188L  1C    6m  CC=14     ←0
   │ streaming_analyzer         181L  1C    6m  CC=12     ←0
   │ ts_extractors              180L  0C    5m  CC=7      ←2
   │ repo_files                 174L  0C    8m  CC=8      ←1
-  │ config                     174L  5C    2m  CC=1      ←0
   │ base                       174L  2C    8m  CC=2      ←1
-  │ __init__                   173L  1C    5m  CC=1      ←0
+  │ config                     174L  5C    2m  CC=1      ←0
+  │ __init__                   171L  1C    5m  CC=1      ←0
   │ detector                   168L  1C    8m  CC=9      ←0
   │ ruby                       164L  1C    4m  CC=14     ←1
   │ dashboard_data             163L  1C    9m  CC=7      ←0
@@ -198,11 +200,11 @@ LAYERS:
   │ sample.php                  44L  1C    1m  CC=1      ←0
   │ sample                      40L  2C    5m  CC=3      ←0
   │ sample.ts                   26L  1C    1m  CC=1      ←0
-  │ sample_bad.go               24L  0C    2m  CC=1      ←0
+  │ sample_bad.go               24L  1C    3m  CC=1      ←0
   │ sample_bad.php              22L  1C    1m  CC=1      ←0
-  │ sample_bad.ts               20L  2C    3m  CC=1      ←0
+  │ sample_bad.ts               20L  1C    3m  CC=1      ←0
+  │ sample_bad.rs               18L  1C    1m  CC=1      ←0
   │ sample_bad.java             18L  1C    1m  CC=1      ←0
-  │ sample_bad.rs               18L  1C    2m  CC=1      ←0
   │
   ── zero ──
      code2llm/patterns/__init__.py             0L
@@ -225,8 +227,8 @@ COUPLING:
   CYCLES: none
   HUB: code2llm.core/ (fan-in=9)
   HUB: code2llm.exporters/ (fan-in=8)
-  SMELL: code2llm/ fan-out=8 → split needed
   SMELL: code2llm.cli_exports/ fan-out=11 → split needed
+  SMELL: code2llm/ fan-out=8 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
