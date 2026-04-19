@@ -1,5 +1,19 @@
 ## [Unreleased]
 
+## [0.5.128] - 2026-04-19
+
+### Docs
+- Update redsl_refactor_plan.md
+- Update redsl_refactor_report.md
+
+### Other
+- Update code2llm/cli_exports/orchestrator.py
+- Update code2llm/core/file_filter.py
+- Update code2llm/exporters/flow_constants.py
+- Update planfile.yaml
+- Update redsl_refactor_plan.toon.yaml
+- Update redsl_refactor_report.toon.yaml
+
 ## [0.5.127] - 2026-04-19
 
 ### Other

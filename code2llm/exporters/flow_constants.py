@@ -13,6 +13,10 @@ EXCLUDE_PATTERNS = {
     'venv', '.venv', 'env', '.env', 'publish-env', 'test-env',
     'site-packages', 'node_modules', '__pycache__', '.git',
     'dist', 'build', 'egg-info', '.tox', '.mypy_cache',
+    # Backup directories that often contain nested venvs
+    '.algitex', '.backup', 'backups', '.bak',
+    # Additional venv patterns  
+    'virtualenv', '.virtualenv', 'envs', '.envs',
 }
 
 def is_excluded_path(path: str) -> bool:

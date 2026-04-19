@@ -1,0 +1,18 @@
+# redsl | refactor | 2026-04-19
+# mode=dry-run | files=145 | lines=24326
+# CC̄=17.0 | critical=1 | decisions=1
+
+STATUS[planned]
+
+DECISIONS[1]:
+  1. extract_functions → code2llm/core/analyzer.py (score=1.27) Funkcja o CC > 15 — rozbij na mniejsze
+
+METRICS[6]:
+  🟢 project_yaml_exporter::None CC=0 LOC=15
+  🟢 validate_toon::None CC=7 LOC=390
+  🟢 orchestrator.sh::None CC=0 LOC=58
+  🟢 project.sh::None CC=0 LOC=49
+  🟢 project2.sh::None CC=0 LOC=35
+  🔴 code2llm/core/analyzer.py::analyze_project CC=27 LOC=0
+
+LOG: /home/tom/github/semcod/code2llm/logs/redsl_20260419_193258.log

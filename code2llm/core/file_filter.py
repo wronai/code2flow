@@ -19,6 +19,12 @@ _SKIP_DIR_NAMES = frozenset({
     'lib', 'lib64', 'site-packages', 'include', 'bin', 'share',
     '.code2llm_cache',
     'tests', 'test',
+    # Backup and auto-generated directories that often contain venvs
+    '.algitex', '.backup', 'backups', '.bak', 'bak',
+    # Additional venv patterns
+    'virtualenv', '.virtualenv', 'envs', '.envs', 'venv-', '.venv-',
+    # CI/CD and deployment artifacts
+    '.terraform', '.serverless', '.netlify', '.vercel',
 })
 
 

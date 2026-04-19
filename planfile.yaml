@@ -17,7 +17,7 @@ tasks:
   title: 'reduce_complexity: readme_exporter (CC=13)'
   description: Module 'readme_exporter' has cyclomatic complexity CC=13 (499 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/readme_exporter.py
+  file: code2llm/exporters/readme_exporter.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -32,7 +32,7 @@ tasks:
   title: 'reduce_complexity: mermaid_exporter (CC=13)'
   description: Module 'mermaid_exporter' has cyclomatic complexity CC=13 (492 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/mermaid_exporter.py
+  file: code2llm/exporters/mermaid_exporter.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -47,7 +47,7 @@ tasks:
   title: 'reduce_complexity: llm_flow (CC=14)'
   description: Module 'llm_flow' has cyclomatic complexity CC=14 (476 lines, 1 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/llm_flow.py
+  file: code2llm/generators/llm_flow.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -62,7 +62,7 @@ tasks:
   title: 'reduce_complexity: prompt (CC=14)'
   description: Module 'prompt' has cyclomatic complexity CC=14 (475 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/prompt.py
+  file: code2llm/cli_exports/prompt.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -77,7 +77,7 @@ tasks:
   title: 'reduce_complexity: evolution_exporter (CC=11)'
   description: Module 'evolution_exporter' has cyclomatic complexity CC=11 (473 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/evolution_exporter.py
+  file: code2llm/exporters/evolution_exporter.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -92,7 +92,7 @@ tasks:
   title: 'reduce_complexity: renderer (CC=11)'
   description: Module 'renderer' has cyclomatic complexity CC=11 (471 lines, 1 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/renderer.py
+  file: code2llm/exporters/toon/renderer.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -107,7 +107,7 @@ tasks:
   title: 'reduce_complexity: base (CC=14)'
   description: Module 'base' has cyclomatic complexity CC=14 (464 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/base.py
+  file: code2llm/exporters/base.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -122,7 +122,7 @@ tasks:
   title: 'reduce_complexity: analyzer (CC=11)'
   description: Module 'analyzer' has cyclomatic complexity CC=11 (432 lines, 1 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/analyzer.py
+  file: code2llm/core/analyzer.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -137,7 +137,7 @@ tasks:
   title: 'reduce_complexity: map_exporter (CC=13)'
   description: Module 'map_exporter' has cyclomatic complexity CC=13 (432 lines, 1
     complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/map_exporter.py
+  file: code2llm/exporters/map_exporter.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -152,7 +152,7 @@ tasks:
   title: 'reduce_complexity: file_analyzer (CC=12)'
   description: Module 'file_analyzer' has cyclomatic complexity CC=12 (392 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/file_analyzer.py
+  file: code2llm/core/file_analyzer.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -167,7 +167,7 @@ tasks:
   title: 'reduce_complexity: pipeline (CC=10)'
   description: Module 'pipeline' has cyclomatic complexity CC=10 (388 lines, 3 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/pipeline.py
+  file: code2llm/nlp/pipeline.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -182,7 +182,7 @@ tasks:
   title: 'reduce_complexity: flow_exporter (CC=10)'
   description: Module 'flow_exporter' has cyclomatic complexity CC=10 (385 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/flow_exporter.py
+  file: code2llm/exporters/flow_exporter.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -197,7 +197,7 @@ tasks:
   title: 'reduce_complexity: data_analysis (CC=14)'
   description: Module 'data_analysis' has cyclomatic complexity CC=14 (375 lines,
     3 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/data_analysis.py
+  file: code2llm/analysis/data_analysis.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -212,7 +212,7 @@ tasks:
   title: 'reduce_complexity: pipeline_detector (CC=13)'
   description: Module 'pipeline_detector' has cyclomatic complexity CC=13 (362 lines,
     3 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/pipeline_detector.py
+  file: code2llm/analysis/pipeline_detector.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -242,7 +242,7 @@ tasks:
   title: 'reduce_complexity: entity_resolution (CC=13)'
   description: Module 'entity_resolution' has cyclomatic complexity CC=13 (326 lines,
     3 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/entity_resolution.py
+  file: code2llm/nlp/entity_resolution.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -257,7 +257,7 @@ tasks:
   title: 'reduce_complexity: persistent_cache (CC=10)'
   description: Module 'persistent_cache' has cyclomatic complexity CC=10 (322 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/persistent_cache.py
+  file: code2llm/core/persistent_cache.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -287,7 +287,7 @@ tasks:
   title: 'reduce_complexity: formats (CC=13)'
   description: Module 'formats' has cyclomatic complexity CC=13 (315 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/formats.py
+  file: code2llm/cli_exports/formats.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -302,7 +302,7 @@ tasks:
   title: 'reduce_complexity: metrics_core (CC=12)'
   description: Module 'metrics_core' has cyclomatic complexity CC=12 (305 lines, 1
     complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/metrics_core.py
+  file: code2llm/exporters/toon/metrics_core.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -317,7 +317,7 @@ tasks:
   title: 'reduce_complexity: side_effects (CC=14)'
   description: Module 'side_effects' has cyclomatic complexity CC=14 (294 lines, 2
     complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/side_effects.py
+  file: code2llm/analysis/side_effects.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -332,7 +332,7 @@ tasks:
   title: 'reduce_complexity: llm_task (CC=14)'
   description: Module 'llm_task' has cyclomatic complexity CC=14 (277 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/llm_task.py
+  file: code2llm/generators/llm_task.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -347,7 +347,7 @@ tasks:
   title: 'reduce_complexity: toon_size_manager (CC=10)'
   description: Module 'toon_size_manager' has cyclomatic complexity CC=10 (265 lines,
     0 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/toon_size_manager.py
+  file: code2llm/core/toon_size_manager.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -362,7 +362,7 @@ tasks:
   title: 'reduce_complexity: mermaid_flow_helpers (CC=10)'
   description: Module 'mermaid_flow_helpers' has cyclomatic complexity CC=10 (262
     lines, 0 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/mermaid_flow_helpers.py
+  file: code2llm/exporters/mermaid_flow_helpers.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -377,7 +377,7 @@ tasks:
   title: 'reduce_complexity: context_exporter (CC=10)'
   description: Module 'context_exporter' has cyclomatic complexity CC=10 (250 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/context_exporter.py
+  file: code2llm/exporters/context_exporter.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -392,7 +392,7 @@ tasks:
   title: 'reduce_complexity: scanner (CC=14)'
   description: Module 'scanner' has cyclomatic complexity CC=14 (201 lines, 1 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/scanner.py
+  file: code2llm/exporters/index_generator/scanner.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -407,7 +407,7 @@ tasks:
   title: 'reduce_complexity: flow_renderer (CC=14)'
   description: Module 'flow_renderer' has cyclomatic complexity CC=14 (188 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/flow_renderer.py
+  file: code2llm/exporters/flow_renderer.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -422,7 +422,7 @@ tasks:
   title: 'reduce_complexity: streaming_analyzer (CC=12)'
   description: Module 'streaming_analyzer' has cyclomatic complexity CC=12 (181 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/streaming_analyzer.py
+  file: code2llm/core/streaming_analyzer.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -437,7 +437,7 @@ tasks:
   title: 'reduce_complexity: ruby (CC=14)'
   description: Module 'ruby' has cyclomatic complexity CC=14 (164 lines, 1 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/ruby.py
+  file: code2llm/core/lang/ruby.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -452,7 +452,7 @@ tasks:
   title: 'reduce_complexity: modules (CC=11)'
   description: Module 'modules' has cyclomatic complexity CC=11 (151 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/modules.py
+  file: code2llm/exporters/project_yaml/modules.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -467,7 +467,7 @@ tasks:
   title: 'reduce_complexity: prompt_engine (CC=12)'
   description: Module 'prompt_engine' has cyclomatic complexity CC=12 (150 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/prompt_engine.py
+  file: code2llm/refactor/prompt_engine.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -482,7 +482,7 @@ tasks:
   title: 'reduce_complexity: context_view (CC=11)'
   description: Module 'context_view' has cyclomatic complexity CC=11 (136 lines, 1
     complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/context_view.py
+  file: code2llm/exporters/context_view.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -497,7 +497,7 @@ tasks:
   title: 'reduce_complexity: core (CC=12)'
   description: Module 'core' has cyclomatic complexity CC=12 (120 lines, 1 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/core.py
+  file: code2llm/exporters/project_yaml/core.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -512,7 +512,7 @@ tasks:
   title: 'reduce_complexity: validate_project (CC=11)'
   description: Module 'validate_project' has cyclomatic complexity CC=11 (118 lines,
     0 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/validate_project.py
+  file: code2llm/exporters/validate_project.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -527,7 +527,7 @@ tasks:
   title: 'reduce_complexity: hotspots (CC=13)'
   description: Module 'hotspots' has cyclomatic complexity CC=13 (106 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/hotspots.py
+  file: code2llm/exporters/project_yaml/hotspots.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -542,7 +542,7 @@ tasks:
   title: 'reduce_complexity: health (CC=13)'
   description: Module 'health' has cyclomatic complexity CC=13 (103 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/health.py
+  file: code2llm/exporters/project_yaml/health.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -557,7 +557,7 @@ tasks:
   title: 'reduce_complexity: go_lang (CC=10)'
   description: Module 'go_lang' has cyclomatic complexity CC=10 (102 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/go_lang.py
+  file: code2llm/core/lang/go_lang.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -572,7 +572,7 @@ tasks:
   title: 'reduce_complexity: pipeline_resolver (CC=10)'
   description: Module 'pipeline_resolver' has cyclomatic complexity CC=10 (91 lines,
     1 complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/pipeline_resolver.py
+  file: code2llm/analysis/pipeline_resolver.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -587,7 +587,7 @@ tasks:
   title: 'reduce_complexity: generic (CC=12)'
   description: Module 'generic' has cyclomatic complexity CC=12 (71 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/generic.py
+  file: code2llm/core/lang/generic.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -712,7 +712,7 @@ tasks:
   title: 'reduce_complexity: mermaid (CC=13)'
   description: Module 'mermaid' has cyclomatic complexity CC=13 (484 lines, 0 complex
     functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/mermaid.py
+  file: code2llm/generators/mermaid.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -727,7 +727,7 @@ tasks:
   title: 'reduce_complexity: orchestrator (CC=10)'
   description: Module 'orchestrator' has cyclomatic complexity CC=10 (337 lines, 0
     complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/orchestrator.py
+  file: code2llm/cli_exports/orchestrator.py
   action: reduce_complexity
   priority: 3
   effort: medium
@@ -742,7 +742,7 @@ tasks:
   title: 'reduce_complexity: file_filter (CC=14)'
   description: Module 'file_filter' has cyclomatic complexity CC=14 (100 lines, 1
     complex functions). Apply guard clauses, extract helpers, reduce nesting.
-  file: code2llm/file_filter.py
+  file: code2llm/core/file_filter.py
   action: reduce_complexity
   priority: 3
   effort: medium

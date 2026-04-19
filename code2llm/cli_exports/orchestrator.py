@@ -189,9 +189,7 @@ def _expand_all_formats(requested: List[str], include_png: bool = False) -> List
     """Expand 'all' to concrete format list."""
     if 'all' not in requested:
         return requested[:]
-    formats = ['toon', 'map', 'context', 'evolution']
-    if include_png:
-        formats.append('mermaid')
+    formats = ['toon', 'map', 'context', 'evolution', 'mermaid']
     return formats
 
 
