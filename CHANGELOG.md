@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.5.119] - 2026-04-19
+
+### Other
+- Update code2llm/exporters/index_generator.py
+- Update code2llm/exporters/index_generator/__init__.py
+- Update code2llm/exporters/index_generator/renderer.py
+- Update code2llm/exporters/index_generator/scanner.py
+
 ## [0.5.118] - 2026-04-19
 
 ### Docs
