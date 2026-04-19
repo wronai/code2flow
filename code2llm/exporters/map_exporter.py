@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .base import BaseExporter, export_format
+from .flow_constants import is_excluded_path
 from code2llm.core.models import AnalysisResult, FunctionInfo, ClassInfo, ModuleInfo
 from code2llm.core.config import LANGUAGE_EXTENSIONS
 from typing import Optional
@@ -315,15 +316,7 @@ class MapExporter(BaseExporter):
         return f"{fi.name}({args_str}){ret}"
 
     def _is_excluded(self, path: str) -> bool:
-        if not path:
-            return False
-        path_lower = path.lower().replace('\\', '/')
-        for pattern in EXCLUDE_PATTERNS:
-            if f'/{pattern}/' in path_lower or path_lower.startswith(f'{pattern}/'):
-                return True
-            if pattern in path_lower.split('/'):
-                return True
-        return False
+        return is_excluded_path(path)
 
     def _rel_path(self, fpath: str, project_path: str) -> str:
         if not project_path or not fpath:

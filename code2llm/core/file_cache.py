@@ -9,6 +9,12 @@ from typing import Any, Optional, Tuple
 import ast
 
 
+def make_cache_key(file_path: str, content: str) -> str:
+    """Generate a cache key from file stem and MD5 of content."""
+    content_hash = hashlib.md5(content.encode()).hexdigest()[:16]
+    return f"{Path(file_path).stem}_{content_hash}"
+
+
 class FileCache:
     """Cache for parsed AST files."""
     
@@ -26,9 +32,7 @@ class FileCache:
             return f"{Path(file_path).stem}_unknown"
 
     def _get_cache_key(self, file_path: str, content: str) -> str:
-        """Generate cache key from file path and content hash (legacy)."""
-        content_hash = hashlib.md5(content.encode()).hexdigest()[:16]
-        return f"{Path(file_path).stem}_{content_hash}"
+        return make_cache_key(file_path, content)
     
     def _get_cache_path(self, cache_key: str) -> Path:
         """Get cache file path."""

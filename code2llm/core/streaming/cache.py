@@ -1,9 +1,10 @@
 """Memory-efficient streaming cache with LRU eviction."""
 
 import ast
-import hashlib
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+from code2llm.core.file_cache import make_cache_key
 
 
 class StreamingFileCache:
@@ -17,9 +18,7 @@ class StreamingFileCache:
         self._access_order: List[str] = []
     
     def _get_cache_key(self, file_path: str, content: str) -> str:
-        """Generate cache key."""
-        content_hash = hashlib.md5(content.encode()).hexdigest()[:16]
-        return f"{Path(file_path).stem}_{content_hash}"
+        return make_cache_key(file_path, content)
     
     def _evict_if_needed(self) -> None:
         """Evict oldest entries if cache is full."""

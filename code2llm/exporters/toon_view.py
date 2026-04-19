@@ -7,6 +7,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
 
+from code2llm.exporters.base import ViewGeneratorMixin
+
 # Language detection from file extensions
 _LANG_EXT_MAP = {
     '.py': 'python', '.ts': 'typescript', '.tsx': 'typescript',
@@ -21,14 +23,8 @@ _LANG_EXT_MAP = {
 }
 
 
-class ToonViewGenerator:
+class ToonViewGenerator(ViewGeneratorMixin):
     """Generate project.toon.yaml from project.yaml data."""
-
-    def generate(self, data: Dict[str, Any], output_path: str) -> None:
-        lines = self._render(data)
-        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
 
     def _render(self, data: Dict[str, Any]) -> List[str]:
         proj = data.get("project", {})

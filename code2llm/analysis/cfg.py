@@ -6,7 +6,7 @@ from typing import Optional
 
 from code2llm.core.config import Config
 from code2llm.core.models import AnalysisResult, FlowNode, FlowEdge, FunctionInfo
-from code2llm.analysis.utils import ast_unparse
+from code2llm.analysis.utils import ast_unparse, qualified_name
 
 
 class CFGExtractor(ast.NodeVisitor):
@@ -261,12 +261,7 @@ class CFGExtractor(ast.NodeVisitor):
             self.generic_visit(node)
             
     def _qualified_name(self, name: str) -> str:
-        """Get fully qualified name."""
-        parts = [self.module_name]
-        if self.class_stack:
-            parts.append(self.class_stack[-1])
-        parts.append(name)
-        return '.'.join(parts)
+        return qualified_name(self.module_name, self.class_stack, name)
         
     def _extract_condition(self, node: ast.AST) -> str:
         """Extract condition as string."""

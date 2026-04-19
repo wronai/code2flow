@@ -5,7 +5,7 @@ from typing import Optional, Set, List, Dict
 
 from code2llm.core.config import Config
 from code2llm.core.models import AnalysisResult, FlowEdge
-from code2llm.analysis.utils import ast_unparse
+from code2llm.analysis.utils import ast_unparse, qualified_name
 
 
 class CallGraphExtractor(ast.NodeVisitor):
@@ -140,12 +140,7 @@ class CallGraphExtractor(ast.NodeVisitor):
         self.generic_visit(node)
         
     def _qualified_name(self, name: str) -> str:
-        """Get fully qualified name."""
-        parts = [self.module_name]
-        if self.class_stack:
-            parts.append(self.class_stack[-1])
-        parts.append(name)
-        return '.'.join(parts)
+        return qualified_name(self.module_name, self.class_stack, name)
         
     def _resolve_call(self, node: ast.AST) -> Optional[str]:
         """Resolve a call to its full name."""

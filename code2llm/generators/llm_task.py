@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
+from ._utils import dump_yaml
+
 
 def _strip_bom(text: str) -> str:
     return text[1:] if text.startswith("\ufeff") else text
@@ -229,15 +231,6 @@ def load_input(path: Path) -> Dict[str, Any]:
 
     return parse_llm_task_text(raw)
 
-
-def dump_yaml(data: Dict[str, Any]) -> str:
-    return yaml.safe_dump(
-        data,
-        sort_keys=False,
-        allow_unicode=True,
-        width=100,
-        default_flow_style=False,
-    )
 
 
 def create_parser() -> argparse.ArgumentParser:

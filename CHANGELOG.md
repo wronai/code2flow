@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+## [0.5.118] - 2026-04-19
+
+### Docs
+- Update docs/README.md
+- Update project/README.md
+
+### Other
+- Update code2llm/analysis/call_graph.py
+- Update code2llm/analysis/cfg.py
+- Update code2llm/analysis/data_analysis.py
+- Update code2llm/analysis/utils/__init__.py
+- Update code2llm/analysis/utils/ast_helpers.py
+- Update code2llm/core/file_cache.py
+- Update code2llm/core/streaming/cache.py
+- Update code2llm/exporters/article_view.py
+- Update code2llm/exporters/base.py
+- Update code2llm/exporters/context_view.py
+- ... and 18 more files
+
 ## [0.5.117] - 2026-04-19
 
 ### Other

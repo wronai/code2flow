@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .base import BaseExporter, export_format
-from .flow_constants import CC_HIGH, FAN_OUT_THRESHOLD, EXCLUDE_PATTERNS, HUB_SPLIT_RECOMMENDATIONS, HUB_TYPE_THRESHOLD
+from .flow_constants import CC_HIGH, FAN_OUT_THRESHOLD, EXCLUDE_PATTERNS, HUB_SPLIT_RECOMMENDATIONS, HUB_TYPE_THRESHOLD, is_excluded_path
 from .flow_renderer import FlowRenderer
 from code2llm.core.models import (
     AnalysisResult, FunctionInfo, ClassInfo, ModuleInfo, FlowNode
@@ -382,12 +382,4 @@ class FlowExporter(BaseExporter):
     # utility helpers
     # ------------------------------------------------------------------
     def _is_excluded(self, path: str) -> bool:
-        if not path:
-            return False
-        path_lower = path.lower().replace('\\', '/')
-        for pattern in EXCLUDE_PATTERNS:
-            if f'/{pattern}/' in path_lower or path_lower.startswith(f'{pattern}/'):
-                return True
-            if pattern in path_lower.split('/'):
-                return True
-        return False
+        return is_excluded_path(path)

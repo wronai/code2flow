@@ -8,6 +8,8 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 import yaml
 
+from ._utils import dump_yaml
+
 
 _FUNC_LABEL_PREFIX = "FUNC:"
 _CALL_LABEL_PREFIX = "CALL "
@@ -401,15 +403,6 @@ def render_llm_flow_md(flow: Dict[str, Any]) -> str:
 
     return "\n".join(lines).rstrip() + "\n"
 
-
-def dump_yaml(data: Dict[str, Any]) -> str:
-    return yaml.safe_dump(
-        data,
-        sort_keys=False,
-        allow_unicode=True,
-        width=100,
-        default_flow_style=False,
-    )
 
 
 def create_parser() -> argparse.ArgumentParser:

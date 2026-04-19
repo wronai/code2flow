@@ -1,26 +1,26 @@
-# vallm batch | 263f | 163✓ 5⚠ 29✗ | 2026-04-19
+# vallm batch | 267f | 165✓ 5⚠ 30✗ | 2026-04-19
 
 SUMMARY:
-  scanned: 263  passed: 163 (62.0%)  warnings: 5  errors: 29  unsupported: 71
+  scanned: 267  passed: 165 (61.8%)  warnings: 5  errors: 30  unsupported: 72
 
 WARNINGS[5]{path,score}:
   code2llm/cli_parser.py,0.97
     issues[1]{rule,severity,message,line}:
-      complexity.lizard_length,warning,create_parser: 237 lines exceeds limit 100,19
+      complexity.lizard_length,warning,create_parser: 252 lines exceeds limit 100,19
   code2llm/generators/mermaid.py,0.97
     issues[1]{rule,severity,message,line}:
-      complexity.lizard_length,warning,generate_single_png: 102 lines exceeds limit 100,287
+      complexity.lizard_length,warning,generate_single_png: 102 lines exceeds limit 100,286
   code2llm/analysis/data_analysis.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 7.1 (threshold: 20),
+      complexity.maintainability,warning,Low maintainability index: 11.5 (threshold: 20),
   code2llm/exporters/toon/renderer.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 10.0 (threshold: 20),
   code2llm/generators/llm_flow.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 15.9 (threshold: 20),
+      complexity.maintainability,warning,Low maintainability index: 16.0 (threshold: 20),
 
-ERRORS[29]{path,score}:
+ERRORS[30]{path,score}:
   demo_langs/invalid/sample_bad.go,0.00
     issues[1]{rule,severity,message,line}:
       syntax.tree_sitter,error,tree-sitter found 3 parse error(s) in go,
@@ -85,6 +85,9 @@ ERRORS[29]{path,score}:
   tests/test_toon_v2.py,0.93
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,2
+  tests/test_persistent_cache.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
   tests/test_advanced_analysis.py,0.95
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,1
@@ -117,8 +120,8 @@ ERRORS[29]{path,score}:
       python.import.resolvable,error,Module 'pytest' not found,3
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,47
-  *.txt,5
+  *.md,49
+  *.txt,6
   *.yml,1
   *.example,1
-  other,17
+  other,15

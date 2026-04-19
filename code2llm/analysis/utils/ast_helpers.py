@@ -57,6 +57,19 @@ def ast_unparse(node: Optional[ast.AST], default_none: str = "None") -> str:
         return str(node)
 
 
+def qualified_name(module_name: str, class_stack: list, name: str) -> str:
+    """Build a fully-qualified dotted name from module, optional class scope, and name.
+
+    Shared replacement for the identical ``_qualified_name`` methods in
+    ``CallGraphExtractor`` and ``CFGExtractor``.
+    """
+    parts = [module_name]
+    if class_stack:
+        parts.append(class_stack[-1])
+    parts.append(name)
+    return '.'.join(parts)
+
+
 def expr_to_str(node: ast.expr) -> Optional[str]:
     """Convert an AST expression to a dotted string (for call-name extraction).
 

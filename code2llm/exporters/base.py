@@ -94,6 +94,22 @@ class BaseExporter(ABC):
 Exporter = BaseExporter
 
 
+class ViewGeneratorMixin:
+    """Mixin providing the shared ``generate`` implementation for view generators.
+
+    Eliminates the identical ``generate`` method duplicated across
+    ``ArticleViewGenerator``, ``ContextViewGenerator``, and ``ToonViewGenerator``.
+
+    Subclasses must implement ``_render(data) -> List[str]``.
+    """
+
+    def generate(self, data: Dict[str, Any], output_path: str) -> None:
+        lines = self._render(data)
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+
 # Export registry: format_name -> exporter_class
 EXPORT_REGISTRY: Dict[str, Type[BaseExporter]] = {}
 
