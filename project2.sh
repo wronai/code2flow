@@ -2,6 +2,9 @@
 set -e
 clear
 
+# Performance: disable pip version check (~4-8s saved)
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+
 VENV="venv"
 PIP="$VENV/bin/pip"
 
@@ -10,6 +13,8 @@ if [ ! -f "$PIP" ]; then
     python3 -m venv "$VENV"
 fi
 
+$PIP install sumd --upgrade --quiet
+$PIP install doql --upgrade --quiet
 $PIP install regix --upgrade --quiet
 #$PIP install pyqual --upgrade --quiet
 $PIP install prefact --upgrade --quiet
@@ -27,7 +32,13 @@ rm -f project/analysis.yaml
 
 $PIP install code2docs --upgrade --quiet
 $VENV/bin/code2docs ./ --readme-only
-$VENV/bin/redup scan . --format toon --output ./project
+
+# Fix 3: Skip redup for non-Python projects (saves ~8s when no .py files)
+if find . -name "*.py" -not -path "./.git/*" -not -path "./$VENV/*" -print -quit 2>/dev/null | grep -q .; then
+    $VENV/bin/redup scan . --format toon --output ./project
+else
+    echo "# redup/duplication | 0 groups | skip (non-python project)" > ./project/duplication.toon.yaml
+fi
 #$VENV/bin/redup scan . --functions-only -f toon --output ./project
 #$VENV/bin/vallm batch ./src --recursive --semantic --model qwen2.5-coder:7b
 #$VENV/bin/vallm batch --parallel .

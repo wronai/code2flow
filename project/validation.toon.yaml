@@ -1,7 +1,7 @@
-# vallm batch | 331f | 0✓ 256⚠ 0✗ | 2026-04-20
+# vallm batch | 332f | 0✓ 256⚠ 0✗ | 2026-04-20
 
 SUMMARY:
-  scanned: 331  passed: 0 (0.0%)  warnings: 256  errors: 0  unsupported: 0
+  scanned: 332  passed: 0 (0.0%)  warnings: 256  errors: 0  unsupported: 0
 
 WARNINGS[256]{path,score}:
   code2llm/cli_parser.py,0.74

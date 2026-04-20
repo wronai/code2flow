@@ -1,31 +1,2425 @@
-# code2llm - Summary Report
+# code2llm - Generated Analysis Files
 
-SUMR - Summary Report for project analysis
+SUMD - Structured Unified Markdown Descriptor for AI-aware project refactorization
 
 ## Contents
 
 - [Metadata](#metadata)
-- [Quality Status](#quality-status)
-- [Metrics](#metrics)
+- [Architecture](#architecture)
+- [Quality Pipeline (`pyqual.yaml`)](#quality-pipeline-pyqualyaml)
+- [Dependencies](#dependencies)
+- [Source Map](#source-map)
 - [Refactoring Analysis](#refactoring-analysis)
 - [Intent](#intent)
 
 ## Metadata
 
 - **name**: `code2llm`
-- **version**: `0.5.120`
-- **generated_at**: `2026-04-19T12:31:10+02:00`
+- **version**: `0.5.135`
+- **python_requires**: `>=3.8`
+- **license**: Apache-2.0
+- **ai_model**: `openrouter/qwen/qwen3-coder-next`
+- **ecosystem**: SUMD + DOQL + testql + taskfile
+- **generated_from**: pyproject.toml, requirements.txt, Taskfile.yml, Makefile, app.doql.css, pyqual.yaml, goal.yaml, .env.example, src(5 mod), project/(6 analysis files)
 
-## Quality Status
+## Architecture
 
-- **pyqual_config**: ✅ Present
-- **last_run**: 2026-04-08
+```
+SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (verification)
+```
 
-## Metrics
+### DOQL Application Declaration (`app.doql.css`)
 
-- **python_files**: 170
-- **total_lines**: 30816
+```css markpact:doql path=app.doql.css
+app {
+  name: "code2llm";
+  version: "0.5.104";
+}
+
+entity[name="FlowNode"] {
+
+}
+
+entity[name="FlowEdge"] {
+
+}
+
+entity[name="FunctionInfo"] {
+
+}
+
+entity[name="ClassInfo"] {
+
+}
+
+entity[name="ModuleInfo"] {
+
+}
+
+entity[name="Pattern"] {
+
+}
+
+entity[name="CodeSmell"] {
+
+}
+
+entity[name="Mutation"] {
+
+}
+
+entity[name="DataFlow"] {
+
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="code2llm"] {
+
+}
+
+workflow[name="install"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m pip install -e .;
+  step-2: run cmd=echo "✓ code2llm installed with TOON format support";
+}
+
+workflow[name="dev-install"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m pip install -e ".[dev]";
+  step-2: run cmd=echo "✓ code2llm installed with dev dependencies";
+}
+
+workflow[name="test"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m pytest tests/ -v --tb=short 2>/dev/null || echo "No tests yet - create tests/ directory";
+}
+
+workflow[name="test-cov"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m pytest tests/ --cov=code2llm --cov-report=html --cov-report=term 2>/dev/null || echo "No tests yet";
+}
+
+workflow[name="test-toon"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🎯 Testing TOON format...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./test_toon -m hybrid -f toon;
+  step-3: run cmd=$(PYTHON) validate_toon.py test_toon/analysis.toon;
+  step-4: run cmd=echo "✓ TOON format test complete";
+}
+
+workflow[name="validate-toon"] {
+  trigger: "manual";
+  step-1: depend target=test-toon;
+}
+
+workflow[name="test-all-formats"] {
+  trigger: "manual";
+  step-1: run cmd=echo "📊 Testing all output formats...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./test_all -m hybrid -f all;
+  step-3: run cmd=$(PYTHON) validate_toon.py test_all/analysis.toon;
+  step-4: run cmd=echo "✓ All formats test complete";
+}
+
+workflow[name="test-comprehensive"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🚀 Running comprehensive test suite...";
+  step-2: run cmd=bash project.sh;
+  step-3: run cmd=echo "✓ Comprehensive tests complete";
+}
+
+workflow[name="lint"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m flake8 code2llm/ --max-line-length=100 --ignore=E203,W503 2>/dev/null || echo "flake8 not installed";
+  step-2: run cmd=$(PYTHON) -m black --check code2llm/ 2>/dev/null || echo "black not installed";
+  step-3: run cmd=echo "✓ Linting complete";
+}
+
+workflow[name="format"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m black code2llm/ --line-length=100 2>/dev/null || echo "black not installed, run: pip install black";
+  step-2: run cmd=echo "✓ Code formatted";
+}
+
+workflow[name="typecheck"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m mypy code2llm/ --ignore-missing-imports 2>/dev/null || echo "mypy not installed";
+}
+
+workflow[name="check"] {
+  trigger: "manual";
+  step-1: run cmd=echo "✓ All checks passed";
+}
+
+workflow[name="run"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m code2llm ../python/stts_core -v -o ./output;
+}
+
+workflow[name="analyze"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🎯 Running TOON format analysis on current project...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./analysis -m hybrid -f toon;
+  step-3: run cmd=$(PYTHON) validate_toon.py analysis/analysis.toon;
+  step-4: run cmd=echo "✓ TOON analysis complete - check analysis/analysis.toon";
+}
+
+workflow[name="analyze-all"] {
+  trigger: "manual";
+  step-1: run cmd=echo "📊 Running analysis with all formats...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./analysis_all -m hybrid -f all;
+  step-3: run cmd=$(PYTHON) validate_toon.py analysis_all/analysis.toon;
+  step-4: run cmd=echo "✓ All formats analysis complete - check analysis_all/";
+}
+
+workflow[name="toon-demo"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🎯 Quick TOON format demo...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./demo -m hybrid -f toon;
+  step-3: run cmd=echo "📁 Generated: demo/analysis.toon";
+  step-4: run cmd=echo "📊 Size: $$(du -h demo/analysis.toon | cut -f1)";
+  step-5: run cmd=echo "🔍 Preview:";
+  step-6: run cmd=head -20 demo/analysis.toon;
+}
+
+workflow[name="toon-compare"] {
+  trigger: "manual";
+  step-1: run cmd=echo "📊 Comparing TOON vs YAML formats...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./compare -m hybrid -f toon,yaml;
+  step-3: run cmd=echo "📁 Files generated:";
+  step-4: run cmd=echo "  - TOON:  compare/analysis.toon  ($$(du -h compare/analysis.toon | cut -f1))";
+  step-5: run cmd=echo "  - YAML:  compare/analysis.yaml  ($$(du -h compare/analysis.yaml | cut -f1))";
+  step-6: run cmd=echo "  - Ratio: $$(echo "scale=1; $$(du -k compare/analysis.yaml | cut -f1) / $$(du -k compare/analysis.toon | cut -f1)" | bc)x smaller";
+  step-7: run cmd=$(PYTHON) validate_toon.py compare/analysis.yaml compare/analysis.toon;
+}
+
+workflow[name="toon-validate"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🔍 Validating TOON format structure...";
+  step-2: run cmd=$(PYTHON) validate_toon.py analysis/analysis.toon 2>/dev/null || $(PYTHON) validate_toon.py test_toon/analysis.toon 2>/dev/null || echo "Run 'make test-toon' first";
+}
+
+workflow[name="build"] {
+  trigger: "manual";
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info;
+  step-2: run cmd=$(PYTHON) -m build;
+  step-3: run cmd=echo "✓ Build complete - check dist/";
+}
+
+workflow[name="publish-test"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🚀 Publishing to TestPyPI...";
+  step-2: run cmd=$(PYTHON) -m venv publish-test-env;
+  step-3: run cmd=publish-test-env/bin/pip install twine;
+  step-4: run cmd=publish-test-env/bin/python -m twine upload --repository testpypi dist/*;
+  step-5: run cmd=rm -rf publish-test-env;
+  step-6: run cmd=echo "✓ Published to TestPyPI";
+}
+
+workflow[name="bump-patch"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🔢 Bumping patch version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py patch 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="bump-minor"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🔢 Bumping minor version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py minor 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="bump-major"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🔢 Bumping major version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py major 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="publish"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🚀 Publishing to PyPI...";
+  step-2: run cmd=echo "🔢 Bumping patch version...";
+  step-3: run cmd=$(MAKE) bump-patch;
+  step-4: run cmd=echo "🔨 Rebuilding package with new version...";
+  step-5: run cmd=$(MAKE) build;
+  step-6: run cmd=echo "📦 Publishing to PyPI...";
+  step-7: run cmd=$(PYTHON) -m venv publish-env;
+  step-8: run cmd=publish-env/bin/pip install twine;
+  step-9: run cmd=publish-env/bin/python -m twine upload dist/*;
+  step-10: run cmd=rm -rf publish-env;
+  step-11: run cmd=echo "✓ Published to PyPI";
+}
+
+workflow[name="mermaid-png"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) mermaid_to_png.py --batch output output;
+}
+
+workflow[name="install-mermaid"] {
+  trigger: "manual";
+  step-1: run cmd=npm install -g @mermaid-js/mermaid-cli;
+}
+
+workflow[name="check-mermaid"] {
+  trigger: "manual";
+  step-1: run cmd=echo "Checking available Mermaid renderers...";
+  step-2: run cmd=which mmdc > /dev/null && echo "✓ mmdc (mermaid-cli)" || echo "✗ mmdc (run: npm install -g @mermaid-js/mermaid-cli)";
+  step-3: run cmd=which npx > /dev/null && echo "✓ npx (for @mermaid-js/mermaid-cli)" || echo "✗ npx (install Node.js)";
+  step-4: run cmd=which puppeteer > /dev/null && echo "✓ puppeteer" || echo "✗ puppeteer (run: npm install -g puppeteer)";
+}
+
+workflow[name="clean"] {
+  trigger: "manual";
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info;
+  step-2: run cmd=rm -rf .pytest_cache .coverage htmlcov/;
+  step-3: run cmd=rm -rf code2llm/__pycache__ code2llm/*/__pycache__;
+  step-4: run cmd=rm -rf test_* demo compare analysis analysis_all output_* 2>/dev/null || true;
+  step-5: run cmd=find . -name "*.pyc" -delete 2>/dev/null || true;
+  step-6: run cmd=find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true;
+  step-7: run cmd=echo "✓ Cleaned build artifacts and test outputs";
+}
+
+workflow[name="clean-png"] {
+  trigger: "manual";
+  step-1: run cmd=rm -f output/*.png;
+  step-2: run cmd=echo "✓ Cleaned PNG files";
+}
+
+workflow[name="quickstart"] {
+  trigger: "manual";
+  step-1: run cmd=echo "🚀 Quick Start with code2llm TOON format:";
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "1. Install:        make install";
+  step-4: run cmd=echo "2. Test TOON:      make test-toon";
+  step-5: run cmd=echo "3. Analyze:        make analyze";
+  step-6: run cmd=echo "4. Compare:        make toon-compare";
+  step-7: run cmd=echo "5. All formats:    make test-all-formats";
+  step-8: run cmd=echo "";
+  step-9: run cmd=echo "📖 For more: make help";
+}
+
+workflow[name="health"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: "manual";
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="help"] {
+  trigger: "manual";
+  step-1: run cmd=echo "code2llm - Python Code Flow Analysis Tool with LLM Integration and TOON;
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo \"\U0001F680 Installation:\; 
+  step-4: run cmd=echo "  make install       - Install package";
+  step-5: run cmd=echo "  make dev-install   - Install with development dependencies";
+  step-6: run cmd=echo "";
+  step-7: run cmd=echo \"\U0001F9EA Testing:\; 
+  step-8: run cmd=echo "  make test          - Run test suite";
+  step-9: run cmd=echo "  make test-toon     - Test TOON format only";
+  step-10: run cmd=echo "  make validate-toon - Validate TOON format output";
+  step-11: run cmd=echo "  make test-all-formats - Test all output formats";
+  step-12: run cmd=echo "";
+  step-13: run cmd=echo \"\U0001F527 Code Quality:\; 
+  step-14: run cmd=echo "  make lint          - Run linters (flake8, black --check)";
+  step-15: run cmd=echo "  make format        - Format code with black";
+  step-16: run cmd=echo "  make typecheck     - Run mypy type checking";
+  step-17: run cmd=echo "  make check         - Run all quality checks";
+  step-18: run cmd=echo "";
+  step-19: run cmd=echo \"\U0001F4CA Analysis:\; 
+  step-20: run cmd=echo "  make analyze       - Run analysis on current project (TOON format)";
+  step-21: run cmd=echo "  make run           - Run with example arguments";
+  step-22: run cmd=echo "  make analyze-all   - Run analysis with all formats";
+  step-23: run cmd=echo "";
+  step-24: run cmd=echo \"\U0001F3AF TOON Format:\; 
+  step-25: run cmd=echo "  make toon-demo     - Quick TOON format demo";
+  step-26: run cmd=echo "  make toon-compare  - Compare TOON vs YAML formats";
+  step-27: run cmd=echo "  make toon-validate - Validate TOON format structure";
+  step-28: run cmd=echo "";
+  step-29: run cmd=echo \"\U0001F4E6 Building & Release:\; 
+  step-30: run cmd=echo "  make build         - Build distribution packages";
+  step-31: run cmd=echo "  make publish       - Publish to PyPI (with version bump)";
+  step-32: run cmd=echo "  make publish-test  - Publish to TestPyPI";
+  step-33: run cmd=echo "  make bump-patch    - Bump patch version";
+  step-34: run cmd=echo "  make bump-minor    - Bump minor version";
+  step-35: run cmd=echo "  make bump-major    - Bump major version";
+  step-36: run cmd=echo "";
+  step-37: run cmd=echo \"\U0001F3A8 Visualization:\; 
+  step-38: run cmd=echo "  make mermaid-png   - Generate PNG from all Mermaid files";
+  step-39: run cmd=echo "  make install-mermaid - Install Mermaid CLI renderer";
+  step-40: run cmd=echo "  make check-mermaid - Check available Mermaid renderers";
+  step-41: run cmd=echo "";
+  step-42: run cmd=echo \"\U0001F9F9 Maintenance:\; 
+  step-43: run cmd=echo "  make clean         - Remove build artifacts";
+  step-44: run cmd=echo "  make clean-png     - Clean PNG files";
+  step-45: run cmd=echo "";
+}
+
+deploy {
+  target: makefile;
+}
+
+environment[name="local"] {
+  runtime: makefile;
+  env_file: ".env";
+}
+
+workflow[name="all"] {
+  trigger: "manual";
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}
+
+workflow[name="fmt"] {
+  trigger: "manual";
+  step-1: run cmd=ruff format .;
+}
+
+/* auto-added stub: define where entities are persisted */
+database[name="default"] {
+  engine: "sqlite";
+  path: "data/app.db";
+}
+```
+
+### Source Modules
+
+- `code2llm.api`
+- `code2llm.cli`
+- `code2llm.cli_analysis`
+- `code2llm.cli_commands`
+- `code2llm.cli_parser`
+
+## Quality Pipeline (`pyqual.yaml`)
+
+```yaml markpact:pyqual path=pyqual.yaml
+pipeline:
+  name: code2llm-quality
+
+  metrics:
+    cc_max: 15
+    critical_max: 0
+
+  custom_tools:
+    - name: code2llm_code2llm
+      binary: code2llm
+      command: >-
+        code2llm {workdir} -f toon -o ./project --no-chunk
+        --exclude .git .venv .venv_test build dist __pycache__ .pytest_cache .code2llm_cache .benchmarks .mypy_cache .ruff_cache node_modules
+      output: ""
+      allow_failure: false
+
+    - name: vallm_code2llm
+      binary: vallm
+      command: >-
+        vallm batch {workdir} --recursive --format toon --output ./project
+        --exclude .git,.venv,.venv_test,build,dist,__pycache__,.pytest_cache,.code2llm_cache,.benchmarks,.mypy_cache,.ruff_cache,node_modules
+      output: ""
+      allow_failure: false
+
+  stages:
+    - name: analyze
+      tool: code2llm_code2llm
+      optional: true
+      timeout: 0
+
+    - name: validate
+      tool: vallm_code2llm
+      optional: true
+      timeout: 0
+
+    - name: lint
+      tool: ruff
+      optional: true
+
+    - name: fix
+      tool: prefact
+      optional: true
+      when: metrics_fail
+      timeout: 900
+
+    - name: test
+      run: python3 -m pytest -q
+      when: always
+
+  loop:
+    max_iterations: 3
+    on_fail: report
+
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next
+```
+
+## Dependencies
+
+### Runtime
+
+```text markpact:deps python
+networkx>=2.6
+matplotlib>=3.4
+pyyaml>=5.4
+numpy>=1.20
+jinja2>=3.0
+radon>=5.1
+astroid>=3.0
+code2logic
+vulture>=2.10
+tiktoken>=0.5
+tree-sitter>=0.21
+tree-sitter-python>=0.21
+tree-sitter-javascript>=0.21
+tree-sitter-typescript>=0.21
+tree-sitter-go>=0.21
+tree-sitter-rust>=0.21
+tree-sitter-java>=0.21
+tree-sitter-c>=0.21
+tree-sitter-cpp>=0.22
+tree-sitter-c-sharp>=0.21
+tree-sitter-php>=0.22
+tree-sitter-ruby>=0.21
+```
+
+### Development
+
+```text markpact:deps python scope=dev
+pytest>=6.2
+pytest-cov>=2.12
+pytest-xdist>=3.0
+black>=21.0
+flake8>=3.9
+mypy>=0.910
+goal>=2.1.0
+costs>=0.1.20
+pfix>=0.1.60
+```
+
+## Source Map
+
+*Top 5 modules by symbol density — signatures for LLM orientation.*
+
+### `code2llm.cli_commands` (`code2llm/cli_commands.py`)
+
+```python
+def handle_special_commands()  # CC=9, fan=5
+def handle_cache_command(args_list)  # CC=12, fan=17 ⚠
+def handle_report_command(args_list)  # CC=4, fan=9
+def validate_and_setup(args)  # CC=3, fan=6
+def print_start_info(args, source_path, output_dir)  # CC=2, fan=1
+def validate_chunked_output(output_dir, args)  # CC=3, fan=6
+def _get_chunk_dirs(output_dir)  # CC=3, fan=2
+def _validate_chunks(chunk_dirs, required_files)  # CC=3, fan=7
+def _validate_single_chunk(chunk_dir, required_files)  # CC=4, fan=3
+def _get_file_sizes(chunk_dir, required_files)  # CC=3, fan=3
+def _print_chunk_errors(chunk_name, chunk_issues)  # CC=2, fan=1
+def _print_validation_summary(chunk_dirs, valid_chunks, issues)  # CC=3, fan=2
+def generate_llm_context(args_list)  # CC=3, fan=12
+```
+
+### `code2llm.cli_analysis` (`code2llm/cli_analysis.py`)
+
+```python
+def _run_analysis(args, source_path, output_dir)  # CC=5, fan=4
+def _run_standard_analysis(args, source_path, output_dir)  # CC=5, fan=8
+def _build_config(args, output_dir)  # CC=9, fan=9
+def _print_analysis_summary(result)  # CC=1, fan=2
+def _run_chunked_analysis(args, source_path, output_dir)  # CC=3, fan=8
+def _print_chunked_plan(subprojects)  # CC=4, fan=5
+def _filter_subprojects(args, subprojects)  # CC=10, fan=4 ⚠
+def _analyze_all_subprojects(args, subprojects, output_dir)  # CC=4, fan=8
+def _analyze_subproject(args, subproject, output_dir)  # CC=14, fan=16 ⚠
+def _merge_chunked_results(all_results, source_path)  # CC=9, fan=5
+def _run_streaming_analysis(args, config, source_path)  # CC=7, fan=9
+```
+
+### `code2llm.api` (`code2llm/api.py`)
+
+```python
+def analyze(project_path, config)  # CC=2, fan=2
+def analyze_file(file_path, config)  # CC=1, fan=4
+```
+
+### `code2llm.cli_parser` (`code2llm/cli_parser.py`)
+
+```python
+def get_version()  # CC=2, fan=5
+def create_parser()  # CC=1, fan=5
+```
+
+### `code2llm.cli` (`code2llm/cli.py`)
+
+```python
+def main()  # CC=7, fan=9
+```
 
 ## Refactoring Analysis
 
-Run `code2llm ./ -f evolution` for detailed refactoring queue.
+*Pre-refactoring snapshot — use this section to identify targets. Generated from `project/` toon files.*
+
+### Call Graph & Complexity (`project/calls.toon.yaml`)
+
+```toon markpact:analysis path=project/calls.toon.yaml
+# code2llm call graph | /home/tom/github/semcod/code2llm
+# nodes: 455 | edges: 500 | modules: 113
+# CC̄=3.9
+
+HUBS[20]:
+  code2llm.cli_parser.create_parser
+    CC=1  in:1  out:45  total:46
+  code2llm.generators.llm_task.normalize_llm_task
+    CC=14  in:1  out:43  total:44
+  code2llm.generators.llm_flow.generator.render_llm_flow_md
+    CC=10  in:1  out:42  total:43
+  benchmarks.benchmark_performance.main
+    CC=1  in:0  out:41  total:41
+  validate_toon.analyze_class_differences
+    CC=6  in:1  out:39  total:40
+  code2llm.generators.llm_flow.analysis._summarize_functions
+    CC=14  in:1  out:35  total:36
+  benchmarks.benchmark_evolution.run_benchmark
+    CC=9  in:0  out:34  total:34
+  code2llm.cli_commands.handle_cache_command
+    CC=12  in:1  out:33  total:34
+  code2llm.core.lang.base._extract_declarations
+    CC=9  in:4  out:28  total:32
+  code2llm.core.lang.rust.analyze_rust
+    CC=9  in:1  out:31  total:32
+  benchmarks.benchmark_optimizations.benchmark_cold_vs_warm
+    CC=7  in:1  out:30  total:31
+  benchmarks.benchmark_performance.create_test_project
+    CC=5  in:1  out:29  total:30
+  code2llm.core.toon_size_manager._split_by_modules
+    CC=10  in:1  out:27  total:28
+  code2llm.exporters.mermaid.compact.export_compact
+    CC=13  in:0  out:27  total:27
+  code2llm.core.lang.go_lang._analyze_go_regex
+    CC=10  in:1  out:26  total:27
+  code2llm.cli_exports.orchestrator._run_exports
+    CC=14  in:1  out:26  total:27
+  code2llm.cli_exports.orchestrator_handlers._export_mermaid
+    CC=6  in:1  out:26  total:27
+  validate_toon.compare_modules
+    CC=5  in:1  out:26  total:27
+  code2llm.exporters.mermaid.calls.export_calls
+    CC=13  in:0  out:26  total:26
+  code2llm.exporters.evolution_exporter.EvolutionExporter._is_excluded
+    CC=1  in:24  out:1  total:25
+
+MODULES:
+  benchmarks.benchmark_evolution  [3 funcs]
+    load_previous  CC=3  out:3
+    run_benchmark  CC=9  out:34
+    save_current  CC=1  out:3
+  benchmarks.benchmark_format_quality  [3 funcs]
+    _print_benchmark_header  CC=1  out:4
+    _print_ground_truth_info  CC=1  out:7
+    run_benchmark  CC=2  out:22
+  benchmarks.benchmark_optimizations  [5 funcs]
+    benchmark_cold_vs_warm  CC=7  out:30
+    clear_caches  CC=3  out:7
+    main  CC=3  out:13
+    print_summary  CC=1  out:18
+    run_analysis  CC=1  out:7
+  benchmarks.benchmark_performance  [2 funcs]
+    create_test_project  CC=5  out:29
+    main  CC=1  out:41
+  benchmarks.format_evaluator  [5 funcs]
+    _check_structural_features  CC=1  out:16
+    _detect_hub_types  CC=2  out:2
+    _detect_pipelines  CC=5  out:5
+    _detect_problems  CC=1  out:16
+    evaluate_format  CC=4  out:22
+  benchmarks.project_generator  [6 funcs]
+    add_validator_to_core  CC=1  out:3
+    create_core_py  CC=1  out:2
+    create_etl_py  CC=1  out:2
+    create_ground_truth_project  CC=1  out:6
+    create_utils_py  CC=1  out:2
+    create_validation_py  CC=1  out:2
+  benchmarks.reporting  [8 funcs]
+    _print_gap_analysis  CC=6  out:9
+    _print_header  CC=1  out:3
+    _print_pipelines_detail  CC=5  out:11
+    _print_problems_detail  CC=5  out:13
+    _print_scores_table  CC=3  out:7
+    _print_structural_features  CC=5  out:11
+    build_report  CC=3  out:8
+    print_results  CC=1  out:6
+  code2llm.analysis.call_graph  [2 funcs]
+    _expr_to_str  CC=1  out:1
+    visit_FunctionDef  CC=2  out:4
+  code2llm.analysis.cfg  [2 funcs]
+    _expr_to_str  CC=1  out:1
+    visit_FunctionDef  CC=5  out:8
+  code2llm.analysis.data_analysis  [3 funcs]
+    _find_data_pipelines  CC=7  out:7
+    _categorize_functions  CC=8  out:8
+    _make_stage  CC=2  out:0
+  code2llm.analysis.dfg  [1 funcs]
+    _expr_to_str  CC=1  out:1
+  code2llm.analysis.pipeline_resolver  [1 funcs]
+    resolve  CC=4  out:5
+  code2llm.analysis.side_effects  [1 funcs]
+    analyze_function  CC=3  out:6
+  code2llm.analysis.type_inference  [1 funcs]
+    enrich_function  CC=3  out:4
+  code2llm.analysis.utils.ast_helpers  [3 funcs]
+    ast_unparse  CC=4  out:4
+    find_function_node  CC=8  out:4
+    qualified_name  CC=2  out:3
+  code2llm.api  [2 funcs]
+    analyze  CC=2  out:2
+    analyze_file  CC=1  out:4
+  code2llm.cli  [1 funcs]
+    main  CC=7  out:11
+  code2llm.cli_analysis  [11 funcs]
+    _analyze_all_subprojects  CC=4  out:8
+    _analyze_subproject  CC=14  out:19
+    _build_config  CC=9  out:13
+    _filter_subprojects  CC=10  out:5
+    _merge_chunked_results  CC=9  out:7
+    _print_analysis_summary  CC=1  out:9
+    _print_chunked_plan  CC=4  out:9
+    _run_analysis  CC=5  out:4
+    _run_chunked_analysis  CC=3  out:13
+    _run_standard_analysis  CC=5  out:8
+  code2llm.cli_commands  [13 funcs]
+    _get_chunk_dirs  CC=3  out:2
+    _get_file_sizes  CC=3  out:3
+    _print_chunk_errors  CC=2  out:2
+    _print_validation_summary  CC=3  out:12
+    _validate_chunks  CC=3  out:11
+    _validate_single_chunk  CC=4  out:4
+    generate_llm_context  CC=3  out:21
+    handle_cache_command  CC=12  out:33
+    handle_report_command  CC=4  out:17
+    handle_special_commands  CC=9  out:8
+  code2llm.cli_exports.code2logic  [8 funcs]
+    _build_code2logic_cmd  CC=2  out:3
+    _check_code2logic_installed  CC=2  out:4
+    _export_code2logic  CC=6  out:13
+    _find_code2logic_output  CC=6  out:6
+    _handle_code2logic_error  CC=6  out:7
+    _normalize_code2logic_output  CC=2  out:4
+    _run_code2logic  CC=3  out:4
+    _should_run_code2logic  CC=2  out:0
+  code2llm.cli_exports.formats  [9 funcs]
+    _export_calls  CC=1  out:1
+    _export_calls_format  CC=4  out:7
+    _export_calls_toon  CC=1  out:1
+    _export_mermaid_pngs  CC=11  out:11
+    _export_project_toon  CC=2  out:8
+    _export_project_yaml  CC=2  out:5
+    _export_simple_formats  CC=13  out:24
+    _export_yaml  CC=6  out:10
+    _run_report  CC=6  out:12
+  code2llm.cli_exports.orchestrator  [8 funcs]
+    _build_export_config  CC=1  out:7
+    _collect_dry_run_files  CC=3  out:4
+    _expand_all_formats  CC=2  out:0
+    _export_registry_formats  CC=9  out:12
+    _export_single  CC=10  out:13
+    _get_format_kwargs  CC=2  out:0
+    _run_exports  CC=14  out:26
+    _show_dry_run_plan  CC=4  out:16
+  code2llm.cli_exports.orchestrator_chunked  [3 funcs]
+    _export_chunked  CC=6  out:9
+    _get_filtered_subprojects  CC=9  out:7
+    _process_subproject  CC=5  out:5
+  code2llm.cli_exports.orchestrator_handlers  [7 funcs]
+    _export_calls  CC=5  out:7
+    _export_context_fallback  CC=3  out:5
+    _export_index_html  CC=5  out:6
+    _export_mermaid  CC=6  out:26
+    _export_mermaid_pngs  CC=6  out:4
+    _export_project_toon  CC=2  out:7
+    _export_readme  CC=4  out:6
+  code2llm.cli_exports.prompt  [18 funcs]
+    _analyze_generated_files  CC=14  out:11
+    _build_dynamic_focus_areas  CC=9  out:17
+    _build_dynamic_tasks  CC=8  out:16
+    _build_main_files_section  CC=1  out:1
+    _build_missing_files_section  CC=6  out:5
+    _build_optional_files_section  CC=2  out:1
+    _build_priority_order  CC=9  out:21
+    _build_prompt_file_lines  CC=4  out:5
+    _build_prompt_footer  CC=5  out:7
+    _build_prompt_header  CC=1  out:0
+  code2llm.cli_parser  [1 funcs]
+    create_parser  CC=1  out:45
+  code2llm.core.config  [2 funcs]
+    get_workers  CC=2  out:1
+    _get_optimal_workers  CC=3  out:5
+  code2llm.core.file_analyzer  [1 funcs]
+    _route_to_language_analyzer  CC=10  out:10
+  code2llm.core.file_cache  [2 funcs]
+    _get_cache_key  CC=1  out:1
+    make_cache_key  CC=1  out:4
+  code2llm.core.file_filter  [1 funcs]
+    __init__  CC=9  out:13
+  code2llm.core.gitignore  [1 funcs]
+    load_gitignore_patterns  CC=3  out:4
+  code2llm.core.incremental  [3 funcs]
+    needs_analysis  CC=2  out:5
+    update  CC=1  out:2
+    _file_signature  CC=2  out:1
+  code2llm.core.lang.base  [10 funcs]
+    _extract_declarations  CC=9  out:28
+    _match_method_name  CC=14  out:9
+    _process_class_method  CC=2  out:7
+    _process_functions  CC=9  out:2
+    _process_standalone_function  CC=10  out:11
+    _resolve_call  CC=7  out:7
+    analyze_c_family  CC=5  out:6
+    calculate_complexity_regex  CC=6  out:5
+    extract_calls_regex  CC=9  out:11
+    extract_function_body  CC=10  out:4
+  code2llm.core.lang.cpp  [1 funcs]
+    analyze_cpp  CC=1  out:1
+  code2llm.core.lang.csharp  [1 funcs]
+    analyze_csharp  CC=1  out:1
+  code2llm.core.lang.generic  [1 funcs]
+    analyze_generic  CC=12  out:20
+  code2llm.core.lang.go_lang  [2 funcs]
+    _analyze_go_regex  CC=10  out:26
+    analyze_go  CC=4  out:6
+  code2llm.core.lang.java  [1 funcs]
+    analyze_java  CC=1  out:1
+  code2llm.core.lang.php  [4 funcs]
+    _adjust_qualified_names  CC=3  out:6
+    _extract_php_traits  CC=4  out:8
+    _parse_php_metadata  CC=8  out:9
+    analyze_php  CC=2  out:10
+  code2llm.core.lang.ruby  [3 funcs]
+    analyze  CC=1  out:1
+    _adjust_ruby_module_qualnames  CC=4  out:10
+    analyze_ruby  CC=14  out:19
+  code2llm.core.lang.rust  [1 funcs]
+    analyze_rust  CC=9  out:31
+  code2llm.core.lang.ts_extractors  [5 funcs]
+    _extract_classes_ts  CC=1  out:6
+    _extract_functions_ts  CC=1  out:9
+    _find_name_node  CC=7  out:0
+    _get_node_text  CC=1  out:1
+    extract_declarations_ts  CC=1  out:5
+  code2llm.core.lang.ts_parser  [9 funcs]
+    __init__  CC=1  out:1
+    parse  CC=3  out:3
+    supports  CC=2  out:1
+    _get_language  CC=7  out:6
+    _get_parser  CC=4  out:3
+    _init_tree_sitter  CC=2  out:1
+    get_parser  CC=2  out:1
+    is_available  CC=1  out:1
+    parse_source  CC=1  out:3
+  code2llm.core.lang.typescript  [3 funcs]
+    analyze_typescript_js  CC=1  out:5
+    get_typescript_lang_config  CC=1  out:0
+    get_typescript_patterns  CC=1  out:8
+  code2llm.core.large_repo  [9 funcs]
+    _categorize_subdirs  CC=7  out:10
+    _collect_files_in_dir  CC=1  out:1
+    _collect_files_recursive  CC=1  out:1
+    _merge_small_l1_dirs  CC=7  out:19
+    _process_level1_files  CC=5  out:13
+    _split_hierarchically  CC=8  out:14
+    _split_level2_consolidated  CC=9  out:19
+    get_analysis_plan  CC=2  out:4
+    should_use_chunking  CC=1  out:1
+  code2llm.core.persistent_cache  [5 funcs]
+    get_file_result  CC=4  out:5
+    put_file_result  CC=3  out:7
+    _pack  CC=2  out:2
+    _unpack  CC=2  out:2
+    get_all_projects  CC=6  out:8
+  code2llm.core.repo_files  [8 funcs]
+    _get_gitignore_parser  CC=2  out:2
+    calculate_priority  CC=7  out:1
+    collect_files_in_dir  CC=6  out:10
+    collect_root_files  CC=3  out:5
+    contains_python_files  CC=3  out:4
+    count_py_files  CC=3  out:4
+    get_level1_dirs  CC=8  out:9
+    should_skip_file  CC=7  out:4
+  code2llm.core.streaming.cache  [1 funcs]
+    _get_cache_key  CC=1  out:1
+  code2llm.core.toon_size_manager  [8 funcs]
+    _parse_modules  CC=6  out:7
+    _split_by_lines  CC=8  out:20
+    _split_by_modules  CC=10  out:27
+    _write_chunk  CC=2  out:1
+    get_file_size_kb  CC=1  out:1
+    manage_toon_size  CC=8  out:11
+    should_split_toon  CC=1  out:1
+    split_toon_file  CC=3  out:6
+  code2llm.exporters.base  [1 funcs]
+    get_exporter  CC=1  out:1
+  code2llm.exporters.evolution.computation  [8 funcs]
+    aggregate_file_stats  CC=7  out:11
+    build_context  CC=10  out:12
+    compute_func_data  CC=3  out:10
+    compute_god_modules  CC=2  out:4
+    compute_hub_types  CC=7  out:8
+    filter_god_modules  CC=3  out:5
+    make_relative_path  CC=3  out:3
+    scan_file_sizes  CC=6  out:7
+  code2llm.exporters.evolution.exclusion  [1 funcs]
+    is_excluded  CC=5  out:4
+  code2llm.exporters.evolution.yaml_export  [1 funcs]
+    export_to_yaml  CC=11  out:24
+  code2llm.exporters.evolution_exporter  [2 funcs]
+    _is_excluded  CC=1  out:1
+    export  CC=1  out:22
+  code2llm.exporters.flow_constants  [1 funcs]
+    is_excluded_path  CC=6  out:4
+  code2llm.exporters.flow_exporter  [1 funcs]
+    _is_excluded  CC=1  out:1
+  code2llm.exporters.flow_renderer  [1 funcs]
+    render_header  CC=4  out:4
+  code2llm.exporters.map.alerts  [3 funcs]
+    _read_previous_cc_avg  CC=6  out:6
+    build_hotspots  CC=5  out:4
+    load_evolution_trend  CC=5  out:2
+  code2llm.exporters.map.details  [4 funcs]
+    _rank_modules  CC=5  out:7
+    _render_map_class  CC=7  out:8
+    _render_map_module  CC=13  out:16
+    render_details  CC=2  out:2
+  code2llm.exporters.map.header  [4 funcs]
+    _render_alerts_line  CC=2  out:3
+    _render_hotspots_line  CC=2  out:3
+    _render_stats_line  CC=5  out:7
+    render_header  CC=8  out:18
+  code2llm.exporters.map.module_list  [1 funcs]
+    render_module_list  CC=4  out:8
+  code2llm.exporters.map.utils  [4 funcs]
+    count_total_lines  CC=5  out:5
+    detect_languages  CC=8  out:10
+    file_line_count  CC=2  out:4
+    rel_path  CC=6  out:9
+  code2llm.exporters.map.yaml_export  [5 funcs]
+    _build_module_classes_data  CC=6  out:5
+    _build_module_entry  CC=2  out:6
+    _build_module_exports  CC=6  out:4
+    _build_module_functions_data  CC=7  out:2
+    export_to_yaml  CC=8  out:19
+  code2llm.exporters.map_exporter  [1 funcs]
+    export  CC=1  out:10
+  code2llm.exporters.mermaid.calls  [1 funcs]
+    export_calls  CC=13  out:26
+  code2llm.exporters.mermaid.classic  [4 funcs]
+    _render_cc_styles  CC=6  out:12
+    _render_edges  CC=8  out:9
+    _render_subgraphs  CC=6  out:14
+    export_classic  CC=1  out:5
+  code2llm.exporters.mermaid.compact  [1 funcs]
+    export_compact  CC=13  out:27
+  code2llm.exporters.mermaid.flow_compact  [8 funcs]
+    _longest_path_dfs  CC=7  out:5
+    _select_longest_path  CC=4  out:4
+    build_callers_graph  CC=4  out:4
+    export_flow_compact  CC=1  out:9
+    find_critical_path  CC=2  out:6
+    find_leaves  CC=4  out:5
+    is_entry_point  CC=11  out:7
+    should_skip_module  CC=3  out:2
+  code2llm.exporters.mermaid.flow_detailed  [1 funcs]
+    export_flow_detailed  CC=1  out:14
+  code2llm.exporters.mermaid.flow_full  [1 funcs]
+    export_flow_full  CC=1  out:14
+  code2llm.exporters.mermaid.utils  [8 funcs]
+    _sanitize_identifier  CC=4  out:3
+    build_name_index  CC=2  out:3
+    get_cc  CC=3  out:2
+    module_of  CC=4  out:4
+    readable_id  CC=1  out:1
+    resolve_callee  CC=6  out:3
+    safe_module  CC=1  out:1
+    write_file  CC=1  out:5
+  code2llm.exporters.mermaid_flow_helpers  [12 funcs]
+    _append_entry_styles  CC=3  out:3
+    _append_flow_node  CC=4  out:6
+    _classify_architecture_module  CC=4  out:3
+    _entry_points  CC=3  out:2
+    _filtered_functions  CC=4  out:4
+    _group_architecture_functions  CC=2  out:3
+    _group_functions_by_module  CC=2  out:4
+    _render_architecture_view  CC=6  out:13
+    _render_flow_edges  CC=11  out:10
+    _render_flow_styles  CC=6  out:10
+  code2llm.exporters.project_yaml.core  [3 funcs]
+    _build_project_yaml  CC=12  out:25
+    _detect_primary_language  CC=9  out:11
+    export  CC=1  out:6
+  code2llm.exporters.project_yaml.evolution  [2 funcs]
+    build_evolution  CC=3  out:4
+    load_previous_evolution  CC=6  out:5
+  code2llm.exporters.project_yaml.health  [3 funcs]
+    build_alerts  CC=13  out:11
+    build_health  CC=7  out:13
+    count_duplicates  CC=5  out:8
+  code2llm.exporters.project_yaml.hotspots  [3 funcs]
+    build_hotspots  CC=5  out:7
+    build_refactoring  CC=13  out:20
+    hotspot_note  CC=7  out:5
+  code2llm.exporters.project_yaml.modules  [7 funcs]
+    build_class_export  CC=11  out:10
+    build_exports  CC=2  out:3
+    build_function_exports  CC=7  out:6
+    build_modules  CC=5  out:11
+    compute_inbound_deps  CC=5  out:3
+    compute_module_entry  CC=4  out:12
+    group_by_file  CC=5  out:8
+  code2llm.exporters.readme.content  [1 funcs]
+    generate_readme_content  CC=1  out:2
+  code2llm.exporters.readme.files  [1 funcs]
+    get_existing_files  CC=2  out:1
+  code2llm.exporters.readme.insights  [1 funcs]
+    extract_insights  CC=13  out:14
+  code2llm.exporters.readme.sections  [3 funcs]
+    build_core_files_section  CC=4  out:10
+    build_llm_files_section  CC=5  out:12
+    build_viz_files_section  CC=7  out:13
+  code2llm.exporters.readme_exporter  [1 funcs]
+    export  CC=5  out:17
+  code2llm.exporters.report_generators  [1 funcs]
+    load_project_yaml  CC=13  out:17
+  code2llm.exporters.toon.helpers  [7 funcs]
+    _dup_file_set  CC=2  out:3
+    _hotspot_description  CC=8  out:5
+    _package_of  CC=2  out:2
+    _package_of_module  CC=4  out:4
+    _rel_path  CC=6  out:9
+    _scan_line_counts  CC=6  out:10
+    _traits_from_cfg  CC=7  out:7
+  code2llm.exporters.toon.metrics  [2 funcs]
+    _compute_hotspots  CC=5  out:7
+    compute_all_metrics  CC=1  out:15
+  code2llm.exporters.toon.metrics_core  [7 funcs]
+    _build_coupling_matrix  CC=8  out:6
+    _build_function_to_module_map  CC=3  out:2
+    _resolve_callee_module  CC=9  out:5
+    compute_class_metrics  CC=7  out:14
+    compute_file_metrics  CC=12  out:25
+    compute_function_metrics  CC=8  out:14
+    compute_package_metrics  CC=5  out:9
+  code2llm.exporters.toon.metrics_duplicates  [2 funcs]
+    _calculate_duplicate_info  CC=6  out:14
+    detect_duplicates  CC=4  out:5
+  code2llm.exporters.toon.module_detail  [2 funcs]
+    _render_module_detail  CC=3  out:10
+    render_details  CC=3  out:2
+  code2llm.exporters.toon.renderer  [2 funcs]
+    _detect_language_label  CC=10  out:12
+    render_layers  CC=2  out:8
+  code2llm.exporters.validate_project  [2 funcs]
+    _check_required_keys  CC=9  out:6
+    validate_project_yaml  CC=11  out:17
+  code2llm.generators._utils  [1 funcs]
+    dump_yaml  CC=1  out:1
+  code2llm.generators.llm_flow.analysis  [3 funcs]
+    _node_counts_by_function  CC=4  out:4
+    _pick_relevant_functions  CC=8  out:11
+    _summarize_functions  CC=14  out:35
+  code2llm.generators.llm_flow.cli  [1 funcs]
+    main  CC=3  out:18
+  code2llm.generators.llm_flow.generator  [2 funcs]
+    generate_llm_flow  CC=5  out:12
+    render_llm_flow_md  CC=10  out:42
+  code2llm.generators.llm_flow.nodes  [7 funcs]
+    _collect_entrypoints  CC=5  out:6
+    _collect_functions  CC=7  out:10
+    _collect_nodes  CC=5  out:5
+    _deduplicate_entrypoints  CC=5  out:4
+    _extract_entrypoint_info  CC=4  out:6
+    _group_nodes_by_file  CC=3  out:5
+    _is_entrypoint_file  CC=2  out:2
+  code2llm.generators.llm_flow.parsing  [1 funcs]
+    _parse_func_label  CC=4  out:4
+  code2llm.generators.llm_flow.utils  [4 funcs]
+    _as_dict  CC=2  out:1
+    _as_list  CC=2  out:1
+    _safe_read_yaml  CC=12  out:14
+    _strip_bom  CC=2  out:1
+  code2llm.generators.llm_task  [12 funcs]
+    _apply_bullet_sections  CC=6  out:10
+    _apply_simple_sections  CC=5  out:4
+    _create_empty_task_data  CC=1  out:0
+    _ensure_list  CC=3  out:1
+    _parse_acceptance_tests  CC=3  out:4
+    _parse_bullets  CC=4  out:5
+    _parse_sections  CC=7  out:8
+    _strip_bom  CC=2  out:1
+    load_input  CC=15  out:20
+    main  CC=4  out:13
+  code2llm.generators.mermaid  [1 funcs]
+    run_cli  CC=1  out:8
+  code2llm.generators.mermaid.fix  [7 funcs]
+    _fix_class_line  CC=6  out:11
+    _fix_edge_label_pipes  CC=8  out:10
+    _fix_edge_line  CC=5  out:9
+    _fix_subgraph_line  CC=3  out:8
+    _sanitize_label_text  CC=1  out:9
+    _sanitize_node_id  CC=3  out:3
+    fix_mermaid_file  CC=5  out:10
+  code2llm.generators.mermaid.png  [8 funcs]
+    _build_renderers  CC=2  out:8
+    _is_png_fresh  CC=2  out:3
+    _prepare_and_render  CC=4  out:8
+    _run_mmdc_subprocess  CC=8  out:7
+    _setup_puppeteer_config  CC=4  out:9
+    generate_pngs  CC=7  out:9
+    generate_single_png  CC=3  out:5
+    generate_with_puppeteer  CC=2  out:7
+  code2llm.generators.mermaid.validation  [6 funcs]
+    _check_bracket_balance  CC=7  out:8
+    _check_node_ids  CC=12  out:12
+    _is_balanced_node_line  CC=6  out:0
+    _scan_brackets  CC=10  out:6
+    _strip_label_segments  CC=1  out:6
+    validate_mermaid_file  CC=6  out:10
+  code2llm.parsers.toon_parser  [6 funcs]
+    _detect_section  CC=3  out:2
+    _parse_header_line  CC=2  out:2
+    _parse_stats_line  CC=5  out:5
+    is_toon_file  CC=4  out:5
+    load_toon  CC=2  out:4
+    parse_toon_content  CC=8  out:9
+  demo_langs.valid.sample  [10 funcs]
+    Order  CC=1  out:0
+    getId  CC=1  out:0
+    getItem  CC=1  out:0
+    addOrder  CC=1  out:1
+    getOrder  CC=3  out:1
+    main  CC=2  out:6
+    processOrders  CC=2  out:2
+    addUser  CC=1  out:1
+    service  CC=1  out:1
+    main  CC=2  out:5
+  examples.litellm.run  [3 funcs]
+    get_refactoring_advice  CC=2  out:5
+    main  CC=1  out:17
+    run_analysis  CC=4  out:8
+  examples.streaming-analyzer.sample_project.main  [2 funcs]
+    handle_get_request  CC=4  out:6
+    process_request  CC=6  out:11
+  examples.streaming-analyzer.sample_project.utils  [2 funcs]
+    format_output  CC=3  out:5
+    validate_input  CC=4  out:2
+  scripts.benchmark_badges  [3 funcs]
+    create_html  CC=4  out:3
+    get_shield_url  CC=1  out:3
+    main  CC=5  out:23
+  scripts.bump_version  [7 funcs]
+    bump_version  CC=4  out:5
+    format_version  CC=1  out:0
+    get_current_version  CC=3  out:9
+    main  CC=3  out:11
+    parse_version  CC=2  out:3
+    update_pyproject_toml  CC=1  out:5
+    update_version_file  CC=1  out:3
+  test_langs.invalid.sample_bad  [6 funcs]
+    AddUser  CC=1  out:2
+    NewUserService  CC=1  out:1
+    User  CC=1  out:0
+    addUser  CC=1  out:1
+    service  CC=1  out:1
+    main  CC=1  out:3
+  test_langs.valid.sample  [8 funcs]
+    User  CC=1  out:0
+    getId  CC=1  out:0
+    getName  CC=1  out:0
+    addUser  CC=1  out:1
+    getUser  CC=3  out:1
+    main  CC=2  out:6
+    processUsers  CC=2  out:2
+    service  CC=1  out:1
+  test_python_only.valid.sample  [1 funcs]
+    main  CC=2  out:5
+  validate_toon  [21 funcs]
+    _compare_all_aspects  CC=1  out:5
+    _extract_keys_from_yaml  CC=1  out:2
+    _extract_names_from_toon  CC=3  out:4
+    _print_comparison_summary  CC=5  out:5
+    _run_comparison_mode  CC=7  out:12
+    _run_single_file_mode  CC=6  out:12
+    analyze_class_differences  CC=6  out:39
+    compare_basic_stats  CC=4  out:11
+    compare_classes  CC=1  out:19
+    compare_functions  CC=6  out:24
+
+EDGES:
+  test_langs.invalid.sample_bad.main → test_langs.invalid.sample_bad.NewUserService
+  test_langs.invalid.sample_bad.main → test_langs.invalid.sample_bad.AddUser
+  test_langs.valid.sample.UserService.getUser → test_langs.valid.sample.User.getId
+  test_langs.valid.sample.UserService.processUsers → test_langs.valid.sample.User.getName
+  test_langs.invalid.sample_bad.UserService.service → test_langs.invalid.sample_bad.UserService.addUser
+  test_langs.valid.sample.UserService.service → test_langs.valid.sample.UserService.addUser
+  test_langs.valid.sample.UserService.main → test_langs.valid.sample.UserService.addUser
+  test_langs.valid.sample.UserService.main → test_langs.valid.sample.User.User
+  test_langs.valid.sample.UserService.main → test_langs.valid.sample.UserService.getUser
+  test_langs.valid.sample.UserService.main → test_langs.valid.sample.User.getName
+  validate_toon.load_file → code2llm.parsers.toon_parser.is_toon_file
+  validate_toon.load_file → validate_toon.load_yaml
+  validate_toon.load_file → code2llm.parsers.toon_parser.load_toon
+  validate_toon.extract_functions_from_toon → validate_toon._extract_names_from_toon
+  validate_toon.extract_classes_from_yaml → validate_toon._extract_keys_from_yaml
+  validate_toon.extract_classes_from_toon → validate_toon._extract_names_from_toon
+  validate_toon.extract_modules_from_yaml → validate_toon._extract_keys_from_yaml
+  validate_toon.compare_functions → validate_toon.extract_functions_from_yaml
+  validate_toon.compare_functions → validate_toon.extract_functions_from_toon
+  validate_toon.compare_classes → validate_toon.extract_classes_from_yaml
+  validate_toon.compare_classes → validate_toon.extract_classes_from_toon
+  validate_toon.compare_classes → validate_toon.analyze_class_differences
+  validate_toon.compare_modules → validate_toon.extract_modules_from_yaml
+  validate_toon.compare_modules → validate_toon.extract_modules_from_toon
+  validate_toon._run_single_file_mode → validate_toon.load_file
+  validate_toon._run_single_file_mode → validate_toon.validate_toon_completeness
+  validate_toon._run_comparison_mode → validate_toon.load_yaml
+  validate_toon._run_comparison_mode → validate_toon.load_file
+  validate_toon._run_comparison_mode → validate_toon._compare_all_aspects
+  validate_toon._run_comparison_mode → validate_toon._print_comparison_summary
+  validate_toon._compare_all_aspects → validate_toon.compare_basic_stats
+  validate_toon._compare_all_aspects → validate_toon.compare_functions
+  validate_toon._compare_all_aspects → validate_toon.compare_classes
+  validate_toon._compare_all_aspects → validate_toon.compare_modules
+  validate_toon._compare_all_aspects → validate_toon.validate_toon_completeness
+  validate_toon.main → validate_toon._run_single_file_mode
+  validate_toon.main → validate_toon._run_comparison_mode
+  examples.litellm.run.main → examples.litellm.run.run_analysis
+  examples.litellm.run.main → examples.litellm.run.get_refactoring_advice
+  benchmarks.benchmark_evolution.run_benchmark → benchmarks.benchmark_evolution.load_previous
+  benchmarks.benchmark_evolution.run_benchmark → benchmarks.benchmark_evolution.save_current
+  benchmarks.reporting.print_results → benchmarks.reporting._print_header
+  benchmarks.reporting.print_results → benchmarks.reporting._print_scores_table
+  benchmarks.reporting.print_results → benchmarks.reporting._print_problems_detail
+  benchmarks.reporting.print_results → benchmarks.reporting._print_pipelines_detail
+  benchmarks.reporting.print_results → benchmarks.reporting._print_structural_features
+  benchmarks.reporting.print_results → benchmarks.reporting._print_gap_analysis
+  examples.streaming-analyzer.sample_project.main.Application.process_request → examples.streaming-analyzer.sample_project.utils.validate_input
+  examples.streaming-analyzer.sample_project.main.Application.handle_get_request → examples.streaming-analyzer.sample_project.utils.format_output
+  benchmarks.project_generator.create_ground_truth_project → benchmarks.project_generator.create_core_py
+```
+
+### Code Analysis (`project/analysis.toon.yaml`)
+
+```toon markpact:analysis path=project/analysis.toon.yaml
+# code2llm | 210f 27941L | python:191,shell:3,java:1 | 2026-04-20
+# CC̄=3.9 | critical:1/1188 | dups:0 | cycles:0
+
+HEALTH[1]:
+  🟡 CC    load_input CC=15 (limit:15)
+
+REFACTOR[1]:
+  1. split 1 high-CC methods  (CC>15)
+
+PIPELINES[713]:
+  [1] Src [add_user]: add_user
+      PURITY: 100% pure
+  [2] Src [get_user]: get_user
+      PURITY: 100% pure
+  [3] Src [main]: main
+      PURITY: 100% pure
+  [4] Src [new]: new
+      PURITY: 100% pure
+  [5] Src [main]: main → NewUserService
+      PURITY: 100% pure
+
+LAYERS:
+  code2llm/                       CC̄=4.3    ←in:0  →out:8  !! split
+  │ !! renderer                   637L  1C    1m  CC=1      ←0
+  │ large_repo                 488L  2C   20m  CC=9      ←1
+  │ prompt                     475L  0C   18m  CC=14     ←2
+  │ renderer                   471L  1C   26m  CC=11     ←0
+  │ base                       464L  0C   14m  CC=14     ←8
+  │ analyzer                   442L  1C   20m  CC=11     ←0
+  │ file_analyzer              392L  1C   18m  CC=12     ←0
+  │ pipeline                   388L  3C   20m  CC=10     ←0
+  │ flow_exporter              385L  1C   14m  CC=10     ←0
+  │ data_analysis              375L  3C   28m  CC=14     ←0
+  │ pipeline_detector          362L  3C    9m  CC=13     ←0
+  │ yaml_exporter              354L  1C   25m  CC=8      ←0
+  │ content                    348L  0C    1m  CC=1      ←1
+  │ dashboard_renderer         342L  1C    4m  CC=6      ←0
+  │ cli_analysis               331L  0C   11m  CC=14     ←1
+  │ cli_parser                 327L  0C    2m  CC=2      ←1
+  │ entity_resolution          326L  3C   16m  CC=13     ←0
+  │ persistent_cache           322L  1C   18m  CC=10     ←1
+  │ cli_commands               317L  0C   13m  CC=12     ←1
+  │ formats                    315L  0C   16m  CC=13     ←3
+  │ !! llm_task                   309L  0C   14m  CC=15     ←0
+  │ metrics_core               305L  1C   16m  CC=12     ←0
+  │ intent_matching            297L  3C   15m  CC=7      ←0
+  │ side_effects               294L  2C   15m  CC=14     ←0
+  │ orchestrator               293L  0C   11m  CC=14     ←2
+  │ type_inference             290L  1C   17m  CC=9      ←0
+  │ cfg                        280L  1C   16m  CC=5      ←0
+  │ config                     269L  6C    2m  CC=3      ←0
+  │ toon_size_manager          265L  0C    8m  CC=10     ←1
+  │ png                        264L  0C    8m  CC=8      ←3
+  │ mermaid_flow_helpers       263L  0C   12m  CC=11     ←3
+  │ context_exporter           250L  1C   15m  CC=10     ←0
+  │ dfg                        219L  1C   12m  CC=7      ←0
+  │ scanner                    201L  1C    6m  CC=14     ←0
+  │ __init__                   199L  1C   11m  CC=9      ←0
+  │ call_graph                 198L  1C   12m  CC=9      ←0
+  │ refactoring                195L  1C   11m  CC=9      ←0
+  │ render                     195L  0C    6m  CC=10     ←1
+  │ models                     193L  11C    6m  CC=8      ←0
+  │ smells                     192L  1C    9m  CC=7      ←0
+  │ flow_renderer              188L  1C    6m  CC=14     ←2
+  │ streaming_analyzer         181L  1C    6m  CC=12     ←0
+  │ ts_extractors              180L  0C    5m  CC=7      ←2
+  │ repo_files                 174L  0C    8m  CC=8      ←1
+  │ base                       174L  2C    8m  CC=2      ←2
+  │ config                     174L  5C    2m  CC=1      ←0
+  │ analysis                   173L  1C    5m  CC=14     ←1
+  │ __init__                   171L  1C    5m  CC=1      ←0
+  │ detector                   168L  1C    8m  CC=9      ←0
+  │ computation                167L  0C    8m  CC=10     ←2
+  │ ruby                       164L  1C    4m  CC=14     ←1
+  │ dashboard_data             163L  1C    9m  CC=7      ←0
+  │ module_detail              162L  1C    9m  CC=7      ←1
+  │ article_view               159L  1C    8m  CC=7      ←0
+  │ ts_parser                  158L  1C    9m  CC=7      ←2
+  │ flow_compact               157L  0C    8m  CC=11     ←1
+  │ export_pipeline            153L  2C    5m  CC=4      ←0
+  │ toon_view                  153L  1C    8m  CC=6      ←0
+  │ modules                    151L  0C    7m  CC=11     ←1
+  │ incremental                150L  1C   10m  CC=4      ←0
+  │ prompt_engine              150L  1C    7m  CC=12     ←0
+  │ orchestrator_handlers      149L  0C    8m  CC=6      ←2
+  │ fix                        147L  0C    7m  CC=8      ←1
+  │ toon_parser                147L  0C   10m  CC=8      ←1
+  │ gitignore                  138L  2C    7m  CC=7      ←2
+  │ context_view               136L  1C    7m  CC=11     ←0
+  │ prioritizer                131L  2C    4m  CC=9      ←0
+  │ file_filter                127L  1C    9m  CC=9      ←0
+  │ code2logic                 127L  0C    8m  CC=6      ←2
+  │ normalization              122L  2C   13m  CC=6      ←0
+  │ core                       120L  1C    3m  CC=12     ←0
+  │ validation                 119L  0C    6m  CC=12     ←1
+  │ validate_project           118L  0C    3m  CC=11     ←1
+  │ generator                  118L  0C    2m  CC=10     ←1
+  │ scanner                    116L  1C    7m  CC=5      ←0
+  │ details                    115L  0C    5m  CC=13     ←0
+  │ helpers                    111L  0C    7m  CC=8      ←8
+  │ file_cache                 107L  1C   10m  CC=5      ←1
+  │ hotspots                   106L  0C    3m  CC=13     ←1
+  │ yaml_export                106L  0C    5m  CC=8      ←0
+  │ health                     103L  0C    3m  CC=13     ←2
+  │ yaml_export                103L  0C    1m  CC=11     ←0
+  │ nodes                      103L  0C    7m  CC=7      ←1
+  │ ast_registry               102L  1C    9m  CC=5      ←4
+  │ go_lang                    102L  0C    2m  CC=10     ←1
+  │ pipeline_classifier        100L  1C    5m  CC=8      ←0
+  │ utils                       99L  0C    8m  CC=6      ←7
+  │ metrics                     98L  1C    4m  CC=5      ←0
+  │ metrics_health              98L  1C    6m  CC=7      ←0
+  │ __init__                    98L  0C    0m  CC=0.0    ←0
+  │ rust                        94L  0C    1m  CC=9      ←1
+  │ classic                     93L  0C    4m  CC=8      ←0
+  │ pipeline_resolver           91L  1C    5m  CC=10     ←1
+  │ mermaid                     88L  0C    1m  CC=1      ←0
+  │ orchestrator_chunked        87L  0C    3m  CC=9      ←0
+  │ ast_helpers                 86L  0C    5m  CC=8      ←5
+  │ alerts                      84L  0C    4m  CC=8      ←2
+  │ utils                       84L  0C    5m  CC=12     ←3
+  │ __init__                    82L  0C    0m  CC=0.0    ←0
+  │ metrics_duplicates          78L  1C    4m  CC=8      ←0
+  │ __init__                    78L  0C    0m  CC=0.0    ←0
+  │ coupling                    77L  1C    5m  CC=7      ←0
+  │ report_generators           76L  0C    1m  CC=13     ←1
+  │ cli                         76L  0C    2m  CC=3      ←0
+  │ incremental                 75L  1C    5m  CC=5      ←0
+  │ evolution_exporter          74L  1C    3m  CC=1      ←8
+  │ mermaid_exporter            74L  1C    0m  CC=0.0    ←0
+  │ api                         73L  0C    2m  CC=2      ←0
+  │ __init__                    73L  1C    5m  CC=1      ←0
+  │ generic                     71L  0C    1m  CC=12     ←1
+  │ header                      71L  0C    4m  CC=8      ←0
+  │ flow_detailed               70L  0C    1m  CC=1      ←0
+  │ flow_full                   70L  0C    1m  CC=1      ←0
+  │ __init__                    70L  0C    0m  CC=0.0    ←0
+  │ cli                         69L  0C    1m  CC=7      ←0
+  │ utils                       69L  0C    4m  CC=8      ←4
+  │ html_dashboard              68L  1C    3m  CC=1      ←0
+  │ strategies                  68L  1C    0m  CC=0.0    ←0
+  │ sections                    67L  0C    3m  CC=7      ←1
+  │ compact                     67L  0C    1m  CC=13     ←0
+  │ php                         66L  0C    4m  CC=8      ←1
+  │ readme_exporter             66L  1C    1m  CC=5      ←0
+  │ __init__                    66L  0C    0m  CC=0.0    ←0
+  │ calls                       62L  0C    1m  CC=13     ←0
+  │ __init__                    60L  0C    0m  CC=0.0    ←0
+  │ __init__                    54L  0C    0m  CC=0.0    ←0
+  │ __init__                    53L  0C    1m  CC=6      ←0
+  │ typescript                  53L  0C    3m  CC=1      ←1
+  │ __init__                    52L  0C    1m  CC=3      ←0
+  │ insights                    52L  0C    1m  CC=13     ←1
+  │ orchestrator_constants      52L  0C    0m  CC=0.0    ←0
+  │ cache                       50L  1C    5m  CC=4      ←0
+  │ map_exporter                50L  1C    2m  CC=1      ←0
+  │ flow_constants              46L  0C    1m  CC=6      ←6
+  │ evolution                   46L  0C    2m  CC=6      ←3
+  │ java                        43L  0C    1m  CC=1      ←1
+  │ csharp                      42L  0C    1m  CC=1      ←1
+  │ __init__                    40L  0C    0m  CC=0.0    ←0
+  │ parsing                     39L  0C    2m  CC=5      ←2
+  │ __init__                    37L  0C    1m  CC=2      ←0
+  │ cpp                         35L  0C    1m  CC=1      ←1
+  │ json_exporter               27L  1C    1m  CC=3      ←0
+  │ files                       26L  0C    1m  CC=2      ←1
+  │ module_list                 26L  0C    1m  CC=4      ←1
+  │ constants                   25L  0C    0m  CC=0.0    ←0
+  │ __init__                    23L  0C    0m  CC=0.0    ←0
+  │ exclusion                   17L  0C    1m  CC=5      ←2
+  │ _utils                      15L  0C    1m  CC=1      ←2
+  │ project_yaml_exporter       15L  0C    0m  CC=0.0    ←0
+  │ __init__                    15L  0C    0m  CC=0.0    ←0
+  │ constants                   15L  0C    0m  CC=0.0    ←0
+  │ __init__                    15L  0C    0m  CC=0.0    ←0
+  │ llm_exporter                12L  0C    0m  CC=0.0    ←0
+  │ __init__                     7L  0C    0m  CC=0.0    ←0
+  │ __main__                     6L  0C    0m  CC=0.0    ←0
+  │ __init__                     5L  0C    0m  CC=0.0    ←0
+  │ __init__                     0L  0C    0m  CC=0.0    ←0
+  │ __init__                     0L  0C    0m  CC=0.0    ←0
+  │
+  scripts/                        CC̄=3.9    ←in:0  →out:0
+  │ benchmark_badges           392L  0C    9m  CC=13     ←0
+  │ bump_version                96L  0C    7m  CC=4      ←0
+  │
+  ./                              CC̄=3.1    ←in:0  →out:0
+  │ validate_toon              379L  0C   21m  CC=7      ←0
+  │ setup                       72L  0C    2m  CC=2      ←0
+  │ orchestrator.sh             58L  0C    0m  CC=0.0    ←0
+  │ project.sh                  49L  0C    0m  CC=0.0    ←0
+  │ project2.sh                 35L  0C    0m  CC=0.0    ←0
+  │
+  benchmarks/                     CC̄=3.0    ←in:0  →out:1
+  │ benchmark_performance      306L  0C    7m  CC=6      ←0
+  │ project_generator          233L  0C    6m  CC=1      ←1
+  │ reporting                  179L  0C    9m  CC=6      ←1
+  │ benchmark_optimizations    157L  0C    5m  CC=7      ←0
+  │ benchmark_format_quality   143L  0C    5m  CC=4      ←0
+  │ format_evaluator           138L  1C    5m  CC=5      ←1
+  │ benchmark_evolution        137L  0C    4m  CC=13     ←0
+  │ benchmark_constants         29L  0C    0m  CC=0.0    ←0
+  │
+  badges/                         CC̄=2.7    ←in:0  →out:0
+  │ server                     110L  0C    3m  CC=4      ←0
+  │
+  examples/                       CC̄=2.4    ←in:0  →out:0
+  │ demo                       251L  0C    7m  CC=5      ←0
+  │ main                       158L  2C    9m  CC=6      ←0
+  │ database                   157L  1C   13m  CC=5      ←0
+  │ entity_preparers           129L  6C   18m  CC=5      ←0
+  │ cache                      121L  2C   10m  CC=5      ←0
+  │ run                        120L  0C    3m  CC=4      ←0
+  │ template_engine            104L  3C   10m  CC=3      ←0
+  │ auth                        88L  1C   10m  CC=3      ←0
+  │ utils                       84L  0C    5m  CC=7      ←1
+  │ api                         76L  1C    7m  CC=5      ←0
+  │ generator                   61L  1C    2m  CC=4      ←0
+  │ functional_refactoring_example    61L  1C    9m  CC=4      ←0
+  │ cli                         45L  0C    1m  CC=6      ←0
+  │ models                      25L  2C    0m  CC=0.0    ←0
+  │ __init__                     6L  0C    0m  CC=0.0    ←0
+  │ __init__                     1L  0C    0m  CC=0.0    ←0
+  │
+  test_python_only/               CC̄=1.8    ←in:0  →out:0
+  │ sample                      40L  2C    5m  CC=3      ←0
+  │ __init__                     1L  0C    0m  CC=0.0    ←0
+  │ __init__                     1L  0C    0m  CC=0.0    ←0
+  │
+  demo_langs/                     CC̄=1.5    ←in:0  →out:0
+  │ sample                      53L  2C    8m  CC=3      ←0
+  │ sample.rs                   47L  1C    4m  CC=2      ←0
+  │ sample.java                 47L  2C    7m  CC=3      ←0
+  │ sample.go                   46L  0C    4m  CC=3      ←0
+  │ sample.php                  44L  1C    1m  CC=1      ←0
+  │ sample.ts                   26L  1C    4m  CC=2      ←0
+  │
+  test_langs/                     CC̄=1.4    ←in:0  →out:0
+  │ sample.rs                   47L  1C    4m  CC=2      ←0
+  │ sample.java                 47L  2C    7m  CC=3      ←1
+  │ sample.go                   46L  0C    4m  CC=3      ←0
+  │ sample.php                  44L  1C    1m  CC=1      ←0
+  │ sample                      40L  2C    5m  CC=3      ←0
+  │ sample.ts                   26L  1C    1m  CC=1      ←0
+  │ sample_bad.go               24L  0C    3m  CC=1      ←0
+  │ sample_bad.php              22L  1C    1m  CC=1      ←0
+  │ sample_bad.ts               20L  1C    2m  CC=1      ←0
+  │ sample_bad.rs               18L  1C    1m  CC=1      ←0
+  │ sample_bad.java             18L  2C    2m  CC=1      ←3
+  │
+  ── zero ──
+     code2llm/patterns/__init__.py             0L
+     code2llm/refactor/__init__.py             0L
+
+COUPLING:
+                            code2llm.cli_exports      code2llm.exporters           code2llm.core                code2llm       code2llm.analysis     code2llm.generators        code2llm.parsers      test_langs.invalid           validate_toon              benchmarks        demo_langs.valid  test_python_only.valid
+    code2llm.cli_exports                      ──                       8                       1                      ←4                                               2                                                                                                                                                  !! fan-out
+      code2llm.exporters                      ←8                      ──                                                                       2                                                                                                                                                                          hub
+           code2llm.core                      ←1                                              ──                      ←4                      ←3                                                                                                                      ←1                                                  hub
+                code2llm                       4                                               4                      ──                                                                                                                                                                                                  !! fan-out
+       code2llm.analysis                                              ←2                       3                                              ──                                                                                                                                                                        
+     code2llm.generators                      ←2                                                                                                                      ──                                                                                                                                                
+        code2llm.parsers                                                                                                                                                                      ──                                              ←2                                                                        
+      test_langs.invalid                                                                                                                                                                                              ──                                                                      ←1                      ←1
+           validate_toon                                                                                                                                                                       2                                              ──                                                                        
+              benchmarks                                                                       1                                                                                                                                                                      ──                                                
+        demo_langs.valid                                                                                                                                                                                               1                                                                      ──                        
+  test_python_only.valid                                                                                                                                                                                               1                                                                                              ──
+  CYCLES: none
+  HUB: code2llm.exporters/ (fan-in=8)
+  HUB: code2llm.core/ (fan-in=9)
+  SMELL: code2llm.cli_exports/ fan-out=11 → split needed
+  SMELL: code2llm/ fan-out=8 → split needed
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon
+```
+
+### Duplication (`project/duplication.toon.yaml`)
+
+```toon markpact:analysis path=project/duplication.toon.yaml
+# redup/duplication | 8 groups | 192f 27344L | 2026-04-20
+
+SUMMARY:
+  files_scanned: 192
+  total_lines:   27344
+  dup_groups:    8
+  dup_fragments: 21
+  saved_lines:   312
+  scan_ms:       9497
+
+HOTSPOTS[7] (files with most duplication):
+  benchmarks/project_generator.py  dup=187L  groups=1  frags=4  (0.7%)
+  code2llm/exporters/mermaid/utils.py  dup=18L  groups=2  frags=3  (0.1%)
+  code2llm/exporters/toon/helpers.py  dup=12L  groups=1  frags=1  (0.0%)
+  validate_toon.py  dup=12L  groups=1  frags=4  (0.0%)
+  code2llm/exporters/map/header.py  dup=8L  groups=1  frags=2  (0.0%)
+  code2llm/core/lang/cpp.py  dup=7L  groups=1  frags=1  (0.0%)
+  code2llm/core/lang/csharp.py  dup=7L  groups=1  frags=1  (0.0%)
+
+DUPLICATES[8] (ranked by impact):
+  [362da81ebf98419f] !! STRU  create_core_py  L=88 N=4 saved=264 sim=1.00
+      benchmarks/project_generator.py:11-98  (create_core_py)
+      benchmarks/project_generator.py:101-130  (create_etl_py)
+      benchmarks/project_generator.py:133-173  (create_validation_py)
+      benchmarks/project_generator.py:176-203  (create_utils_py)
+  [710a483fb398e4ca]   STRU  analyze_cpp  L=7 N=3 saved=14 sim=1.00
+      code2llm/core/lang/cpp.py:29-35  (analyze_cpp)
+      code2llm/core/lang/csharp.py:36-42  (analyze_csharp)
+      code2llm/core/lang/java.py:37-43  (analyze_java)
+  [5411378d5b98038d]   STRU  module_of  L=12 N=2 saved=12 sim=1.00
+      code2llm/exporters/mermaid/utils.py:32-43  (module_of)
+      code2llm/exporters/toon/helpers.py:34-45  (_package_of_module)
+  [95b3b58a4f01f4cc]   STRU  extract_functions_from_toon  L=3 N=4 saved=9 sim=1.00
+      validate_toon.py:52-54  (extract_functions_from_toon)
+      validate_toon.py:62-64  (extract_classes_from_yaml)
+      validate_toon.py:67-69  (extract_classes_from_toon)
+      validate_toon.py:115-117  (extract_modules_from_yaml)
+  [413b836b4dc3a103]   STRU  _render_alerts_line  L=4 N=2 saved=4 sim=1.00
+      code2llm/exporters/map/header.py:59-62  (_render_alerts_line)
+      code2llm/exporters/map/header.py:65-68  (_render_hotspots_line)
+  [c427db29782c2b80]   EXAC  visit_AsyncFunctionDef  L=3 N=2 saved=3 sim=1.00
+      code2llm/analysis/call_graph.py:109-111  (visit_AsyncFunctionDef)
+      code2llm/analysis/cfg.py:107-109  (visit_AsyncFunctionDef)
+  [f55844b1df4e27e0]   STRU  _export_calls  L=3 N=2 saved=3 sim=1.00
+      code2llm/cli_exports/formats.py:231-233  (_export_calls)
+      code2llm/cli_exports/formats.py:236-238  (_export_calls_toon)
+  [65cac80cf1403b3c]   STRU  readable_id  L=3 N=2 saved=3 sim=1.00
+      code2llm/exporters/mermaid/utils.py:11-13  (readable_id)
+      code2llm/exporters/mermaid/utils.py:16-18  (safe_module)
+
+REFACTOR[8] (ranked by priority):
+  [1] ○ extract_module     → benchmarks/utils/create_core_py.py
+      WHY: 4 occurrences of 88-line block across 1 files — saves 264 lines
+      FILES: benchmarks/project_generator.py
+  [2] ○ extract_function   → code2llm/core/lang/utils/analyze_cpp.py
+      WHY: 3 occurrences of 7-line block across 3 files — saves 14 lines
+      FILES: code2llm/core/lang/cpp.py, code2llm/core/lang/csharp.py, code2llm/core/lang/java.py
+  [3] ○ extract_function   → code2llm/exporters/utils/module_of.py
+      WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
+      FILES: code2llm/exporters/mermaid/utils.py, code2llm/exporters/toon/helpers.py
+  [4] ○ extract_function   → utils/extract_functions_from_toon.py
+      WHY: 4 occurrences of 3-line block across 1 files — saves 9 lines
+      FILES: validate_toon.py
+  [5] ○ extract_function   → code2llm/exporters/map/utils/_render_alerts_line.py
+      WHY: 2 occurrences of 4-line block across 1 files — saves 4 lines
+      FILES: code2llm/exporters/map/header.py
+  [6] ○ extract_function   → code2llm/analysis/utils/visit_AsyncFunctionDef.py
+      WHY: 2 occurrences of 3-line block across 2 files — saves 3 lines
+      FILES: code2llm/analysis/call_graph.py, code2llm/analysis/cfg.py
+  [7] ○ extract_function   → code2llm/cli_exports/utils/_export_calls.py
+      WHY: 2 occurrences of 3-line block across 1 files — saves 3 lines
+      FILES: code2llm/cli_exports/formats.py
+  [8] ○ extract_function   → code2llm/exporters/mermaid/utils/readable_id.py
+      WHY: 2 occurrences of 3-line block across 1 files — saves 3 lines
+      FILES: code2llm/exporters/mermaid/utils.py
+
+QUICK_WINS[4] (low risk, high savings — do first):
+  [1] extract_module     saved=264L  → benchmarks/utils/create_core_py.py
+      FILES: project_generator.py
+  [2] extract_function   saved=14L  → code2llm/core/lang/utils/analyze_cpp.py
+      FILES: cpp.py, csharp.py, java.py
+  [3] extract_function   saved=12L  → code2llm/exporters/utils/module_of.py
+      FILES: utils.py, helpers.py
+  [4] extract_function   saved=9L  → utils/extract_functions_from_toon.py
+      FILES: validate_toon.py
+
+EFFORT_ESTIMATE (total ≈ 14.8h):
+  hard   create_core_py                      saved=264L  ~792min
+  easy   analyze_cpp                         saved=14L  ~28min
+  easy   module_of                           saved=12L  ~24min
+  easy   extract_functions_from_toon         saved=9L  ~18min
+  easy   _render_alerts_line                 saved=4L  ~8min
+  easy   visit_AsyncFunctionDef              saved=3L  ~6min
+  easy   _export_calls                       saved=3L  ~6min
+  easy   readable_id                         saved=3L  ~6min
+
+METRICS-TARGET:
+  dup_groups:  8 → 0
+  saved_lines: 312 lines recoverable
+```
+
+### Evolution / Churn (`project/evolution.toon.yaml`)
+
+```toon markpact:analysis path=project/evolution.toon.yaml
+# code2llm/evolution | 999 func | 150f | 2026-04-20
+
+NEXT[1] (ranked by impact):
+  [1] !! SPLIT           code2llm/exporters/index_generator/renderer.py
+      WHY: 637L, 1 classes, max CC=1
+      EFFORT: ~4h  IMPACT: 637
+
+
+RISKS[1]:
+  ⚠ Splitting code2llm/exporters/index_generator/renderer.py may break 1 import paths
+
+METRICS-TARGET:
+  CC̄:          4.1 → ≤2.9
+  max-CC:      15 → ≤7
+  god-modules: 1 → 0
+  high-CC(≥15): 1 → ≤0
+  hub-types:   0 → ≤0
+
+PATTERNS (language parser shared logic):
+  _extract_declarations() in base.py — unified extraction for:
+    - TypeScript: interfaces, types, classes, functions, arrow funcs
+    - PHP: namespaces, traits, classes, functions, includes
+    - Ruby: modules, classes, methods, requires
+    - C++: classes, structs, functions, #includes
+    - C#: classes, interfaces, methods, usings
+    - Java: classes, interfaces, methods, imports
+    - Go: packages, functions, structs
+    - Rust: modules, functions, traits, use statements
+
+  Shared regex patterns per language:
+    - import: language-specific import/require/using patterns
+    - class: class/struct/trait declarations with inheritance
+    - function: function/method signatures with visibility
+    - brace_tracking: for C-family languages ({ })
+    - end_keyword_tracking: for Ruby (module/class/def...end)
+
+  Benefits:
+    - Consistent extraction logic across all languages
+    - Reduced code duplication (~70% reduction in parser LOC)
+    - Easier maintenance: fix once, apply everywhere
+    - Standardized FunctionInfo/ClassInfo models
+
+HISTORY:
+  prev CC̄=4.1 → now CC̄=4.1
+```
+
+### Validation (`project/validation.toon.yaml`)
+
+```toon markpact:analysis path=project/validation.toon.yaml
+# vallm batch | 332f | 0✓ 256⚠ 0✗ | 2026-04-20
+
+SUMMARY:
+  scanned: 332  passed: 0 (0.0%)  warnings: 256  errors: 0  unsupported: 0
+
+WARNINGS[256]{path,score}:
+  code2llm/cli_parser.py,0.74
+    issues[2]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+      complexity.lizard_length,warning,create_parser: 262 lines exceeds limit 100,19
+  tests/test_format_quality.py,0.74
+    issues[2]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+      complexity.lizard_length,warning,ground_truth_project: 116 lines exceeds limit 100,25
+  .pyqual/ruff.json,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JSON: Download error: Language 'JSON' not available for download. Available groups: [""all""]",
+  .pyqual/runtime_errors.json,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JSON: Download error: Language 'JSON' not available for download. Available groups: [""all""]",
+  SUMR.json,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JSON: Download error: Language 'JSON' not available for download. Available groups: [""all""]",
+  badges/server.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/benchmark_constants.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/benchmark_evolution.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/benchmark_format_quality.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/benchmark_optimizations.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/benchmark_performance.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/format_evaluator.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/project_generator.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/reporting.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  benchmarks/test_performance.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  calls.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  calls_output/calls.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  code2llm/.code2llm_incremental.json,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JSON: Download error: Language 'JSON' not available for download. Available groups: [""all""]",
+  code2llm/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/__main__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/call_graph.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/cfg.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/coupling.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/data_analysis.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/dfg.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/pipeline_classifier.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/pipeline_detector.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/pipeline_resolver.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/side_effects.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/smells.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/type_inference.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/utils/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/analysis/utils/ast_helpers.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/api.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_analysis.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_commands.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/code2logic.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/formats.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/orchestrator.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/orchestrator_chunked.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/orchestrator_constants.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/orchestrator_handlers.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/cli_exports/prompt.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/analyzer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/ast_registry.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/config.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/export_pipeline.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/file_analyzer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/file_cache.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/file_filter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/gitignore.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/incremental.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/base.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/cpp.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/csharp.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/generic.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/go_lang.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/java.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/php.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/ruby.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/rust.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/ts_extractors.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/ts_parser.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/lang/typescript.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/large_repo.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/models.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/persistent_cache.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/refactoring.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/repo_files.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming/cache.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming/incremental.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming/prioritizer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming/scanner.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming/strategies.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/streaming_analyzer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/core/toon_size_manager.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/article_view.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/base.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/context_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/context_view.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/dashboard_data.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/dashboard_renderer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution/computation.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution/constants.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution/exclusion.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution/render.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution/yaml_export.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/evolution_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/flow_constants.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/flow_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/flow_renderer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/html_dashboard.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/index_generator.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/index_generator/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/index_generator/renderer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/index_generator/scanner.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/json_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/llm_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/alerts.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/details.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/header.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/module_list.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/utils.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map/yaml_export.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/map_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/calls.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/classic.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/compact.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/flow_compact.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/flow_detailed.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/flow_full.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid/utils.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/mermaid_flow_helpers.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/constants.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/core.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/evolution.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/health.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/hotspots.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml/modules.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/project_yaml_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/readme/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/readme/content.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/readme/files.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/readme/insights.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/readme/sections.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/readme_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/report_generators.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/helpers.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/metrics.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/metrics_core.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/metrics_duplicates.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/metrics_health.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/module_detail.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon/renderer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/toon_view.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/validate_project.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/exporters/yaml_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/_utils.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/analysis.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/cli.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/generator.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/nodes.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/parsing.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_flow/utils.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/llm_task.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/mermaid.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/mermaid/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/mermaid/fix.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/mermaid/png.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/generators/mermaid/validation.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/nlp/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/nlp/config.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/nlp/config.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  code2llm/nlp/entity_resolution.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/nlp/intent_matching.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/nlp/normalization.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/nlp/pipeline.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/parsers/toon_parser.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/patterns/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/patterns/detector.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/refactor/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  code2llm/refactor/prompt_engine.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  demo_langs/invalid/sample_bad.go,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse GO: Download error: Language 'GO' not available for download. Available groups: [""all""]",
+  demo_langs/invalid/sample_bad.java,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JAVA: Download error: Language 'JAVA' not available for download. Available groups: [""all""]",
+  demo_langs/invalid/sample_bad.php,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PHP: Download error: Language 'PHP' not available for download. Available groups: [""all""]",
+  demo_langs/invalid/sample_bad.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  demo_langs/invalid/sample_bad.rs,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse RUST: Download error: Language 'RUST' not available for download. Available groups: [""all""]",
+  demo_langs/invalid/sample_bad.ts,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse TYPESCRIPT: Download error: Language 'TYPESCRIPT' not available for download. Available groups: [""all""]",
+  demo_langs/valid/sample.go,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse GO: Download error: Language 'GO' not available for download. Available groups: [""all""]",
+  demo_langs/valid/sample.java,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JAVA: Download error: Language 'JAVA' not available for download. Available groups: [""all""]",
+  demo_langs/valid/sample.php,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PHP: Download error: Language 'PHP' not available for download. Available groups: [""all""]",
+  demo_langs/valid/sample.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  demo_langs/valid/sample.rs,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse RUST: Download error: Language 'RUST' not available for download. Available groups: [""all""]",
+  demo_langs/valid/sample.ts,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse TYPESCRIPT: Download error: Language 'TYPESCRIPT' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/cache.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/cli.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/entity_preparers.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/generator.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/models.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring/template_engine.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/functional_refactoring_example.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/litellm/run.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/demo.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/sample_project/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/sample_project/api.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/sample_project/auth.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/sample_project/database.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/sample_project/main.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/sample_project/utils.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/streaming-analyzer/test_example.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  goal.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  orchestrator.sh,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse BASH: Download error: Language 'BASH' not available for download. Available groups: [""all""]",
+  planfile.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  prefact.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  project.sh,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse BASH: Download error: Language 'BASH' not available for download. Available groups: [""all""]",
+  project/calls.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  project2.sh,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse BASH: Download error: Language 'BASH' not available for download. Available groups: [""all""]",
+  project_calls_test/calls.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  pyproject.toml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse TOML: Download error: Language 'TOML' not available for download. Available groups: [""all""]",
+  pyqual.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  redsl.yaml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse YAML: Download error: Language 'YAML' not available for download. Available groups: [""all""]",
+  scripts/benchmark_badges.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  scripts/bump_version.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  setup.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  sumd.json,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JSON: Download error: Language 'JSON' not available for download. Available groups: [""all""]",
+  test_langs/invalid/sample_bad.go,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse GO: Download error: Language 'GO' not available for download. Available groups: [""all""]",
+  test_langs/invalid/sample_bad.java,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JAVA: Download error: Language 'JAVA' not available for download. Available groups: [""all""]",
+  test_langs/invalid/sample_bad.php,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PHP: Download error: Language 'PHP' not available for download. Available groups: [""all""]",
+  test_langs/invalid/sample_bad.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  test_langs/invalid/sample_bad.rs,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse RUST: Download error: Language 'RUST' not available for download. Available groups: [""all""]",
+  test_langs/invalid/sample_bad.ts,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse TYPESCRIPT: Download error: Language 'TYPESCRIPT' not available for download. Available groups: [""all""]",
+  test_langs/valid/sample.go,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse GO: Download error: Language 'GO' not available for download. Available groups: [""all""]",
+  test_langs/valid/sample.java,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JAVA: Download error: Language 'JAVA' not available for download. Available groups: [""all""]",
+  test_langs/valid/sample.php,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PHP: Download error: Language 'PHP' not available for download. Available groups: [""all""]",
+  test_langs/valid/sample.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  test_langs/valid/sample.rs,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse RUST: Download error: Language 'RUST' not available for download. Available groups: [""all""]",
+  test_langs/valid/sample.ts,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse TYPESCRIPT: Download error: Language 'TYPESCRIPT' not available for download. Available groups: [""all""]",
+  test_python_only/invalid/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  test_python_only/invalid/sample_bad.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  test_python_only/valid/__init__.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  test_python_only/valid/sample.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_advanced_analysis.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_analyzer.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_calls_toon_export.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_deep_analysis.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_edge_cases.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_flow_exporter.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_multilanguage_e2e.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_nlp_pipeline.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_nonpython_cc_calls.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_persistent_cache.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_pipeline_detector.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_project_toon_export.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_prompt_engine.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_prompt_txt.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_refactoring_engine.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_toon_v2.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  validate_toon.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+```
+
+## Intent
+
+High-performance Python code flow analysis with optimized TOON format - CFG, DFG, call graphs, and intelligent code queries

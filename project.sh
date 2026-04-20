@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 clear
+
+# Performance: disable pip version check (~4-8s saved)
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+
 # Activate virtual environment
 source .venv/bin/activate
 
