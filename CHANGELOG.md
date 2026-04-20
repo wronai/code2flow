@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.5.139] - 2026-04-20
+
+### Other
+- Update code2llm/cli_exports/orchestrator_chunked.py
+
 ## [0.5.138] - 2026-04-20
 
 ### Docs

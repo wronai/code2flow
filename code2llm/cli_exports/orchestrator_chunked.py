@@ -33,7 +33,7 @@ def _export_chunked(
     for sp in subprojects:
         _process_subproject(args, sp, output_dir)
 
-    _export_registry_formats(args, result, output_dir, ['toon', 'context', 'evolution'])
+    _export_registry_formats(args, result, output_dir, ['toon', 'map', 'context', 'evolution'])
 
     if 'calls' in formats or 'calls_toon' in formats:
         _export_calls(args, result, output_dir, formats)
