@@ -43,12 +43,7 @@ class ProjectAnalyzer:
     def analyze_project(self, project_path: str) -> AnalysisResult:
         """Analyze entire project."""
         start_time = time.time()
-        print(f"DEBUG analyze_project: input project_path={project_path}")
-        print(f"DEBUG analyze_project: self.project_path before={self.project_path}")
         project_path = self._resolve_project_path(project_path)
-        print(f"DEBUG analyze_project: project_path after resolve={project_path}")
-        print(f"DEBUG analyze_project: self.project_path after={self.project_path}")
-        print(f"DEBUG analyze_project: file_filter.project_path={self.file_filter.project_path}")
         files = self._collect_files(project_path)
 
         if self.config.verbose:
@@ -67,9 +62,7 @@ class ProjectAnalyzer:
                 print(f"   ... and {len(files_to_analyze) - 10} more")
             print()
 
-        print(f"DEBUG analyze_project: files_to_analyze={len(files_to_analyze)}")
         fresh_results = self._run_analysis(files_to_analyze)
-        print(f"DEBUG analyze_project: fresh_results={len(fresh_results)}")
         self._store_to_persistent_cache(pcache, files_to_analyze, fresh_results)
 
         merged = self._merge_results(cached_results + fresh_results, str(project_path))
@@ -214,10 +207,6 @@ class ProjectAnalyzer:
                 if not self.file_filter.should_process(file_str):
                     continue
 
-                # DEBUG
-                if 'vendor' in file_str.lower():
-                    print(f"DEBUG _collect_files: COLLECTED vendor file: {file_str}")
-
                 # Calculate module name from relative path
                 rel = os.path.relpath(file_str, project_str)
                 parts = rel.replace('\\', '/').split('/')
@@ -230,10 +219,6 @@ class ProjectAnalyzer:
                     module_name = '.'.join(dir_parts + [stem]) if dir_parts else stem
 
                 files.append((file_str, module_name))
-
-        # DEBUG
-        vendor_count = len([f for f, m in files if 'vendor' in f.lower()])
-        print(f"DEBUG _collect_files: total={len(files)}, vendor={vendor_count}")
 
         return files
     
