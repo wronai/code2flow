@@ -23,7 +23,7 @@ High-performance Python code flow analysis with optimized TOON format - CFG, DFG
 ## Metadata
 
 - **name**: `code2llm`
-- **version**: `0.5.135`
+- **version**: `0.5.137`
 - **python_requires**: `>=3.8`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -533,7 +533,7 @@ pipeline:
 ```yaml
 project:
   name: code2llm
-  version: 0.5.135
+  version: 0.5.137
   env: local
 ```
 
@@ -664,13 +664,13 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# code2llm | 232f 33141L | python:217,go:4,rust:4,typescript:4,shell:3 | 2026-04-20
-# stats: 494 func | 183 cls | 232 mod | CC̄=4.5 | critical:40 | cycles:0
+# code2llm | 233f 33382L | python:218,go:4,rust:4,typescript:4,shell:3 | 2026-04-20
+# stats: 496 func | 183 cls | 233 mod | CC̄=4.5 | critical:40 | cycles:0
 # alerts[5]: CC load_input=15; CC _analyze_subproject=14; CC _run_exports=14; CC _analyze_generated_files=14; CC _match_method_name=14
 # hotspots[5]: run_benchmark fan=18; _run_exports fan=18; handle_cache_command fan=17; _analyze_subproject fan=16; _export_mermaid fan=16
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[232]:
+M[233]:
   badges/server.py,110
   benchmarks/benchmark_constants.py,30
   benchmarks/benchmark_evolution.py,138
@@ -867,9 +867,10 @@ M[232]:
   examples/streaming-analyzer/sample_project/main.py,159
   examples/streaming-analyzer/sample_project/utils.py,85
   examples/streaming-analyzer/test_example.py,93
-  orchestrator.sh,59
-  project.sh,49
-  project2.sh,37
+  orchestrator.sh,83
+  pipeline.py,204
+  project.sh,53
+  project2.sh,46
   scripts/benchmark_badges.py,392
   scripts/bump_version.py,97
   setup.py,73
@@ -1810,6 +1811,10 @@ D:
     test_imports()
     test_basic_analysis()
     main()
+  pipeline.py:
+    e: _detect_primary_language,run_pipeline
+    _detect_primary_language(project_dir)
+    run_pipeline(project_dir;output_dir)
   scripts/benchmark_badges.py:
     e: get_shield_url,parse_evolution_metrics,parse_format_quality_report,parse_performance_report,generate_badges,generate_format_quality_badges,generate_performance_badges,create_html,main
     get_shield_url(label;message;color)
