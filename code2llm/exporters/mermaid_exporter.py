@@ -72,4 +72,3 @@ class MermaidExporter(BaseExporter):
     _should_skip_module = staticmethod(_should_skip_module)
     _is_entry_point = staticmethod(_is_entry_point)
     _find_critical_path = staticmethod(_find_critical_path)
-

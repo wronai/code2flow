@@ -1,16 +1,17 @@
 schema: '1.0'
 project: code2llm
 version: 0.5.120
-generated: '2026-04-19'
+generated: '2026-04-20'
 generator: redsl planfile sync
 sources:
 - project/analysis.toon.yaml
 - project/duplication.toon.yaml
 - analysis.toon.yaml
 stats:
-  total: 50
-  todo: 49
-  done: 1
+  total: 51
+  todo: 47
+  done: 4
+
 tasks:
 - id: Q01
   title: 'reduce_complexity: readme_exporter (CC=13)'
@@ -35,7 +36,7 @@ tasks:
   action: reduce_complexity
   priority: 3
   effort: medium
-  status: todo
+  status: done
   labels:
   - refactor
   - complexity
@@ -125,7 +126,7 @@ tasks:
   action: reduce_complexity
   priority: 3
   effort: medium
-  status: todo
+  status: done
   labels:
   - refactor
   - complexity
@@ -693,6 +694,22 @@ tasks:
   source: project/duplication.toon.yaml
   priority_label: medium
 - id: D06
+  title: 'extract_function: create_core_py (saves 264L)'
+  description: 'Duplicated ''create_core_py'': 4 occurrences, 88 lines each, saves
+    264 lines. Files: benchmarks/project_generator.py, benchmarks/project_generator.py,
+    benchmarks/project_generator.py'
+  file: benchmarks/project_generator.py
+  action: extract_function
+  priority: 2
+  effort: low
+  status: done
+  labels:
+  - refactor
+  - duplication
+  - extract-function
+  source: project/duplication.toon.yaml
+  priority_label: high
+- id: D07
   title: 'extract_function: analyze_cpp (saves 14L)'
   description: 'Duplicated ''analyze_cpp'': 3 occurrences, 7 lines each, saves 14
     lines. Files: code2llm/core/lang/cpp.py, code2llm/core/lang/csharp.py, code2llm/core/lang/java.py'
@@ -700,14 +717,13 @@ tasks:
   action: extract_function
   priority: 3
   effort: medium
-  status: done
+  status: todo
   labels:
   - refactor
   - duplication
   - extract-function
   source: project/duplication.toon.yaml
   priority_label: medium
-  completed_at: '2026-04-20T06:52:53.232907+00:00'
 - id: Q02
   title: 'reduce_complexity: mermaid (CC=13)'
   description: Module 'mermaid' has cyclomatic complexity CC=13 (484 lines, 0 complex
@@ -716,7 +732,7 @@ tasks:
   action: reduce_complexity
   priority: 3
   effort: medium
-  status: todo
+  status: done
   labels:
   - refactor
   - complexity

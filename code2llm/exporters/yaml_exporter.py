@@ -15,6 +15,17 @@ class YAMLExporter(BaseExporter):
 
     def __init__(self):
         self.analyzer = DataAnalyzer()
+        self._name_index: Optional[Dict[str, List[str]]] = None
+
+    def _get_name_index(self, funcs: Dict[str, FunctionInfo]) -> Dict[str, List[str]]:
+        """Build index mapping simple names to qualified names for O(1) lookup."""
+        if self._name_index is None:
+            index: Dict[str, List[str]] = defaultdict(list)
+            for qn in funcs:
+                simple_name = qn.split('.')[-1]
+                index[simple_name].append(qn)
+            self._name_index = index
+        return self._name_index
 
     def export(
         self,
@@ -126,6 +137,7 @@ class YAMLExporter(BaseExporter):
         - modules: grouping of functions by module
         - stats: summary statistics
         """
+        self._name_index = None  # Reset cache for fresh analysis
         connected, edges = self._collect_edges(result, max_calls_per_func, max_edges)
         nodes = self._build_nodes(result, connected)
         modules = self._group_by_module(result, connected)
@@ -186,14 +198,15 @@ class YAMLExporter(BaseExporter):
 
     def _build_nodes(self, result: AnalysisResult, connected: Set[str]) -> Dict[str, Dict]:
         """Build node data for all connected functions."""
+        calls_in_counts = self._compute_calls_in_counts(result)
         nodes: Dict[str, Dict] = {}
         for fn in connected:
             fi = result.functions.get(fn)
             if fi:
-                nodes[fn] = self._create_node(fi, fn, result)
+                nodes[fn] = self._create_node(fi, fn, calls_in_counts.get(fn, 0))
         return nodes
 
-    def _create_node(self, fi: FunctionInfo, fn: str, result: AnalysisResult) -> Dict:
+    def _create_node(self, fi: FunctionInfo, fn: str, calls_in: int) -> Dict:
         """Create node dict with function metadata."""
         return {
             'name': fi.name,
@@ -201,19 +214,25 @@ class YAMLExporter(BaseExporter):
             'line': fi.line,
             'cyclomatic_complexity': self._get_cc(fi),
             'calls_out': len(fi.calls),
-            'calls_in': self._count_calls_in(fn, result),
+            'calls_in': calls_in,
         }
 
-    def _count_calls_in(self, fn: str, result: AnalysisResult) -> int:
-        """Count how many functions call the given function."""
-        count = 0
+    def _compute_calls_in_counts(self, result: AnalysisResult) -> Dict[str, int]:
+        """Pre-compute calls_in counts for all functions in O(n * avg_calls) time."""
+        counts: Dict[str, int] = defaultdict(int)
+        name_index = self._get_name_index(result.functions)
+
         for f in result.functions.values():
             for c in f.calls:
-                resolved = self._resolve_callee(c, result.functions)
-                if resolved == fn:
-                    count += 1
-                    break
-        return count
+                # Fast resolution using the index
+                resolved = c if c in result.functions else None
+                if not resolved:
+                    candidates = name_index.get(c, [])
+                    if len(candidates) == 1:
+                        resolved = candidates[0]
+                if resolved:
+                    counts[resolved] += 1
+        return counts
 
     @staticmethod
     def _group_by_module(result: AnalysisResult, connected: Set[str]) -> Dict[str, List[str]]:
@@ -245,12 +264,11 @@ class YAMLExporter(BaseExporter):
         
         return calls_data
 
-    @staticmethod
-    def _resolve_callee(callee: str, funcs: Dict[str, FunctionInfo]) -> Optional[str]:
-        """Resolve callee to a known qualified name."""
+    def _resolve_callee(self, callee: str, funcs: Dict[str, FunctionInfo]) -> Optional[str]:
+        """Resolve callee to a known qualified name using O(1) index lookup."""
         if callee in funcs:
             return callee
-        candidates = [qn for qn in funcs if qn.endswith(f".{callee}")]
+        candidates = self._get_name_index(funcs).get(callee, [])
         if len(candidates) == 1:
             return candidates[0]
         return None

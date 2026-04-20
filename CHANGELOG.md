@@ -1,5 +1,25 @@
 ## [Unreleased]
 
+## [0.5.134] - 2026-04-20
+
+### Docs
+- Update README.md
+- Update redsl_refactor_plan.md
+- Update redsl_refactor_report.md
+
+### Other
+- Update .gitignore
+- Update .pyqual/llx_history.jsonl
+- Update .pyqual/pipeline.db
+- Update .pyqual/ruff.json
+- Update .pyqual/runtime_errors.json
+- Update code2llm/exporters/mermaid_exporter.py
+- Update code2llm/exporters/yaml_exporter.py
+- Update code2llm/generators/mermaid.py
+- Update planfile.yaml
+- Update project/validation.toon.yaml
+- ... and 3 more files
+
 ## [0.5.133] - 2026-04-20
 
 ### Other

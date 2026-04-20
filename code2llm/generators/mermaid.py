@@ -67,8 +67,8 @@ __all__ = [
 ]
 
 
-if __name__ == '__main__':
-    # CLI interface for testing
+def run_cli() -> None:
+    """Run the CLI interface for generating PNGs from Mermaid files."""
     import argparse
     
     parser = argparse.ArgumentParser(description='Generate PNG from Mermaid files')
@@ -82,3 +82,7 @@ if __name__ == '__main__':
     
     count = generate_pngs(input_path, output_path)
     print(f"Generated {count} PNG files")
+
+
+if __name__ == '__main__':
+    run_cli()

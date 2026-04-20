@@ -1,4 +1,4 @@
-# redsl | refactor | 2026-04-19
+# redsl | refactor | 2026-04-20
 # mode=dry-run | files=145 | lines=24326
 # CC̄=17.0 | critical=1 | decisions=1
 
@@ -15,4 +15,4 @@ METRICS[6]:
   🟢 project2.sh::None CC=0 LOC=35
   🔴 code2llm/core/analyzer.py::analyze_project CC=27 LOC=0
 
-LOG: /home/tom/github/semcod/code2llm/logs/redsl_20260419_193258.log
+LOG: /home/tom/github/semcod/code2llm/logs/redsl_20260420_110216.log

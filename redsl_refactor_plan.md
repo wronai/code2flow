@@ -1,9 +1,9 @@
 # reDSL Refactor Plan
 
-> Generated: **2026-04-19 19:33**  
+> Generated: **2026-04-20 11:02**  
 > Project: `/home/tom/github/semcod/code2llm`  
 > Mode: **dry-run**  
-> Log file: `/home/tom/github/semcod/code2llm/logs/redsl_20260419_193258.log`  
+> Log file: `/home/tom/github/semcod/code2llm/logs/redsl_20260420_110216.log`  
 
 ---
 

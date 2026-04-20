@@ -1,0 +1,62 @@
+[
+  {
+    "timestamp": "2026-04-20T09:09:46.623536+00:00",
+    "stage": "analyze",
+    "command": "code2llm . -f toon -o ./project --no-chunk --exclude .git .venv .venv_test build dist __pycache__ .pytest_cache .code2llm_cache .benchmarks .mypy_cache .ruff_cache node_modules",
+    "tool": "code2llm_code2llm",
+    "returncode": 1,
+    "duration_s": 0.567,
+    "error_type": "unknown",
+    "message": "Traceback (most recent call last):\nFile \"/home/tom/.local/bin/code2llm\", line 8, in <module>",
+    "stdout_tail": "",
+    "stderr_tail": "_standard_analysis\n    from .core.analyzer import ProjectAnalyzer\n  File \"/home/tom/github/semcod/code2llm/code2llm/core/analyzer.py\", line 8, in <module>\n    class ProjectAnalyzer:\n    ...<40 lines>...\n                print()\n  File \"/home/tom/github/semcod/code2llm/code2llm/core/analyzer.py\", line 12, in ProjectAnalyzer\n    def __init__(self, config: Optional[Config] = None, project_path: Optional[Path] = None):\n                               ^^^^^^^^\nNameError: name 'Optional' is not defined\n"
+  },
+  {
+    "timestamp": "2026-04-20T09:11:15.780956+00:00",
+    "stage": "validate",
+    "command": "vallm batch . --recursive --format toon --output ./project --exclude .git,.venv,.venv_test,build,dist,__pycache__,.pytest_cache,.code2llm_cache,.benchmarks,.mypy_cache,.ruff_cache,node_modules",
+    "tool": "vallm_code2llm",
+    "returncode": 2,
+    "duration_s": 89.139,
+    "error_type": "unknown",
+    "message": "✓ Results saved to project/validation.toon.yaml",
+    "stdout_tail": "Using .gitignore from .\nExcluded 43216 files by .gitignore\n✓ Results saved to project/validation.toon.yaml\n",
+    "stderr_tail": ""
+  },
+  {
+    "timestamp": "2026-04-20T09:11:19.975273+00:00",
+    "stage": "test",
+    "command": "python3 -m pytest -q",
+    "tool": "",
+    "returncode": 1,
+    "duration_s": 3.782,
+    "error_type": "unknown",
+    "message": "The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"",
+    "stdout_tail": "py::TestProjectMap::test_has_function_signatures\nERROR tests/test_format_quality.py::TestContextMd::test_is_markdown - NameErr...\nERROR tests/test_format_quality.py::TestAnalysisToon::test_has_coupling_section\nERROR tests/test_format_quality.py::TestFlowToon::test_detects_etl_pipeline_functions\nERROR tests/test_format_quality.py::TestCrossFormat::test_flow_toon_has_unique_pipeline_info\nERROR tests/test_format_quality.py::TestAnalysisToon::test_has_severity_markers\n135 passed, 72 errors in 2.75s\n",
+    "stderr_tail": "ncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n"
+  },
+  {
+    "timestamp": "2026-04-20T09:12:43.436777+00:00",
+    "stage": "validate",
+    "command": "vallm batch . --recursive --format toon --output ./project --exclude .git,.venv,.venv_test,build,dist,__pycache__,.pytest_cache,.code2llm_cache,.benchmarks,.mypy_cache,.ruff_cache,node_modules",
+    "tool": "vallm_code2llm",
+    "returncode": 2,
+    "duration_s": 83.392,
+    "error_type": "unknown",
+    "message": "✓ Results saved to project/validation.toon.yaml",
+    "stdout_tail": "Using .gitignore from .\nExcluded 43216 files by .gitignore\n✓ Results saved to project/validation.toon.yaml\n",
+    "stderr_tail": ""
+  },
+  {
+    "timestamp": "2026-04-20T09:12:47.322720+00:00",
+    "stage": "test",
+    "command": "python3 -m pytest -q",
+    "tool": "",
+    "returncode": 1,
+    "duration_s": 3.524,
+    "error_type": "unknown",
+    "message": "The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"",
+    "stdout_tail": "py::TestAnalysisToon::test_has_coupling_section\nERROR tests/test_format_quality.py::TestContextMd::test_is_markdown - NameErr...\nERROR tests/test_format_quality.py::TestFlowToon::test_detects_etl_pipeline_functions\nERROR tests/test_format_quality.py::TestProjectMap::test_has_function_signatures\nERROR tests/test_format_quality.py::TestAnalysisToon::test_has_severity_markers\nERROR tests/test_format_quality.py::TestCrossFormat::test_flow_toon_has_unique_pipeline_info\n135 passed, 72 errors in 2.56s\n",
+    "stderr_tail": "ncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n"
+  }
+]
