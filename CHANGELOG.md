@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.5.132] - 2026-04-20
+
+### Other
+- Update code2llm/core/analyzer.py
+- Update planfile.yaml
+
 ## [0.5.131] - 2026-04-20
 
 ### Other
