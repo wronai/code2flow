@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.5.130] - 2026-04-20
+
+### Other
+- Update code2llm/core/file_filter.py
+
 ## [0.5.129] - 2026-04-20
 
 ### Docs

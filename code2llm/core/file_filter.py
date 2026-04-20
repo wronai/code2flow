@@ -98,10 +98,20 @@ class FastFileFilter:
         path_lower = file_path.lower()
         basename_lower = Path(file_path).name.lower()
 
+        passes_gitignore = self._passes_gitignore(file_path)
+        passes_excludes = self._passes_excludes(path_lower, basename_lower)
+        passes_includes = self._passes_includes(path_lower)
+
+        # DEBUG
+        if 'vendor' in file_path.lower():
+            print(f"DEBUG should_process: {file_path}")
+            print(f"  passes_gitignore={passes_gitignore}, passes_excludes={passes_excludes}, passes_includes={passes_includes}")
+            print(f"  _gitignore_parser={self._gitignore_parser}, project_path={self.project_path}")
+
         return (
-            self._passes_gitignore(file_path) and
-            self._passes_excludes(path_lower, basename_lower) and
-            self._passes_includes(path_lower)
+            passes_gitignore and
+            passes_excludes and
+            passes_includes
         )
     
     def _passes_line_count(self, line_count: int) -> bool:
