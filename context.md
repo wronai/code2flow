@@ -4,11 +4,11 @@
 
 - **Project**: /home/tom/github/semcod/code2llm
 - **Primary Language**: python
-- **Languages**: python: 351, shell: 6, java: 2
+- **Languages**: python: 353, shell: 7, php: 2, java: 2, typescript: 1
 - **Analysis Mode**: static
-- **Total Functions**: 2124
-- **Total Classes**: 241
-- **Modules**: 359
+- **Total Functions**: 2150
+- **Total Classes**: 245
+- **Modules**: 369
 - **Entry Points**: 0
 
 ## Architecture by Module
@@ -56,15 +56,15 @@
 - **Classes**: 1
 - **File**: `analyzer.py`
 
-### code2llm.nlp.pipeline
-- **Functions**: 20
-- **Classes**: 3
-- **File**: `pipeline.py`
-
 ### code2llm.core.large_repo
 - **Functions**: 20
 - **Classes**: 2
 - **File**: `large_repo.py`
+
+### code2llm.nlp.pipeline
+- **Functions**: 20
+- **Classes**: 3
+- **File**: `pipeline.py`
 
 ### core.analyzer
 - **Functions**: 20
@@ -81,13 +81,13 @@
 - **Classes**: 3
 - **File**: `pipeline.py`
 
-### examples.functional_refactoring.entity_preparers
-- **Functions**: 18
-- **Classes**: 6
-- **File**: `entity_preparers.py`
-
 ### code2llm.core.persistent_cache
-- **Functions**: 18
+- **Functions**: 19
+- **Classes**: 1
+- **File**: `persistent_cache.py`
+
+### core.persistent_cache
+- **Functions**: 19
 - **Classes**: 1
 - **File**: `persistent_cache.py`
 
@@ -96,14 +96,14 @@
 - **Classes**: 1
 - **File**: `file_analyzer.py`
 
+### examples.functional_refactoring.entity_preparers
+- **Functions**: 18
+- **Classes**: 6
+- **File**: `entity_preparers.py`
+
 ### code2llm.cli_exports.prompt
 - **Functions**: 18
 - **File**: `prompt.py`
-
-### core.persistent_cache
-- **Functions**: 18
-- **Classes**: 1
-- **File**: `persistent_cache.py`
 
 ### core.file_analyzer
 - **Functions**: 18
@@ -199,21 +199,21 @@ Operates on source files referenced by
 - **Methods**: 16
 - **Key Methods**: code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_flow, code2llm.analysis.data_analysis.DataAnalyzer.analyze_data_structures, code2llm.analysis.data_analysis.DataAnalyzer._find_data_pipelines, code2llm.analysis.data_analysis.DataAnalyzer._find_state_patterns, code2llm.analysis.data_analysis.DataAnalyzer._find_data_dependencies, code2llm.analysis.data_analysis.DataAnalyzer._find_event_flows, code2llm.analysis.data_analysis.DataAnalyzer._detect_types_from_name, code2llm.analysis.data_analysis.DataAnalyzer._create_type_entry, code2llm.analysis.data_analysis.DataAnalyzer._update_type_stats, code2llm.analysis.data_analysis.DataAnalyzer._analyze_data_types
 
-### code2llm.nlp.pipeline.NLPPipeline
-> Main NLP processing pipeline (4a-4e).
+### code2llm.analysis.cfg.CFGExtractor
+> Extract Control Flow Graph from AST.
 - **Methods**: 16
-- **Key Methods**: code2llm.nlp.pipeline.NLPPipeline.__init__, code2llm.nlp.pipeline.NLPPipeline.process, code2llm.nlp.pipeline.NLPPipeline._step_normalize, code2llm.nlp.pipeline.NLPPipeline._step_match_intent, code2llm.nlp.pipeline.NLPPipeline._step_resolve_entities, code2llm.nlp.pipeline.NLPPipeline._infer_entity_types, code2llm.nlp.pipeline.NLPPipeline._calculate_overall_confidence, code2llm.nlp.pipeline.NLPPipeline._calculate_entity_confidence, code2llm.nlp.pipeline.NLPPipeline._apply_fallback, code2llm.nlp.pipeline.NLPPipeline._format_action
+- **Key Methods**: code2llm.analysis.cfg.CFGExtractor.__init__, code2llm.analysis.cfg.CFGExtractor.extract, code2llm.analysis.cfg.CFGExtractor.new_node, code2llm.analysis.cfg.CFGExtractor.connect, code2llm.analysis.cfg.CFGExtractor.visit_FunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_AsyncFunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_If, code2llm.analysis.cfg.CFGExtractor.visit_For, code2llm.analysis.cfg.CFGExtractor.visit_While, code2llm.analysis.cfg.CFGExtractor.visit_Try
+- **Inherits**: ast.NodeVisitor
 
 ### code2llm.exporters.toon.metrics_core.CoreMetricsComputer
 > Computes core structural and complexity metrics.
 - **Methods**: 16
 - **Key Methods**: code2llm.exporters.toon.metrics_core.CoreMetricsComputer.__init__, code2llm.exporters.toon.metrics_core.CoreMetricsComputer.compute_file_metrics, code2llm.exporters.toon.metrics_core.CoreMetricsComputer._new_file_record, code2llm.exporters.toon.metrics_core.CoreMetricsComputer._compute_fan_in, code2llm.exporters.toon.metrics_core.CoreMetricsComputer._process_function_calls, code2llm.exporters.toon.metrics_core.CoreMetricsComputer._process_called_by, code2llm.exporters.toon.metrics_core.CoreMetricsComputer._process_callee_calls, code2llm.exporters.toon.metrics_core.CoreMetricsComputer._handle_suffix_match, code2llm.exporters.toon.metrics_core.CoreMetricsComputer.compute_package_metrics, code2llm.exporters.toon.metrics_core.CoreMetricsComputer.compute_function_metrics
 
-### code2llm.analysis.cfg.CFGExtractor
-> Extract Control Flow Graph from AST.
+### code2llm.nlp.pipeline.NLPPipeline
+> Main NLP processing pipeline (4a-4e).
 - **Methods**: 16
-- **Key Methods**: code2llm.analysis.cfg.CFGExtractor.__init__, code2llm.analysis.cfg.CFGExtractor.extract, code2llm.analysis.cfg.CFGExtractor.new_node, code2llm.analysis.cfg.CFGExtractor.connect, code2llm.analysis.cfg.CFGExtractor.visit_FunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_AsyncFunctionDef, code2llm.analysis.cfg.CFGExtractor.visit_If, code2llm.analysis.cfg.CFGExtractor.visit_For, code2llm.analysis.cfg.CFGExtractor.visit_While, code2llm.analysis.cfg.CFGExtractor.visit_Try
-- **Inherits**: ast.NodeVisitor
+- **Key Methods**: code2llm.nlp.pipeline.NLPPipeline.__init__, code2llm.nlp.pipeline.NLPPipeline.process, code2llm.nlp.pipeline.NLPPipeline._step_normalize, code2llm.nlp.pipeline.NLPPipeline._step_match_intent, code2llm.nlp.pipeline.NLPPipeline._step_resolve_entities, code2llm.nlp.pipeline.NLPPipeline._infer_entity_types, code2llm.nlp.pipeline.NLPPipeline._calculate_overall_confidence, code2llm.nlp.pipeline.NLPPipeline._calculate_entity_confidence, code2llm.nlp.pipeline.NLPPipeline._apply_fallback, code2llm.nlp.pipeline.NLPPipeline._format_action
 
 ### analysis.data_analysis.DataAnalyzer
 > Analyze data flows, structures, and optimization opportunities.
@@ -243,10 +243,22 @@ Key functions that process and transform data:
 ### test_langs.valid.sample.process_users
 
 ### test_langs.valid.sample.UserService.processUsers
-- **Output to**: test_langs.valid.sample.println, test_langs.valid.sample.User.getName
+- **Output to**: test_langs.valid.sample.foreach
 
 ### test_langs.valid.sample.ProcessUsers
 - **Output to**: test_langs.valid.sample.func, test_langs.valid.sample.Printf
+
+### examples.streaming-analyzer.sample_project.auth.AuthManager.validate_session
+> Validate session and return user ID.
+- **Output to**: self.sessions.get
+
+### examples.streaming-analyzer.sample_project.api.APIHandler.process_request
+> Process API request.
+- **Output to**: self._check_rate_limit, self._get_stats, self._get_user_info, self._health_check
+
+### examples.streaming-analyzer.sample_project.api.APIHandler.format_response
+> Format API response.
+- **Output to**: json.dumps
 
 ### examples.streaming-analyzer.sample_project.utils.validate_input
 > Validate input data.
@@ -260,17 +272,23 @@ Key functions that process and transform data:
 > Transform data fields.
 - **Output to**: item.copy, transformations.items, transformed.append, None.upper, None.lower
 
-### examples.streaming-analyzer.sample_project.main.Application.process_request
-> Process a user request with complex logic.
-- **Output to**: request.action.startswith, examples.streaming-analyzer.sample_project.utils.validate_input, print, self.auth.authenticate, print
-
 ### benchmarks.benchmark_evolution.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
 - **Output to**: toon_content.splitlines, re.search, line.strip, line.startswith, int
 
-### examples.streaming-analyzer.sample_project.auth.AuthManager.validate_session
-> Validate session and return user ID.
-- **Output to**: self.sessions.get
+### examples.streaming-analyzer.sample_project.main.Application.process_request
+> Process a user request with complex logic.
+- **Output to**: request.action.startswith, examples.streaming-analyzer.sample_project.utils.validate_input, print, self.auth.authenticate, print
+
+### examples.docker-doql-example.worker.worker.process_message
+- **Output to**: print, time.sleep, print, ch.basic_ack
+
+### scripts.bump_version.parse_version
+> Parse version string into tuple of (major, minor, patch)
+- **Output to**: version_str.split, tuple, int
+
+### scripts.bump_version.format_version
+> Format version tuple as string
 
 ### scripts.benchmark_badges.parse_evolution_metrics
 > Extract metrics from evolution.toon content.
@@ -288,24 +306,13 @@ Key functions that process and transform data:
 > Generate badges from format quality scores.
 - **Output to**: enumerate, badges.append, sorted, badges.append, format_scores.items
 
-### scripts.bump_version.parse_version
-> Parse version string into tuple of (major, minor, patch)
-- **Output to**: version_str.split, tuple, int
-
-### scripts.bump_version.format_version
-> Format version tuple as string
-
 ### code2llm.cli_parser.create_parser
 > Create CLI argument parser.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
-### examples.streaming-analyzer.sample_project.api.APIHandler.process_request
-> Process API request.
-- **Output to**: self._check_rate_limit, self._get_stats, self._get_user_info, self._health_check
-
-### examples.streaming-analyzer.sample_project.api.APIHandler.format_response
-> Format API response.
-- **Output to**: json.dumps
+### validate_toon.validate_toon_completeness
+> Validate toon format structure.
+- **Output to**: print, print, bool, bool, bool
 
 ### test_python_only.valid.sample.UserService.process_users
 - **Output to**: print
@@ -318,10 +325,6 @@ Key functions that process and transform data:
 > Identify common data processing patterns.
 - **Output to**: None._identify_process_patterns, DataAnalyzer
 
-### validate_toon.validate_toon_completeness
-> Validate toon format structure.
-- **Output to**: print, print, bool, bool, bool
-
 ### code2llm.analysis.utils.ast_helpers.ast_unparse
 > Convert an AST node to its source string via ast.unparse (Python 3.9+).
 
@@ -332,14 +335,11 @@ Used as a shared replacemen
 > Remove cached AST and source for *filepath* (e.g. after file write).
 - **Output to**: self._trees.pop, self._sources.pop
 
-### code2llm.core.incremental.IncrementalAnalyzer.invalidate
-> Remove cached state for a file (e.g. after deletion).
-- **Output to**: self._normalize_key
-
 ## Public API Surface
 
 Functions exposed as public API (no underscore prefix):
 
+- `pipeline.run_pipeline` - 68 calls
 - `code2llm.cli_parser.create_parser` - 45 calls
 - `cli_parser.create_parser` - 45 calls
 - `code2llm.generators.llm_task.normalize_llm_task` - 43 calls
@@ -354,8 +354,8 @@ Functions exposed as public API (no underscore prefix):
 - `code2llm.core.lang.rust.analyze_rust` - 31 calls
 - `core.lang.rust.analyze_rust` - 31 calls
 - `benchmarks.benchmark_optimizations.benchmark_cold_vs_warm` - 30 calls
-- `code2llm.nlp.pipeline.NLPPipeline.process` - 29 calls
 - `benchmarks.benchmark_performance.create_test_project` - 29 calls
+- `code2llm.nlp.pipeline.NLPPipeline.process` - 29 calls
 - `nlp.pipeline.NLPPipeline.process` - 29 calls
 - `code2llm.exporters.mermaid.compact.export_compact` - 27 calls
 - `exporters.mermaid.compact.export_compact` - 27 calls
@@ -375,11 +375,10 @@ Functions exposed as public API (no underscore prefix):
 - `exporters.context_exporter.ContextExporter.export` - 24 calls
 - `exporters.evolution.yaml_export.export_to_yaml` - 24 calls
 - `scripts.benchmark_badges.main` - 23 calls
-- `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 22 calls
-- `code2llm.exporters.evolution_exporter.EvolutionExporter.export` - 22 calls
-- `code2llm.exporters.flow_exporter.FlowExporter.export` - 22 calls
 - `benchmarks.format_evaluator.evaluate_format` - 22 calls
+- `code2llm.core.analyzer.ProjectAnalyzer.analyze_project` - 22 calls
 - `benchmarks.benchmark_format_quality.run_benchmark` - 22 calls
+- `code2llm.exporters.evolution_exporter.EvolutionExporter.export` - 22 calls
 
 ## System Interactions
 

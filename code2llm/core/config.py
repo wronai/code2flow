@@ -99,6 +99,12 @@ class FilterConfig:
         "*_test.py", "test_*.py", "conftest.py",
         "*/tests/*", "*/test/*",
         "*demo_langs/invalid*",
+        # Lockfiles and generated artefacts — declarative but noisy and
+        # auto-generated, keep them out of the manifest by default.
+        "*package-lock.json", "*yarn.lock", "*pnpm-lock.yaml",
+        "*poetry.lock", "*Pipfile.lock", "*Cargo.lock", "*composer.lock",
+        "*.terraform.lock.hcl", "*.tfstate", "*.tfstate.backup",
+        "*.min.js", "*.min.css", "*.map",
     ])
     include_patterns: List[str] = field(default_factory=list)
     min_function_lines: int = 1
@@ -238,8 +244,71 @@ LANGUAGE_EXTENSIONS = {
     'raku': ['.raku', '.rakumod'],
 }
 
-# All supported extensions flat list
-ALL_EXTENSIONS = [ext for exts in LANGUAGE_EXTENSIONS.values() for ext in exts]
+# Declarative / IaC / config / docs extensions.
+# These are NOT analyzed for call graphs or CC — they're routed to the
+# generic analyzer. The point is to include them in the content-addressed
+# manifest so the export cache is invalidated when they change (e.g.
+# editing Dockerfile, terraform .tf, k8s manifests, pyproject.toml,
+# README.md, openapi.yaml, ...).
+DECLARATIVE_EXTENSIONS = {
+    # Infrastructure as Code
+    'terraform':   ['.tf', '.tfvars', '.hcl'],
+    'bicep':       ['.bicep'],
+    'nix':         ['.nix'],
+    # (K8s/Helm/Ansible/Pulumi/CloudFormation/docker-compose all use
+    #  yaml/json, matched below.)
+    # Config / serialization
+    'yaml':        ['.yaml', '.yml'],
+    'toml':        ['.toml'],
+    'ini':         ['.ini', '.cfg', '.conf', '.properties'],
+    'xml':         ['.xml'],
+    'json_config': ['.json', '.json5', '.jsonc'],
+    'env':         ['.env'],
+    # Schema / IDL
+    'proto':       ['.proto'],
+    'graphql':     ['.graphql', '.gql'],
+    'avro':        ['.avsc'],
+    'prisma':      ['.prisma'],
+    # Documentation
+    'markdown':    ['.md', '.mdx', '.markdown'],
+    'rst':         ['.rst'],
+    'asciidoc':    ['.adoc', '.asciidoc'],
+    'text':        ['.txt'],
+    # Project DSLs (user-specific, low-friction to include)
+    'dsl':         ['.doql', '.dsl'],
+}
+
+# Declarative files matched by FILENAME (no extension, or compound names).
+# Case-insensitive matched against os.path.basename().
+LANGUAGE_FILENAMES = {
+    'dockerfile': ['Dockerfile', 'Containerfile'],
+    'makefile':   ['Makefile', 'GNUmakefile', 'BSDmakefile'],
+    'jenkins':    ['Jenkinsfile'],
+    'vagrant':    ['Vagrantfile'],
+    'rakefile':   ['Rakefile'],
+    'gemfile':    ['Gemfile'],
+    'procfile':   ['Procfile'],
+    'caddyfile':  ['Caddyfile'],
+    'pipfile':    ['Pipfile'],
+    'brewfile':   ['Brewfile'],
+}
+
+# Filename PREFIXES that indicate a declarative file even with arbitrary
+# suffix — e.g. `Dockerfile.dev`, `Dockerfile.prod`, `Makefile.am`.
+# The match is case-insensitive against the basename; a '.' suffix is
+# required so we don't accidentally match e.g. `Dockerfiles/`.
+LANGUAGE_FILENAME_PREFIXES = ('Dockerfile.', 'Containerfile.', 'Makefile.')
+
+# All supported extensions flat list (programming languages + declarative)
+ALL_EXTENSIONS = (
+    [ext for exts in LANGUAGE_EXTENSIONS.values() for ext in exts]
+    + [ext for exts in DECLARATIVE_EXTENSIONS.values() for ext in exts]
+)
+
+# Flat set of recognised filenames (case-insensitive compare at collection time).
+ALL_FILENAMES = frozenset(
+    name for names in LANGUAGE_FILENAMES.values() for name in names
+)
 
 # Node types
 NODE_TYPES = {

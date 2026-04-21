@@ -1,7 +1,7 @@
 <!-- code2docs:start --># code2llm
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-1191-green)
-> **1191** functions | **137** classes | **216** files | CC̄ = 3.9
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-1200-green)
+> **1200** functions | **141** classes | **225** files | CC̄ = 3.9
 
 > Auto-generated project documentation from source code analysis.
 
@@ -73,201 +73,208 @@ docs = generate_docs("./my-project", config=config)
 ```
 code2llm/
 ├── orchestrator
-        ├── sample
-├── project2
-├── project
-        ├── sample_bad
-    ├── functional_refactoring/
-            ├── api
 ├── setup
+├── validate_toon
+├── pipeline
+├── project
+        ├── sample
+        ├── sample_bad
+    ├── functional_refactoring_example
+        ├── run
+        ├── run-doql
+            ├── Main
+            ├── main
+            ├── main
+            ├── worker
+                ├── main
+            ├── index
+        ├── node/
+            ├── app
+        ├── cli
+        ├── generator
+    ├── functional_refactoring/
+        ├── entity_preparers
+        ├── template_engine
+        ├── models
+        ├── cache
+        ├── demo
+            ├── auth
+        ├── sample_project/
+            ├── api
             ├── database
             ├── utils
-    ├── benchmark_evolution
-    ├── functional_refactoring_example
-├── validate_toon
-    ├── reporting
-        ├── cli
-    ├── project_generator
             ├── main
-    ├── benchmark_constants
+    ├── benchmark_evolution
+    ├── reporting
+    ├── format_evaluator
+    ├── benchmark_format_quality
+    ├── benchmark_performance
+    ├── project_generator
     ├── benchmark_optimizations
-        ├── demo
-    ├── bump_version
-    ├── valid/
-    ├── server
-    ├── invalid/
-    ├── cli
+    ├── benchmark_constants
     ├── benchmark_badges
+    ├── bump_version
+    ├── server
+    ├── valid/
+        ├── sample
+    ├── cli
+    ├── cli_analysis
 ├── code2llm/
     ├── __main__
     ├── api
     ├── cli_parser
-    ├── cli_analysis
-        ├── sample_project/
     ├── cli_commands
-        ├── generator
+        ├── data_analysis
+        ├── pipeline_detector
+        ├── type_inference
     ├── analysis/
         ├── pipeline_resolver
-        ├── sample
-        ├── run
-        ├── data_analysis
-            ├── auth
+        ├── dfg
+        ├── call_graph
         ├── pipeline_classifier
         ├── coupling
-        ├── type_inference
-        ├── utils/
-            ├── ast_helpers
-        ├── smells
-        ├── ast_registry
-        ├── file_cache
+        ├── cfg
         ├── side_effects
+        ├── smells
+            ├── ast_helpers
+        ├── utils/
+        ├── config
+        ├── file_cache
+        ├── ast_registry
         ├── incremental
+        ├── analyzer
+        ├── large_repo
         ├── repo_files
     ├── core/
         ├── streaming_analyzer
-        ├── analyzer
         ├── gitignore
         ├── toon_size_manager
+        ├── models
         ├── refactoring
-        ├── entity_preparers
-        ├── persistent_cache
-        ├── file_filter
         ├── file_analyzer
-        ├── template_engine
+        ├── file_filter
+        ├── export_pipeline
+            ├── incremental
             ├── strategies
         ├── streaming/
-            ├── incremental
-        ├── export_pipeline
-        ├── models
-            ├── cache
             ├── prioritizer
-            ├── rust
-            ├── cpp
             ├── scanner
-    ├── format_evaluator
+            ├── cache
+            ├── rust
+            ├── ruby
+            ├── base
+            ├── cpp
         ├── lang/
             ├── ts_extractors
+            ├── ts_parser
+            ├── php
             ├── csharp
-        ├── cache
+            ├── go_lang
             ├── java
             ├── generic
             ├── typescript
-            ├── go_lang
+        ├── config
     ├── nlp/
-            ├── php
-            ├── ts_parser
-        ├── cfg
+        ├── intent_matching
         ├── entity_resolution
-            ├── ruby
-        ├── readme_exporter
-        ├── map_exporter
         ├── pipeline
+        ├── normalization
+        ├── readme_exporter
+        ├── base
+        ├── map_exporter
         ├── project_yaml_exporter
-            ├── base
+        ├── mermaid_flow_helpers
         ├── mermaid_exporter
         ├── toon/
-        ├── base
-    ├── exporters/
-        ├── dfg
-        ├── report_generators
-        ├── config
-        ├── json_exporter
-        ├── mermaid_flow_helpers
         ├── dashboard_renderer
-        ├── evolution_exporter
-        ├── llm_exporter
+    ├── exporters/
+        ├── json_exporter
+        ├── report_generators
+        ├── yaml_exporter
         ├── context_view
-        ├── call_graph
-        ├── flow_constants
         ├── article_view
-        ├── validate_project
-    ├── benchmark_format_quality
-        ├── html_dashboard
-        ├── index_generator/
         ├── dashboard_data
+        ├── evolution_exporter
+        ├── context_exporter
+        ├── llm_exporter
+        ├── validate_project
+        ├── flow_constants
+        ├── html_dashboard
+        ├── flow_renderer
+        ├── toon_view
+        ├── flow_exporter
+        ├── index_generator/
+            ├── content
             ├── files
         ├── readme/
-            ├── content
-        ├── flow_renderer
-            ├── sections
-        ├── yaml_exporter
-        ├── toon_view
-        ├── context_exporter
             ├── insights
-            ├── metrics_duplicates
+            ├── sections
             ├── helpers
+            ├── metrics_duplicates
             ├── metrics
+            ├── module_detail
+            ├── metrics_health
+            ├── metrics_core
+            ├── renderer
             ├── evolution
         ├── project_yaml/
-            ├── metrics_health
-            ├── module_detail
-        ├── flow_exporter
             ├── health
-            ├── constants
-            ├── hotspots
-        ├── evolution/
             ├── modules
-            ├── constants
-            ├── exclusion
-            ├── module_list
-            ├── metrics_core
-            ├── yaml_export
+            ├── hotspots
             ├── core
-            ├── computation
-            ├── header
-        ├── map/
-            ├── alerts
+            ├── constants
             ├── render
-            ├── details
-            ├── renderer
-        ├── mermaid/
-            ├── utils
-            ├── flow_detailed
-            ├── compact
-            ├── renderer
-        ├── _utils
-            ├── flow_full
-            ├── calls
             ├── yaml_export
-            ├── classic
-    ├── generators/
-            ├── utils
-        ├── mermaid/
-        ├── llm_flow/
-            ├── parsing
-            ├── cli
-            ├── flow_compact
-    ├── benchmark_performance
+        ├── evolution/
+            ├── exclusion
+            ├── constants
+            ├── computation
+            ├── alerts
+            ├── module_list
+            ├── details
+            ├── header
+            ├── yaml_export
+        ├── map/
             ├── utils
             ├── scanner
-        ├── models
-            ├── validation
-            ├── analysis
-    ├── cli_exports/
-            ├── png
-            ├── nodes
-        ├── orchestrator_chunked
-    ├── refactor/
-            ├── fix
-        ├── orchestrator_constants
+            ├── renderer
+            ├── compact
+            ├── classic
+        ├── mermaid/
+            ├── flow_detailed
+            ├── calls
+            ├── flow_compact
+            ├── utils
+            ├── flow_full
+        ├── _utils
+    ├── generators/
+        ├── llm_flow/
         ├── llm_task
-    ├── patterns/
-        ├── code2logic
-        ├── sample
-        ├── orchestrator_handlers
+        ├── mermaid/
+            ├── cli
+            ├── parsing
+            ├── analysis
+            ├── generator
+            ├── utils
+            ├── nodes
+            ├── validation
+            ├── png
+            ├── fix
         ├── formats
+        ├── code2logic
+        ├── orchestrator_chunked
+    ├── cli_exports/
+        ├── orchestrator_handlers
+        ├── prompt
+        ├── orchestrator_constants
+        ├── orchestrator
+    ├── refactor/
+        ├── prompt_engine
         ├── toon_parser
         ├── detector
-        ├── prompt_engine
-        ├── pipeline_detector
-        ├── orchestrator
-        ├── prompt
-├── pipeline
-            ├── generator
-        ├── normalization
-        ├── large_repo
-        ├── config
-        ├── intent_matching
+        ├── sample
+├── project2
+        ├── persistent_cache
 ```
 
 ## API Overview
@@ -276,106 +283,67 @@ code2llm/
 
 - **`User`** — —
 - **`UserService`** — —
-- **`User`** — —
-- **`UserService`** — —
-- **`APIHandler`** — Handles API requests and responses.
-- **`DatabaseConnection`** — Simple database connection simulator.
-- **`TemplateGenerator`** — Original - handles EVERYTHING: loading, matching, rendering, shell, docker, sql...
-- **`UserRequest`** — User request data structure.
-- **`Application`** — Main application class with multiple responsibilities.
 - **`Product`** — —
 - **`ProductRepository`** — —
-- **`CommandGenerator`** — Generates commands from natural language intents.
-- **`PipelineResolver`** — Resolves callee names to qualified function names.
 - **`User`** — —
 - **`UserService`** — —
-- **`DataAnalyzer`** — Analyze data flows, structures, and optimization opportunities.
-- **`DataFlowAnalyzer`** — Analyze data flows: pipelines, state patterns, dependencies, and event flows.
-- **`OptimizationAdvisor`** — Analyze optimization opportunities: data types and process patterns.
-- **`AuthManager`** — Manages user authentication and authorization.
-- **`PipelineClassifier`** — Classify pipelines by domain and derive human-readable names.
-- **`CouplingAnalyzer`** — Analyze coupling between modules.
-- **`TypeInferenceEngine`** — Extract and infer type information from Python source files.
-- **`SmellDetector`** — Detect code smells from analysis results.
-- **`ASTRegistry`** — Parse each file exactly once; share the AST across all analysis consumers.
-- **`FileCache`** — Cache for parsed AST files.
-- **`SideEffectInfo`** — Side-effect analysis result for a single function.
-- **`SideEffectDetector`** — Detect side effects in Python functions via AST analysis.
-- **`IncrementalAnalyzer`** — Track file signatures to skip unchanged files on subsequent runs.
-- **`StreamingAnalyzer`** — Memory-efficient streaming analyzer with progress tracking.
-- **`ProjectAnalyzer`** — Main analyzer with parallel processing.
-- **`GitIgnoreParser`** — Parse and apply .gitignore patterns to file paths.
-- **`RefactoringAnalyzer`** — Performs refactoring analysis on code.
+- **`TemplateGenerator`** — Original - handles EVERYTHING: loading, matching, rendering, shell, docker, sql...
+- **`Main`** — —
+- **`CustomHandler`** — —
+- **`Response`** — —
+- **`Response`** — —
+- **`CommandGenerator`** — Generates commands from natural language intents.
 - **`EntityPreparer`** — Protocol for domain-specific entity preparation.
 - **`ShellEntityPreparer`** — Prepares entities for shell commands.
 - **`DockerEntityPreparer`** — Prepares entities for docker commands.
 - **`SQLEntityPreparer`** — Prepares entities for SQL commands.
 - **`KubernetesEntityPreparer`** — Prepares entities for kubernetes commands.
 - **`EntityPreparationPipeline`** — Coordinates entity preparation across domains.
-- **`PersistentCache`** — Content-addressed persistent cache stored in ~/.code2llm/.
-- **`FastFileFilter`** — Fast file filtering with pattern matching.
-- **`FileAnalyzer`** — Analyzes a single file.
 - **`Template`** — Command template.
 - **`TemplateLoader`** — Loads templates from various sources.
 - **`TemplateRenderer`** — Renders templates with entity substitution.
-- **`ScanStrategy`** — Scanning methodology configuration.
-- **`IncrementalAnalyzer`** — Incremental analysis with change detection.
-- **`SharedExportContext`** — Pre-computed context shared across all exporters.
-- **`ExportPipeline`** — Run multiple exporters with a single shared context.
 - **`CommandContext`** — Context for command generation.
 - **`CommandResult`** — Result of command generation.
-- **`StreamingFileCache`** — Memory-efficient cache with LRU eviction.
-- **`FilePriority`** — Priority scoring for file analysis order.
-- **`SmartPrioritizer`** — Smart file prioritization for optimal analysis order.
-- **`StreamingScanner`** — Handles file scanning operations.
-- **`FormatScore`** — Wynik oceny pojedynczego formatu.
-- **`LanguageParser`** — Abstract base class for language-specific parsers.
 - **`CacheEntry`** — Single cache entry with evolution metadata.
 - **`EvolutionaryCache`** — Cache that evolves based on usage patterns.
-- **`TreeSitterParser`** — Unified tree-sitter parser for all supported languages.
-- **`CFGExtractor`** — Extract Control Flow Graph from AST.
-- **`Entity`** — Resolved entity.
-- **`EntityResolutionResult`** — Result of entity resolution.
-- **`EntityResolver`** — Resolve entities (functions, classes, etc.) from queries.
-- **`RubyParser`** — Ruby language parser - registered via @register_language in __init__.py.
-- **`READMEExporter`** — Export README.md with documentation of all generated files.
-- **`MapExporter`** — Export to map.toon.yaml — structural map with a compact project header.
-- **`PipelineStage`** — Single pipeline stage result.
-- **`NLPPipelineResult`** — Complete NLP pipeline result (4b-4e aggregation).
-- **`NLPPipeline`** — Main NLP processing pipeline (4a-4e).
-- **`MermaidExporter`** — Export call graph to Mermaid format.
-- **`BaseExporter`** — Abstract base class for all code2llm exporters.
-- **`ViewGeneratorMixin`** — Mixin providing the shared ``generate`` implementation for view generators.
+- **`AuthManager`** — Manages user authentication and authorization.
+- **`APIHandler`** — Handles API requests and responses.
+- **`DatabaseConnection`** — Simple database connection simulator.
+- **`UserRequest`** — User request data structure.
+- **`Application`** — Main application class with multiple responsibilities.
+- **`FormatScore`** — Wynik oceny pojedynczego formatu.
+- **`User`** — —
+- **`UserService`** — —
+- **`DataAnalyzer`** — Analyze data flows, structures, and optimization opportunities.
+- **`DataFlowAnalyzer`** — Analyze data flows: pipelines, state patterns, dependencies, and event flows.
+- **`OptimizationAdvisor`** — Analyze optimization opportunities: data types and process patterns.
+- **`PipelineStage`** — A single stage in a detected pipeline.
+- **`Pipeline`** — A detected pipeline with stages, purity info, and domain.
+- **`PipelineDetector`** — Detect pipelines in a codebase using networkx graph analysis.
+- **`TypeInferenceEngine`** — Extract and infer type information from Python source files.
+- **`PipelineResolver`** — Resolves callee names to qualified function names.
 - **`DFGExtractor`** — Extract Data Flow Graph from AST.
-- **`NormalizationConfig`** — Configuration for query normalization.
-- **`IntentMatchingConfig`** — Configuration for intent matching.
-- **`EntityResolutionConfig`** — Configuration for entity resolution.
-- **`MultilingualConfig`** — Configuration for multilingual processing.
-- **`NLPConfig`** — Main NLP pipeline configuration.
-- **`JSONExporter`** — Export to JSON format.
-- **`DashboardRenderer`** — Render HTML dashboard from prepared data structures.
-- **`EvolutionExporter`** — Export evolution.toon.yaml — prioritized refactoring queue.
-- **`ContextViewGenerator`** — Generate context.md from project.yaml data.
 - **`CallGraphExtractor`** — Extract call graph from AST.
-- **`ArticleViewGenerator`** — Generate status.md — publishable project health article.
-- **`HTMLDashboardGenerator`** — Generate dashboard.html from project.yaml data.
-- **`DashboardDataBuilder`** — Build dashboard data structures from project analysis results.
-- **`FlowRenderer`** — Renderer dla sekcji formatu flow.toon.
-- **`YAMLExporter`** — Export to YAML format.
-- **`ToonViewGenerator`** — Generate project.toon.yaml from project.yaml data.
-- **`ContextExporter`** — Export LLM-ready analysis summary with architecture and flows.
-- **`DuplicatesMetricsComputer`** — Detects duplicate classes in the codebase.
-- **`MetricsComputer`** — Computes all metrics for TOON export.
-- **`HealthMetricsComputer`** — Computes health issues and quality alerts.
-- **`ModuleDetailRenderer`** — Renders detailed module information.
-- **`FlowExporter`** — Export to flow.toon — data-flow focused format.
-- **`ToonExporter`** — Export to toon v2 plain-text format — scannable, sorted by severity.
-- **`CoreMetricsComputer`** — Computes core structural and complexity metrics.
-- **`ProjectYAMLExporter`** — Export unified project.yaml — single source of truth for diagnostics.
-- **`HTMLRenderer`** — Render the index.html page with CSS and JavaScript.
-- **`IndexHTMLGenerator`** — Generate index.html for browsing all generated files.
-- **`ToonRenderer`** — Renders all sections for TOON export.
-- **`FileScanner`** — Scan output directory and collect file metadata.
+- **`PipelineClassifier`** — Classify pipelines by domain and derive human-readable names.
+- **`CouplingAnalyzer`** — Analyze coupling between modules.
+- **`CFGExtractor`** — Extract Control Flow Graph from AST.
+- **`SideEffectInfo`** — Side-effect analysis result for a single function.
+- **`SideEffectDetector`** — Detect side effects in Python functions via AST analysis.
+- **`SmellDetector`** — Detect code smells from analysis results.
+- **`AnalysisMode`** — Available analysis modes.
+- **`PerformanceConfig`** — Performance optimization settings.
+- **`FilterConfig`** — Filtering options to reduce analysis scope.
+- **`DepthConfig`** — Depth limiting for control flow analysis.
+- **`OutputConfig`** — Output formatting options.
+- **`Config`** — Analysis configuration with performance optimizations.
+- **`FileCache`** — Cache for parsed AST files.
+- **`ASTRegistry`** — Parse each file exactly once; share the AST across all analysis consumers.
+- **`IncrementalAnalyzer`** — Track file signatures to skip unchanged files on subsequent runs.
+- **`ProjectAnalyzer`** — Main analyzer with parallel processing.
+- **`SubProject`** — Represents a sub-project within a larger repository.
+- **`HierarchicalRepoSplitter`** — Splits large repositories using hierarchical approach.
+- **`StreamingAnalyzer`** — Memory-efficient streaming analyzer with progress tracking.
+- **`GitIgnoreParser`** — Parse and apply .gitignore patterns to file paths.
 - **`BaseModel`** — Base class for models with automated serialization.
 - **`FlowNode`** — Represents a node in the control flow graph.
 - **`FlowEdge`** — Represents an edge in the control flow graph.
@@ -387,51 +355,77 @@ code2llm/
 - **`Mutation`** — Represents a mutation of a variable/object.
 - **`DataFlow`** — Represents data flow for a variable.
 - **`AnalysisResult`** — Complete analysis result for a project.
-- **`FuncSummary`** — —
-- **`User`** — —
-- **`UserService`** — —
-- **`PatternDetector`** — Detect behavioral patterns in code.
-- **`Order`** — —
-- **`OrderService`** — —
-- **`PromptEngine`** — Generate refactoring prompts from analysis results and detected smells.
-- **`PipelineStage`** — A single stage in a detected pipeline.
-- **`Pipeline`** — A detected pipeline with stages, purity info, and domain.
-- **`PipelineDetector`** — Detect pipelines in a codebase using networkx graph analysis.
-- **`NormalizationResult`** — Result of query normalization.
-- **`QueryNormalizer`** — Normalize queries for consistent processing.
-- **`SubProject`** — Represents a sub-project within a larger repository.
-- **`HierarchicalRepoSplitter`** — Splits large repositories using hierarchical approach.
-- **`AnalysisMode`** — Available analysis modes.
-- **`PerformanceConfig`** — Performance optimization settings.
-- **`FilterConfig`** — Filtering options to reduce analysis scope.
-- **`DepthConfig`** — Depth limiting for control flow analysis.
-- **`OutputConfig`** — Output formatting options.
-- **`Config`** — Analysis configuration with performance optimizations.
+- **`RefactoringAnalyzer`** — Performs refactoring analysis on code.
+- **`FileAnalyzer`** — Analyzes a single file.
+- **`FastFileFilter`** — Fast file filtering with pattern matching.
+- **`SharedExportContext`** — Pre-computed context shared across all exporters.
+- **`ExportPipeline`** — Run multiple exporters with a single shared context.
+- **`IncrementalAnalyzer`** — Incremental analysis with change detection.
+- **`ScanStrategy`** — Scanning methodology configuration.
+- **`FilePriority`** — Priority scoring for file analysis order.
+- **`SmartPrioritizer`** — Smart file prioritization for optimal analysis order.
+- **`StreamingScanner`** — Handles file scanning operations.
+- **`StreamingFileCache`** — Memory-efficient cache with LRU eviction.
+- **`RubyParser`** — Ruby language parser - registered via @register_language in __init__.py.
+- **`LanguageParser`** — Abstract base class for language-specific parsers.
+- **`TreeSitterParser`** — Unified tree-sitter parser for all supported languages.
+- **`NormalizationConfig`** — Configuration for query normalization.
+- **`IntentMatchingConfig`** — Configuration for intent matching.
+- **`EntityResolutionConfig`** — Configuration for entity resolution.
+- **`MultilingualConfig`** — Configuration for multilingual processing.
+- **`NLPConfig`** — Main NLP pipeline configuration.
 - **`IntentMatch`** — Single intent match result.
 - **`IntentMatchingResult`** — Result of intent matching.
 - **`IntentMatcher`** — Match queries to intents using fuzzy and keyword matching.
+- **`Entity`** — Resolved entity.
+- **`EntityResolutionResult`** — Result of entity resolution.
+- **`EntityResolver`** — Resolve entities (functions, classes, etc.) from queries.
+- **`PipelineStage`** — Single pipeline stage result.
+- **`NLPPipelineResult`** — Complete NLP pipeline result (4b-4e aggregation).
+- **`NLPPipeline`** — Main NLP processing pipeline (4a-4e).
+- **`NormalizationResult`** — Result of query normalization.
+- **`QueryNormalizer`** — Normalize queries for consistent processing.
+- **`READMEExporter`** — Export README.md with documentation of all generated files.
+- **`BaseExporter`** — Abstract base class for all code2llm exporters.
+- **`ViewGeneratorMixin`** — Mixin providing the shared ``generate`` implementation for view generators.
+- **`MapExporter`** — Export to map.toon.yaml — structural map with a compact project header.
+- **`MermaidExporter`** — Export call graph to Mermaid format.
+- **`DashboardRenderer`** — Render HTML dashboard from prepared data structures.
+- **`JSONExporter`** — Export to JSON format.
+- **`YAMLExporter`** — Export to YAML format.
+- **`ContextViewGenerator`** — Generate context.md from project.yaml data.
+- **`ArticleViewGenerator`** — Generate status.md — publishable project health article.
+- **`DashboardDataBuilder`** — Build dashboard data structures from project analysis results.
+- **`EvolutionExporter`** — Export evolution.toon.yaml — prioritized refactoring queue.
+- **`ContextExporter`** — Export LLM-ready analysis summary with architecture and flows.
+- **`HTMLDashboardGenerator`** — Generate dashboard.html from project.yaml data.
+- **`FlowRenderer`** — Renderer dla sekcji formatu flow.toon.
+- **`ToonViewGenerator`** — Generate project.toon.yaml from project.yaml data.
+- **`FlowExporter`** — Export to flow.toon — data-flow focused format.
+- **`DuplicatesMetricsComputer`** — Detects duplicate classes in the codebase.
+- **`ToonExporter`** — Export to toon v2 plain-text format — scannable, sorted by severity.
+- **`MetricsComputer`** — Computes all metrics for TOON export.
+- **`ModuleDetailRenderer`** — Renders detailed module information.
+- **`HealthMetricsComputer`** — Computes health issues and quality alerts.
+- **`CoreMetricsComputer`** — Computes core structural and complexity metrics.
+- **`ToonRenderer`** — Renders all sections for TOON export.
+- **`ProjectYAMLExporter`** — Export unified project.yaml — single source of truth for diagnostics.
+- **`IndexHTMLGenerator`** — Generate index.html for browsing all generated files.
+- **`FileScanner`** — Scan output directory and collect file metadata.
+- **`HTMLRenderer`** — Render the index.html page with CSS and JavaScript.
+- **`FuncSummary`** — —
+- **`PromptEngine`** — Generate refactoring prompts from analysis results and detected smells.
+- **`PatternDetector`** — Detect behavioral patterns in code.
+- **`User`** — —
+- **`UserService`** — —
+- **`Order`** — —
+- **`OrderService`** — —
+- **`PersistentCache`** — Content-addressed persistent cache stored in ~/.code2llm/.
 
 ### Functions
 
-- `main()` — —
-- `main()` — —
-- `NewUserService()` — —
-- `AddUser()` — —
-- `NewUserService()` — —
-- `AddUser()` — —
-- `GetUser()` — —
-- `ProcessUsers()` — —
 - `read_version()` — —
 - `read_readme()` — —
-- `validate_input(data)` — Validate input data.
-- `format_output(data)` — Format output data.
-- `calculate_metrics(data)` — Calculate metrics from data list.
-- `filter_data(data, criteria)` — Filter data based on criteria.
-- `transform_data(data, transformations)` — Transform data fields.
-- `parse_evolution_metrics(toon_content)` — Extract metrics from evolution.toon content.
-- `load_previous(history_file)` — Load previous metrics from history file if present.
-- `save_current(history_file, metrics)` — Save current metrics for next comparison.
-- `run_benchmark(project_path)` — Run evolution analysis and print before/after table.
 - `load_yaml(filepath)` — Load YAML file safely.
 - `load_file(filepath)` — Load file - auto-detect TOON vs YAML format.
 - `extract_functions_from_yaml(yaml_data)` — Extract function list from standard YAML format.
@@ -447,22 +441,29 @@ code2llm/
 - `compare_modules(yaml_data, toon_data)` — Compare module lists with detailed analysis.
 - `validate_toon_completeness(toon_data)` — Validate toon format structure.
 - `main()` — Main validation function.
-- `print_results(scores)` — Wydrukuj sformatowane wyniki benchmarku.
-- `build_report(scores)` — Zbuduj raport JSON do zapisu.
-- `save_report(report, filename)` — Zapisz raport benchmarku do folderu reports.
-- `generate(query, intent, dry_run, cache_dir)` — Generate command from natural language query.
-- `create_core_py(project)` — Utwórz core.py z god function, hub type, high fan-out i side-effect.
-- `create_etl_py(project)` — Utwórz etl.py z funkcjami pipeline ETL.
-- `create_validation_py(project)` — Utwórz validation.py z pipeline'em walidacji.
-- `create_utils_py(project)` — Utwórz utils.py z duplikatem klasy Validator.
-- `add_validator_to_core(project)` — Dodaj klasę Validator do core.py (tworzy duplikat).
-- `create_ground_truth_project(base_dir)` — Utwórz projekt testowy ze znanymi, mierzalnymi problemami.
-- `main()` — Main entry point.
-- `clear_caches(project_path)` — Clear all caches for clean benchmark.
-- `run_analysis(project_path, config)` — Run analysis and return (time_seconds, file_count).
-- `benchmark_cold_vs_warm(project_path, runs)` — Compare cold (no cache) vs warm (cached) runs.
-- `print_summary(results)` — Print benchmark summary with speedup calculations.
+- `run_pipeline(project_dir, output_dir)` — Run unified pipeline in single process.
+- `NewUserService()` — —
+- `AddUser()` — —
+- `GetUser()` — —
+- `ProcessUsers()` — —
+- `NewUserService()` — —
+- `AddUser()` — —
+- `run_analysis(project_path)` — Run code2llm and return analysis outputs.
+- `get_refactoring_advice(outputs, model)` — Send analysis to LLM and get refactoring advice.
 - `main()` — —
+- `healthHandler()` — —
+- `apiHandler()` — —
+- `main()` — —
+- `process_message(ch, method, properties, body)` — —
+- `main()` — —
+- `sendResponse()` — —
+- `http()` — —
+- `os()` — —
+- `PORT()` — —
+- `SERVICE_NAME()` — —
+- `DB_HOST()` — —
+- `server()` — —
+- `generate(query, intent, dry_run, cache_dir)` — Generate command from natural language query.
 - `demo_quick_strategy()` — Demonstrate quick strategy analysis.
 - `demo_standard_strategy()` — Demonstrate standard strategy analysis.
 - `demo_deep_strategy()` — Demonstrate deep strategy analysis.
@@ -470,6 +471,48 @@ code2llm/
 - `demo_memory_limited()` — Demonstrate memory-limited analysis.
 - `demo_custom_progress()` — Demonstrate custom progress tracking.
 - `main()` — Run all demos.
+- `validate_input(data)` — Validate input data.
+- `format_output(data)` — Format output data.
+- `calculate_metrics(data)` — Calculate metrics from data list.
+- `filter_data(data, criteria)` — Filter data based on criteria.
+- `transform_data(data, transformations)` — Transform data fields.
+- `main()` — Main entry point.
+- `parse_evolution_metrics(toon_content)` — Extract metrics from evolution.toon content.
+- `load_previous(history_file)` — Load previous metrics from history file if present.
+- `save_current(history_file, metrics)` — Save current metrics for next comparison.
+- `run_benchmark(project_path)` — Run evolution analysis and print before/after table.
+- `print_results(scores)` — Wydrukuj sformatowane wyniki benchmarku.
+- `build_report(scores)` — Zbuduj raport JSON do zapisu.
+- `save_report(report, filename)` — Zapisz raport benchmarku do folderu reports.
+- `evaluate_format(name, content, path)` — Oceń pojedynczy format względem ground truth.
+- `run_benchmark()` — Run the full format quality benchmark.
+- `save_report(results, filename)` — Save benchmark report to reports folder.
+- `create_test_project(size)` — Create test project of specified size.
+- `benchmark_original_analyzer(project_path, runs)` — Benchmark original ProjectAnalyzer.
+- `benchmark_streaming_analyzer(project_path, runs)` — Benchmark new StreamingAnalyzer.
+- `benchmark_with_strategies(project_path)` — Benchmark all strategies.
+- `print_comparison(original, streaming)` — Print comparison table.
+- `main()` — Run benchmark suite.
+- `create_core_py(project)` — Utwórz core.py z god function, hub type, high fan-out i side-effect.
+- `create_etl_py(project)` — Utwórz etl.py z funkcjami pipeline ETL.
+- `create_validation_py(project)` — Utwórz validation.py z pipeline'em walidacji.
+- `create_utils_py(project)` — Utwórz utils.py z duplikatem klasy Validator.
+- `add_validator_to_core(project)` — Dodaj klasę Validator do core.py (tworzy duplikat).
+- `create_ground_truth_project(base_dir)` — Utwórz projekt testowy ze znanymi, mierzalnymi problemami.
+- `clear_caches(project_path)` — Clear all caches for clean benchmark.
+- `run_analysis(project_path, config)` — Run analysis and return (time_seconds, file_count).
+- `benchmark_cold_vs_warm(project_path, runs)` — Compare cold (no cache) vs warm (cached) runs.
+- `print_summary(results)` — Print benchmark summary with speedup calculations.
+- `main()` — —
+- `get_shield_url(label, message, color)` — Generate a shields.io badge URL.
+- `parse_evolution_metrics(toon_content)` — Extract metrics from evolution.toon content.
+- `parse_format_quality_report(report_path)` — Parse format quality JSON report.
+- `parse_performance_report(report_path)` — Parse performance JSON report.
+- `generate_badges(metrics)` — Generate badge data from metrics.
+- `generate_format_quality_badges(format_scores)` — Generate badges from format quality scores.
+- `generate_performance_badges(performance_data)` — Generate badges from performance data.
+- `create_html(badges, title)` — Create HTML page with badge table.
+- `main()` — Main function to generate badges.
 - `get_current_version()` — Get current version from pyproject.toml
 - `parse_version(version_str)` — Parse version string into tuple of (major, minor, patch)
 - `format_version(major, minor, patch)` — Format version tuple as string
@@ -480,16 +523,8 @@ code2llm/
 - `index()` — Serve the main badges page.
 - `generate_badges()` — Generate badges by running the benchmark script.
 - `get_badges()` — Get the generated badges HTML.
+- `main()` — —
 - `main()` — Main CLI entry point.
-- `get_shield_url(label, message, color)` — Generate a shields.io badge URL.
-- `parse_evolution_metrics(toon_content)` — Extract metrics from evolution.toon content.
-- `parse_format_quality_report(report_path)` — Parse format quality JSON report.
-- `parse_performance_report(report_path)` — Parse performance JSON report.
-- `generate_badges(metrics)` — Generate badge data from metrics.
-- `generate_format_quality_badges(format_scores)` — Generate badges from format quality scores.
-- `generate_performance_badges(performance_data)` — Generate badges from performance data.
-- `create_html(badges, title)` — Create HTML page with badge table.
-- `main()` — Main function to generate badges.
 - `analyze(project_path, config)` — Analyze a Python project and return structured results.
 - `analyze_file(file_path, config)` — Analyze a single Python file.
 - `get_version()` — Read version from VERSION file.
@@ -501,16 +536,14 @@ code2llm/
 - `print_start_info(args, source_path, output_dir)` — Print analysis start information if verbose.
 - `validate_chunked_output(output_dir, args)` — Validate generated chunked output.
 - `generate_llm_context(args_list)` — Quick command to generate LLM context only.
-- `main()` — —
-- `run_analysis(project_path)` — Run code2llm and return analysis outputs.
-- `get_refactoring_advice(outputs, model)` — Send analysis to LLM and get refactoring advice.
-- `main()` — —
 - `get_ast(filepath, registry)` — Return parsed AST for *filepath* using the shared registry.
 - `find_function_node(tree, name, line)` — Locate a function/async-function node by name and line number.
 - `ast_unparse(node, default_none)` — Convert an AST node to its source string via ast.unparse (Python 3.9+).
 - `qualified_name(module_name, class_stack, name)` — Build a fully-qualified dotted name from module, optional class scope, and name.
 - `expr_to_str(node)` — Convert an AST expression to a dotted string (for call-name extraction).
 - `make_cache_key(file_path, content)` — Generate a cache key from file stem and MD5 of content.
+- `should_use_chunking(project_path, size_threshold_kb)` — Check if repository should use chunked analysis.
+- `get_analysis_plan(project_path, size_limit_kb)` — Get analysis plan for project (auto-detect if chunking needed).
 - `should_skip_file(file_str, project_path, gitignore_parser)` — Check if file should be skipped.
 - `collect_files_in_dir(dir_path, project_path)` — Collect Python files recursively in a directory.
 - `collect_root_files(project_path)` — Collect Python files at root level.
@@ -523,52 +556,45 @@ code2llm/
 - `should_split_toon(filepath, max_kb)` — Check if TOON file exceeds size limit.
 - `split_toon_file(source_file, output_dir, max_kb, prefix)` — Split large TOON file into chunks under size limit.
 - `manage_toon_size(source_file, output_dir, max_kb, prefix)` — Main entry point: check and split TOON file if needed.
-- `get_all_projects(cache_root)` — Return summary dicts for every cached project.
-- `clear_all(cache_root)` — Delete entire ~/.code2llm/ cache.
 - `analyze_rust(content, file_path, module_name, ext)` — Analyze Rust files using regex-based parsing.
-- `analyze_cpp(content, file_path, module_name, ext)` — Analyze C++ files using shared C-family extraction.
-- `evaluate_format(name, content, path)` — Oceń pojedynczy format względem ground truth.
-- `register_language()` — Decorator to register a language parser.
-- `get_parser(extension)` — Get parser for a file extension.
-- `list_parsers()` — List all registered parsers.
-- `extract_declarations_ts(tree, source_bytes, ext, file_path)` — Extract all declarations from a tree-sitter tree.
-- `analyze_csharp(content, file_path, module_name, ext)` — Analyze C# files using shared C-family extraction.
-- `analyze_java(content, file_path, module_name, ext)` — Analyze Java files using shared C-family extraction.
-- `analyze_generic(content, file_path, module_name, ext)` — Basic structural analysis for unsupported languages.
-- `get_typescript_patterns()` — Returns regex patterns for TypeScript/JavaScript parsing.
-- `get_typescript_lang_config()` — Returns language configuration for TypeScript/JavaScript.
-- `analyze_typescript_js(content, file_path, module_name, ext)` — Analyze TypeScript/JavaScript files using shared extraction.
-- `analyze_go(content, file_path, module_name, ext)` — Analyze Go files. Uses tree-sitter when available, regex fallback.
-- `analyze_php(content, file_path, module_name, ext)` — —
-- `get_parser()` — Get global TreeSitterParser instance.
-- `parse_source(content, ext)` — Convenience function: parse string content for given extension.
-- `is_available()` — Check if tree-sitter is available.
 - `analyze_ruby(content, file_path, module_name, ext)` — Analyze Ruby files using shared extraction.
 - `extract_function_body(content, start_line)` — Extract the body of a function between braces from a start line (1-indexed).
 - `calculate_complexity_regex(content, result, lang)` — Estimate cyclomatic complexity for every function using regex keyword counting.
 - `extract_calls_regex(content, module_name, result)` — Extract function calls from function bodies using regex.
 - `analyze_c_family(content, file_path, module_name, stats)` — Shared analyzer for C-family languages (Java, C#, C++, etc.).
+- `analyze_cpp(content, file_path, module_name, ext)` — Analyze C++ files using shared C-family extraction.
+- `register_language()` — Decorator to register a language parser.
+- `get_parser(extension)` — Get parser for a file extension.
+- `list_parsers()` — List all registered parsers.
+- `extract_declarations_ts(tree, source_bytes, ext, file_path)` — Extract all declarations from a tree-sitter tree.
+- `get_parser()` — Get global TreeSitterParser instance.
+- `parse_source(content, ext)` — Convenience function: parse string content for given extension.
+- `is_available()` — Check if tree-sitter is available.
+- `analyze_php(content, file_path, module_name, ext)` — —
+- `analyze_csharp(content, file_path, module_name, ext)` — Analyze C# files using shared C-family extraction.
+- `analyze_go(content, file_path, module_name, ext)` — Analyze Go files. Uses tree-sitter when available, regex fallback.
+- `analyze_java(content, file_path, module_name, ext)` — Analyze Java files using shared C-family extraction.
+- `analyze_generic(content, file_path, module_name, ext)` — Basic structural analysis for unsupported languages.
+- `get_typescript_patterns()` — Returns regex patterns for TypeScript/JavaScript parsing.
+- `get_typescript_lang_config()` — Returns language configuration for TypeScript/JavaScript.
+- `analyze_typescript_js(content, file_path, module_name, ext)` — Analyze TypeScript/JavaScript files using shared extraction.
 - `export_format(name, description, extension, supports_project_yaml)` — Decorator to register an exporter with the EXPORT_REGISTRY.
 - `get_exporter(name)` — Get exporter class by format name.
 - `list_exporters()` — List all registered exporters with metadata.
 - `load_project_yaml(path)` — Load and validate project.yaml with detailed error reporting.
-- `is_excluded_path(path)` — Return True if *path* matches any standard exclusion pattern (venv, cache, etc.).
 - `validate_project_yaml(output_dir, verbose)` — Validate project.yaml against generated views in output_dir.
-- `run_benchmark()` — Run the full format quality benchmark.
-- `get_existing_files(output_dir)` — Check which files exist in the output directory.
+- `is_excluded_path(path)` — Return True if *path* matches any standard exclusion pattern (venv, cache, etc.).
 - `generate_readme_content(project_path, output_dir, total_functions, total_classes)` — Generate the complete README.md content.
+- `get_existing_files(output_dir)` — Check which files exist in the output directory.
+- `extract_insights(output_dir)` — Extract insights from existing analysis files.
 - `build_core_files_section(existing, insights)` — Build the Core Analysis Files section dynamically.
 - `build_llm_files_section(existing)` — Build the LLM-Ready Documentation section dynamically.
 - `build_viz_files_section(existing)` — Build the Visualizations section dynamically.
-- `extract_insights(output_dir)` — Extract insights from existing analysis files.
 - `build_evolution(health, total_lines, prev_evolution)` — Build append-only evolution history.
 - `load_previous_evolution(output_path)` — Load previous evolution entries from existing project.yaml.
 - `build_health(result, modules)` — Build health section with CC metrics, alerts, and issues.
 - `build_alerts(result)` — Build list of health alerts for high CC and high fan-out.
 - `count_duplicates(result)` — Count duplicate class names in different files.
-- `build_hotspots(result)` — Build hotspots list (high fan-out functions).
-- `hotspot_note(fi, fan_out)` — Generate descriptive note for a hotspot.
-- `build_refactoring(result, modules, hotspots)` — Build prioritized refactoring actions.
 - `build_modules(result, line_counts)` — Build module list with per-file metrics.
 - `group_by_file(result)` — Group functions and classes by file path.
 - `compute_module_entry(fpath, result, line_counts, file_funcs)` — Build a single module dict for the given file.
@@ -576,9 +602,17 @@ code2llm/
 - `build_exports(funcs, classes, result)` — Build export list (classes + standalone functions) for a module.
 - `build_class_export(ci, result)` — Build export entry for a single class.
 - `build_function_exports(funcs, classes)` — Build export entries for standalone (non-method) functions.
-- `is_excluded(path)` — Check if path should be excluded (venv, site-packages, etc.).
-- `render_module_list(result, is_excluded_path)` — Render M[] — module list with line counts.
+- `build_hotspots(result)` — Build hotspots list (high fan-out functions).
+- `hotspot_note(fi, fan_out)` — Generate descriptive note for a hotspot.
+- `build_refactoring(result, modules, hotspots)` — Build prioritized refactoring actions.
+- `render_header(ctx)` — Render header line.
+- `render_next(ctx)` — Render NEXT — ranked refactoring queue.
+- `render_risks(ctx)` — Render RISKS — potential breaking changes.
+- `render_metrics_target(ctx)` — Render METRICS-TARGET — baseline vs goals.
+- `render_patterns(ctx)` — Render PATTERNS — shared language parser extraction patterns.
+- `render_history(ctx, output_path)` — Render HISTORY — load previous evolution.toon.yaml if exists.
 - `export_to_yaml(result, output_path)` — Generate evolution.toon.yaml (structured YAML).
+- `is_excluded(path)` — Check if path should be excluded (venv, site-packages, etc.).
 - `compute_func_data(result)` — Compute per-function metrics, excluding venv.
 - `scan_file_sizes(project_path)` — Scan Python files and return line counts.
 - `aggregate_file_stats(result, file_lines)` — Aggregate function and class data per file.
@@ -587,29 +621,30 @@ code2llm/
 - `compute_god_modules(result)` — Identify god modules (≥500 lines) from project files.
 - `compute_hub_types(result)` — Identify hub types consumed by many functions.
 - `build_context(result)` — Build context dict with all computed metrics.
-- `render_header(result, output_path, is_excluded_path)` — Render header lines with project stats and alerts.
 - `build_alerts(funcs)` — Build a compact list of top alerts for the header.
 - `build_hotspots(funcs)` — Build a compact list of top fan-out hotspots for the header.
 - `load_evolution_trend(evolution_path, current_cc)` — Summarize the latest CC trend from the previous evolution.toon.yaml file.
-- `render_header(ctx)` — Render header line.
-- `render_next(ctx)` — Render NEXT — ranked refactoring queue.
-- `render_risks(ctx)` — Render RISKS — potential breaking changes.
-- `render_metrics_target(ctx)` — Render METRICS-TARGET — baseline vs goals.
-- `render_patterns(ctx)` — Render PATTERNS — shared language parser extraction patterns.
-- `render_history(ctx, output_path)` — Render HISTORY — load previous evolution.toon.yaml if exists.
+- `render_module_list(result, is_excluded_path)` — Render M[] — module list with line counts.
 - `render_details(result, is_excluded_path)` — Render D: — details per module.
-- `generate_index_html(output_dir)` — Generate index.html in the specified directory.
+- `render_header(result, output_path, is_excluded_path)` — Render header lines with project stats and alerts.
+- `export_to_yaml(result, output_path, is_excluded_path)` — Export analysis result to map.toon.yaml format (structured YAML).
 - `rel_path(fpath, project_path)` — Get relative path from project root.
 - `file_line_count(fpath)` — Count lines in a file.
 - `count_total_lines(result, is_excluded_path)` — Count total lines across all modules.
 - `detect_languages(result, is_excluded_path)` — Detect all supported programming languages in the project.
-- `export_flow_detailed(result, output_path, include_examples)` — Export detailed per-module view (~150 nodes).
+- `generate_index_html(output_dir)` — Generate index.html in the specified directory.
+- `get_file_types()` — Get file type configuration mapping.
+- `get_default_file_info(ext)` — Get default file info for unknown extension.
 - `export_compact(result, output_path)` — Export module-level graph: one node per module, weighted edges.
-- `dump_yaml(data)` — Shared YAML serialiser (sort_keys=False, unicode, width=100).
-- `export_flow_full(result, output_path, include_examples)` — Export full debug view with all nodes (original flow.mmd).
-- `export_calls(result, output_path)` — Export simplified call graph — only connected nodes.
-- `export_to_yaml(result, output_path, is_excluded_path)` — Export analysis result to map.toon.yaml format (structured YAML).
 - `export_classic(result, output_path)` — Export full flow diagram with CC-based node shapes and styling.
+- `export_flow_detailed(result, output_path, include_examples)` — Export detailed per-module view (~150 nodes).
+- `export_calls(result, output_path)` — Export simplified call graph — only connected nodes.
+- `should_skip_module(module, include_examples)` — Check if module should be skipped (examples, benchmarks, etc.).
+- `is_entry_point(func_name, fi, result)` — Detect if function is an entry point (main, cli, api entry).
+- `build_callers_graph(result, name_index)` — Build reverse graph: map each function to its callers.
+- `find_leaves(result, name_index)` — Find leaf nodes (functions that don't call other project functions).
+- `find_critical_path(result, entry_points)` — Find the longest path from entry points (critical path).
+- `export_flow_compact(result, output_path, include_examples)` — Export compact architectural view (~50 nodes).
 - `readable_id(name)` — Create human-readable Mermaid-safe unique node ID.
 - `safe_module(name)` — Create safe subgraph name.
 - `module_of(func_name)` — Extract module from qualified name.
@@ -617,47 +652,29 @@ code2llm/
 - `resolve_callee(callee, funcs, name_index)` — Resolve callee to a known qualified name.
 - `write_file(path, lines)` — Write lines to file.
 - `get_cc(fi)` — Extract cyclomatic complexity from FunctionInfo.
-- `run_cli()` — Run the CLI interface for generating PNGs from Mermaid files.
-- `create_parser()` — —
-- `main(argv)` — —
-- `should_skip_module(module, include_examples)` — Check if module should be skipped (examples, benchmarks, etc.).
-- `is_entry_point(func_name, fi, result)` — Detect if function is an entry point (main, cli, api entry).
-- `build_callers_graph(result, name_index)` — Build reverse graph: map each function to its callers.
-- `find_leaves(result, name_index)` — Find leaf nodes (functions that don't call other project functions).
-- `find_critical_path(result, entry_points)` — Find the longest path from entry points (critical path).
-- `export_flow_compact(result, output_path, include_examples)` — Export compact architectural view (~50 nodes).
-- `save_report(results, filename)` — Save benchmark report to reports folder.
-- `create_test_project(size)` — Create test project of specified size.
-- `benchmark_original_analyzer(project_path, runs)` — Benchmark original ProjectAnalyzer.
-- `benchmark_streaming_analyzer(project_path, runs)` — Benchmark new StreamingAnalyzer.
-- `benchmark_with_strategies(project_path)` — Benchmark all strategies.
-- `print_comparison(original, streaming)` — Print comparison table.
-- `main()` — Run benchmark suite.
-- `get_file_types()` — Get file type configuration mapping.
-- `get_default_file_info(ext)` — Get default file info for unknown extension.
-- `validate_mermaid_file(mmd_path)` — Validate Mermaid file and return list of errors.
-- `generate_pngs(input_dir, output_dir, timeout, max_workers)` — Generate PNG files from all .mmd files in input_dir (parallel).
-- `generate_single_png(mmd_file, output_file, timeout)` — Generate PNG from single Mermaid file using available renderers.
-- `generate_with_puppeteer(mmd_file, output_file, timeout, max_text_size)` — Generate PNG using Puppeteer with HTML template.
-- `fix_mermaid_file(mmd_path)` — Attempt to fix common Mermaid syntax errors.
+- `export_flow_full(result, output_path, include_examples)` — Export full debug view with all nodes (original flow.mmd).
+- `dump_yaml(data)` — Shared YAML serialiser (sort_keys=False, unicode, width=100).
 - `normalize_llm_task(data)` — —
 - `parse_llm_task_text(text)` — Parse LLM task text into structured data.
 - `load_input(path)` — Load input file with detailed YAML/JSON error reporting.
 - `create_parser()` — —
 - `main(argv)` — —
-- `NewUserService()` — —
-- `AddUser()` — —
-- `GetUser()` — —
-- `ProcessUsers()` — —
-- `main()` — —
+- `run_cli()` — Run the CLI interface for generating PNGs from Mermaid files.
+- `create_parser()` — —
+- `main(argv)` — —
+- `generate_llm_flow(analysis, max_functions, limit_decisions, limit_calls)` — —
+- `render_llm_flow_md(flow)` — —
+- `validate_mermaid_file(mmd_path)` — Validate Mermaid file and return list of errors.
+- `generate_pngs(input_dir, output_dir, timeout, max_workers)` — Generate PNG files from all .mmd files in input_dir (parallel).
+- `generate_single_png(mmd_file, output_file, timeout)` — Generate PNG from single Mermaid file using available renderers.
+- `generate_with_puppeteer(mmd_file, output_file, timeout, max_text_size)` — Generate PNG using Puppeteer with HTML template.
+- `fix_mermaid_file(mmd_path)` — Attempt to fix common Mermaid syntax errors.
 - `parse_toon_content(content)` — Parse TOON v2 plain-text format.
 - `is_toon_file(filepath)` — Check if file is TOON format based on extension or content.
 - `load_toon(filepath)` — Parse TOON plain-text format into structured data.
-- `run_pipeline(project_dir, output_dir)` — Run unified pipeline in single process.
-- `generate_llm_flow(analysis, max_functions, limit_decisions, limit_calls)` — —
-- `render_llm_flow_md(flow)` — —
-- `should_use_chunking(project_path, size_threshold_kb)` — Check if repository should use chunked analysis.
-- `get_analysis_plan(project_path, size_limit_kb)` — Get analysis plan for project (auto-detect if chunking needed).
+- `main()` — —
+- `get_all_projects(cache_root)` — Return summary dicts for every cached project.
+- `clear_all(cache_root)` — Delete entire ~/.code2llm/ cache.
 
 
 ## Project Structure
@@ -725,7 +742,7 @@ code2llm/
 📄 `code2llm.core.lang.typescript` (3 functions)
 📄 `code2llm.core.large_repo` (20 functions, 2 classes)
 📄 `code2llm.core.models` (6 functions, 11 classes)
-📄 `code2llm.core.persistent_cache` (18 functions, 1 classes)
+📄 `code2llm.core.persistent_cache` (20 functions, 1 classes)
 📄 `code2llm.core.refactoring` (11 functions, 1 classes)
 📄 `code2llm.core.repo_files` (8 functions)
 📦 `code2llm.core.streaming`
@@ -824,11 +841,19 @@ code2llm/
 📄 `code2llm.nlp.normalization` (13 functions, 2 classes)
 📄 `code2llm.nlp.pipeline` (20 functions, 3 classes)
 📄 `code2llm.parsers.toon_parser` (10 functions)
-📦 `code2llm.patterns`
 📄 `code2llm.patterns.detector` (8 functions, 1 classes)
 📦 `code2llm.refactor`
 📄 `code2llm.refactor.prompt_engine` (7 functions, 1 classes)
-📄 `demo_langs.valid.sample` (8 functions, 2 classes)
+📄 `demo_langs.valid.sample` (7 functions, 2 classes)
+📄 `examples.docker-doql-example.app.main` (2 functions, 1 classes)
+📄 `examples.docker-doql-example.go.main` (3 functions, 1 classes)
+📄 `examples.docker-doql-example.java.Main` (9 functions, 1 classes)
+📦 `examples.docker-doql-example.node` (6 functions)
+📄 `examples.docker-doql-example.php.index` (1 functions)
+📄 `examples.docker-doql-example.ruby.app`
+📄 `examples.docker-doql-example.run-doql`
+📄 `examples.docker-doql-example.rust.src.main` (1 classes)
+📄 `examples.docker-doql-example.worker.worker` (2 functions)
 📦 `examples.functional_refactoring`
 📄 `examples.functional_refactoring.cache` (10 functions, 2 classes)
 📄 `examples.functional_refactoring.cli` (1 functions)
@@ -853,8 +878,7 @@ code2llm/
 📄 `scripts.bump_version` (7 functions)
 📄 `setup` (2 functions)
 📄 `test_langs.invalid.sample_bad` (3 functions, 2 classes)
-📄 `test_langs.valid.sample` (5 functions, 2 classes)
-📦 `test_python_only.invalid`
+📄 `test_langs.valid.sample` (4 functions, 2 classes)
 📦 `test_python_only.valid`
 📄 `test_python_only.valid.sample` (5 functions, 2 classes)
 📄 `validate_toon` (21 functions)

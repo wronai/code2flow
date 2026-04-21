@@ -65,6 +65,8 @@ class FileAnalyzer:
             cached = self.cache.get_fast(file_path)
             if cached:
                 self.stats['cache_hits'] += 1
+                if 'file' not in cached:
+                    cached['file'] = file_path
                 return cached
 
         ext = path.suffix.lower()
@@ -74,6 +76,14 @@ class FileAnalyzer:
             return {}
 
         result = self._route_to_language_analyzer(content, file_path, module_name, ext)
+
+        # Tag result with its source file so downstream callers
+        # (e.g. PersistentCache in ProjectAnalyzer._store_to_persistent_cache)
+        # can match results back to file paths. Without this, the persistent
+        # manifest never gets populated and the export-level cache key
+        # collapses to md5("{}")[:12], causing stale exports to be reused.
+        if result:
+            result['file'] = file_path
 
         if self.cache and self.config.performance.enable_cache and result:
             self.cache.put_fast(file_path, result)

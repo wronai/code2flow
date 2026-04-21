@@ -36,27 +36,26 @@ VERSION = 2
 _DEFAULT_ROOT = os.path.expanduser("~/.code2llm")
 _MAX_CACHE_MB = 500
 _GC_THRESHOLD = 0.8
-
-try:
-    import msgpack as _msgpack
-    _HAS_MSGPACK = True
-except ImportError:
-    _HAS_MSGPACK = False
-
+_DEFAULT_TTL_DAYS = 1.0
+# Opt-out via env var: CODE2LLM_AUTO_CLEANUP=0 disables automatic TTL-based
+# cleanup on PersistentCache initialisation. Override TTL via
+# CODE2LLM_CACHE_TTL_DAYS (accepts fractional days, e.g. "0.5").
+_ENV_AUTO_CLEANUP = "CODE2LLM_AUTO_CLEANUP"
+_ENV_TTL_DAYS = "CODE2LLM_CACHE_TTL_DAYS"
 
 def _pack(obj: Any) -> bytes:
-    if _HAS_MSGPACK:
-        return _msgpack.packb(obj, use_bin_type=True)
+    # Always pickle: analysis results contain dataclasses (ModuleInfo,
+    # FunctionInfo, ...) and graph objects that msgpack cannot serialize
+    # natively. Falling back to pickle unconditionally keeps the cache
+    # correct; the speed/size delta is negligible for our payloads.
     return pickle.dumps(obj, protocol=4)
 
 
 def _unpack(data: bytes) -> Any:
-    if _HAS_MSGPACK:
-        return _msgpack.unpackb(data, raw=False)
     return pickle.loads(data)
 
 
-_EXT = "msgpack" if _HAS_MSGPACK else "pkl"
+_EXT = "pkl"
 
 
 class PersistentCache:
@@ -67,7 +66,13 @@ class PersistentCache:
     safe because entries are immutable once written (content-addressed).
     """
 
-    def __init__(self, project_dir: str, cache_root: Optional[str] = None):
+    def __init__(
+        self,
+        project_dir: str,
+        cache_root: Optional[str] = None,
+        auto_cleanup: Optional[bool] = None,
+        ttl_days: Optional[float] = None,
+    ):
         self._project_dir = os.path.realpath(project_dir)
         self._root = Path(cache_root or _DEFAULT_ROOT)
         self._project_hash = hashlib.md5(
@@ -84,6 +89,21 @@ class PersistentCache:
 
         self._manifest: Dict[str, Any] = self._load_manifest()
         self._dirty = False
+
+        # Resolve cleanup policy: explicit arg > env var > default.
+        if auto_cleanup is None:
+            auto_cleanup = os.environ.get(_ENV_AUTO_CLEANUP, "1") != "0"
+        if ttl_days is None:
+            try:
+                ttl_days = float(os.environ.get(_ENV_TTL_DAYS, _DEFAULT_TTL_DAYS))
+            except ValueError:
+                ttl_days = _DEFAULT_TTL_DAYS
+        if auto_cleanup:
+            try:
+                self.auto_cleanup(ttl_days=ttl_days)
+            except Exception as exc:
+                # Never let cleanup errors break analysis.
+                logger.debug("auto_cleanup failed: %s", exc)
 
     # ------------------------------------------------------------------
     # File-level cache
@@ -167,12 +187,43 @@ class PersistentCache:
 
         return changed, cached
 
+    def prune_missing(self, current_filepaths: List[str]) -> List[str]:
+        """Remove manifest entries for files not present in *current_filepaths*.
+
+        Keeps the manifest in sync with the real project state so that a
+        deleted source file invalidates the export-level cache (the
+        per-file cache key is content-addressed, but the export-level cache
+        key is derived from the manifest and therefore must shrink when
+        files disappear).
+
+        Returns the list of relative paths that were removed.
+        """
+        current_rel = {
+            os.path.relpath(fp, self._project_dir) for fp in current_filepaths
+        }
+        files_index = self._manifest["files"]
+        stale = [rel for rel in files_index if rel not in current_rel]
+        if not stale:
+            return []
+        for rel in stale:
+            files_index.pop(rel, None)
+        self._dirty = True
+        return stale
+
     # ------------------------------------------------------------------
     # Export-level cache
     # ------------------------------------------------------------------
 
     def get_export_cache_dir(self, config_dict: Dict) -> Optional[Path]:
-        """Return path to a complete cached export, or None if stale/absent."""
+        """Return path to a complete cached export, or None if stale/absent.
+
+        Safety: when the per-file manifest is empty we cannot reliably key
+        the run (hash collapses to md5("{}")), so we refuse to return a
+        cached export. This avoids propagating stale content from an earlier
+        run after the per-file cache was cleared or never populated.
+        """
+        if not self._manifest.get("files"):
+            return None
         run_hash = self._compute_run_hash(config_dict)
         export_dir = self._exports_dir / run_hash
         if export_dir.exists() and (export_dir / "_complete").exists():
@@ -230,6 +281,68 @@ class PersistentCache:
             return total / (1024 * 1024)
         except OSError:
             return 0.0
+
+    def auto_cleanup(self, ttl_days: float = _DEFAULT_TTL_DAYS) -> Dict[str, int]:
+        """Remove stale cache artefacts older than *ttl_days*.
+
+        Runs automatically on `__init__` (opt-out via env var
+        `CODE2LLM_AUTO_CLEANUP=0`). Prevents unbounded disk growth while
+        keeping content-addressed file cache entries that are still
+        referenced by the manifest.
+
+        What is removed:
+          - Export directories with a `_complete` stamp older than TTL,
+            or export dirs never marked complete whose mtime is older
+            than TTL (dead/abandoned runs).
+          - File-level cache entries (`files/*.pkl`) whose mtime is older
+            than TTL AND whose hash is no longer referenced by the
+            manifest (orphaned). Referenced entries are kept regardless
+            of age — they represent content still present in the project.
+
+        Returns a dict summary `{"exports": n, "files": n}` for logging.
+        """
+        cutoff = time.time() - (ttl_days * 86400)
+        removed = {"exports": 0, "files": 0}
+
+        # 1) Stale exports (complete or abandoned)
+        if self._exports_dir.exists():
+            for export_dir in list(self._exports_dir.iterdir()):
+                if not export_dir.is_dir():
+                    continue
+                complete = export_dir / "_complete"
+                try:
+                    if complete.exists():
+                        ts = float(complete.read_text())
+                    else:
+                        ts = export_dir.stat().st_mtime
+                    if ts < cutoff:
+                        shutil.rmtree(export_dir, ignore_errors=True)
+                        removed["exports"] += 1
+                except (ValueError, OSError):
+                    pass
+
+        # 2) Orphaned file-level entries older than TTL
+        known = {v.get("hash") for v in self._manifest.get("files", {}).values()}
+        if self._files_dir.exists():
+            for f in list(self._files_dir.iterdir()):
+                if not f.is_file():
+                    continue
+                if f.stem in known:
+                    continue  # still referenced
+                try:
+                    if f.stat().st_mtime < cutoff:
+                        f.unlink()
+                        removed["files"] += 1
+                except OSError:
+                    pass
+
+        if removed["exports"] or removed["files"]:
+            logger.debug(
+                "auto_cleanup: removed %d exports, %d orphan file entries "
+                "(ttl=%.1fd, project=%s)",
+                removed["exports"], removed["files"], ttl_days, self._project_dir,
+            )
+        return removed
 
     def gc(self, max_age_days: int = 30, max_size_mb: int = _MAX_CACHE_MB) -> int:
         """Remove stale exports and orphaned file entries.

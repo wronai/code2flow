@@ -1,4 +1,4 @@
-# code2llm | 157f 23361L | python:156 | 2026-04-21
+# code2llm | 157f 23354L | python:156 | 2026-04-21
 # CC̄=4.3 | critical:1/939 | dups:0 | cycles:0
 
 HEALTH[1]:
@@ -153,7 +153,7 @@ LAYERS:
   │ base                       464L  0C   14m  CC=14     ←8
   │ analyzer                   460L  1C   20m  CC=11     ←0
   │ file_analyzer              402L  1C   18m  CC=12     ←0
-  │ persistent_cache           353L  1C   19m  CC=10     ←1
+  │ persistent_cache           346L  1C   19m  CC=10     ←1
   │ config                     269L  6C    2m  CC=3      ←0
   │ toon_size_manager          265L  0C    8m  CC=10     ←1
   │ scanner                    201L  1C    6m  CC=14     ←0
@@ -218,23 +218,23 @@ COUPLING:
         exporters.readme                      ←6                                                                                                                                                                                                                                                                                                                      ──                          hub
             cli_analysis                                                                                               1                       2                                                                                                                                                                      ←1                                                                      ──
   CYCLES: none
-  HUB: exporters.readme/ (fan-in=6)
-  HUB: core/ (fan-in=9)
-  HUB: exporters/ (fan-in=54)
   HUB: cli_commands/ (fan-in=5)
-  HUB: core.lang/ (fan-in=9)
+  HUB: exporters.readme/ (fan-in=6)
   HUB: exporters.evolution/ (fan-in=7)
+  HUB: core/ (fan-in=9)
   HUB: exporters.mermaid/ (fan-in=15)
+  HUB: exporters/ (fan-in=54)
+  HUB: core.lang/ (fan-in=9)
   HUB: analysis.utils/ (fan-in=7)
-  SMELL: core/ fan-out=9 → split needed
-  SMELL: exporters/ fan-out=32 → split needed
-  SMELL: analysis/ fan-out=9 → split needed
   SMELL: exporters.map/ fan-out=11 → split needed
-  SMELL: exporters.toon/ fan-out=10 → split needed
-  SMELL: cli/ fan-out=8 → split needed
+  SMELL: analysis/ fan-out=9 → split needed
+  SMELL: core/ fan-out=9 → split needed
   SMELL: exporters.mermaid/ fan-out=15 → split needed
-  SMELL: cli_exports/ fan-out=11 → split needed
+  SMELL: exporters/ fan-out=32 → split needed
   SMELL: exporters.project_yaml/ fan-out=17 → split needed
+  SMELL: cli/ fan-out=8 → split needed
+  SMELL: exporters.toon/ fan-out=10 → split needed
+  SMELL: cli_exports/ fan-out=11 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

@@ -1,13 +1,17 @@
-# vallm batch | 283f | 0✓ 258⚠ 0✗ | 2026-04-21
+# vallm batch | 300f | 0✓ 270⚠ 0✗ | 2026-04-21
 
 SUMMARY:
-  scanned: 283  passed: 0 (0.0%)  warnings: 258  errors: 0  unsupported: 0
+  scanned: 300  passed: 0 (0.0%)  warnings: 270  errors: 0  unsupported: 0
 
-WARNINGS[258]{path,score}:
+WARNINGS[270]{path,score}:
   code2llm/cli_parser.py,0.74
     issues[2]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
       complexity.lizard_length,warning,create_parser: 262 lines exceeds limit 100,19
+  code2llm/core/persistent_cache.py,0.74
+    issues[2]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+      complexity.lizard_cc,warning,auto_cleanup: CC=16 exceeds limit 15,285
   pipeline.py,0.74
     issues[2]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
@@ -221,9 +225,6 @@ WARNINGS[258]{path,score}:
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
   code2llm/core/models.py,0.78
-    issues[1]{rule,severity,message,line}:
-      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
-  code2llm/core/persistent_cache.py,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
   code2llm/core/refactoring.py,0.78
@@ -583,6 +584,36 @@ WARNINGS[258]{path,score}:
   demo_langs/valid/sample.ts,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse TYPESCRIPT: Download error: Language 'TYPESCRIPT' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/app/main.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/go/main.go,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse GO: Download error: Language 'GO' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/java/Main.java,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JAVA: Download error: Language 'JAVA' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/node/index.js,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse JAVASCRIPT: Download error: Language 'JAVASCRIPT' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/php/index.php,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PHP: Download error: Language 'PHP' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/ruby/app.rb,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse RUBY: Download error: Language 'RUBY' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/run-doql.sh,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse BASH: Download error: Language 'BASH' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/rust/Cargo.toml,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse TOML: Download error: Language 'TOML' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/rust/src/main.rs,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse RUST: Download error: Language 'RUST' not available for download. Available groups: [""all""]",
+  examples/docker-doql-example/worker/worker.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
   examples/functional_refactoring/__init__.py,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
@@ -733,6 +764,9 @@ WARNINGS[258]{path,score}:
   tests/test_analyzer.py,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_cache_invalidation_e2e.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
   tests/test_calls_toon_export.py,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
@@ -740,6 +774,9 @@ WARNINGS[258]{path,score}:
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
   tests/test_edge_cases.py,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
+  tests/test_file_analyzer_tagging.py,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse PYTHON: Download error: Language 'PYTHON' not available for download. Available groups: [""all""]",
   tests/test_flow_exporter.py,0.78

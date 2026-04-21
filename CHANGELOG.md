@@ -1,5 +1,34 @@
 ## [Unreleased]
 
+## [0.5.143] - 2026-04-21
+
+### Docs
+- Update README.md
+- Update context.md
+- Update docs/README.md
+- Update examples/docker-doql-example/DEPENDENCY_ANALYSIS.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_cache_invalidation_e2e.py
+- Update tests/test_declarative_collection.py
+- Update tests/test_file_analyzer_tagging.py
+- Update tests/test_persistent_cache.py
+
+### Other
+- Update analysis.toon.yaml
+- Update batch_1/analysis.toon.yaml
+- Update code2llm/analysis.toon.yaml
+- Update code2llm/core/analyzer.py
+- Update code2llm/core/config.py
+- Update code2llm/core/file_analyzer.py
+- Update code2llm/core/persistent_cache.py
+- Update code2llm_part2/analysis.toon.yaml
+- Update evolution.toon.yaml
+- Update project/analysis.toon.yaml
+- ... and 22 more files
+
 ## [0.5.142] - 2026-04-21
 
 ### Docs

@@ -16,7 +16,11 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-from .config import Config, FAST_CONFIG, ALL_EXTENSIONS, LANGUAGE_EXTENSIONS, DEFAULT_PROGRESS_BAR_THRESHOLD
+from .config import (
+    Config, FAST_CONFIG, ALL_EXTENSIONS, ALL_FILENAMES,
+    LANGUAGE_EXTENSIONS, LANGUAGE_FILENAME_PREFIXES,
+    DEFAULT_PROGRESS_BAR_THRESHOLD,
+)
 from .models import AnalysisResult, FlowEdge, FlowNode, Pattern
 from code2llm.analysis.call_graph import CallGraphExtractor
 
@@ -89,6 +93,11 @@ class ProjectAnalyzer:
             pcache = PersistentCache(str(project_path))
             file_paths = [fp for fp, _ in files]
             changed_paths, cached_paths = pcache.get_changed_files(file_paths)
+            # Drop manifest entries for files that vanished since the last
+            # run. Without this the export-level cache key (derived from the
+            # manifest) wouldn't shrink on delete and stale exports could
+            # be re-used.
+            removed = pcache.prune_missing(file_paths)
             path_to_module = dict(files)
             cached_results: List[Dict] = []
             for fp in cached_paths:
@@ -100,6 +109,12 @@ class ProjectAnalyzer:
             files_to_analyze = [(fp, path_to_module[fp]) for fp in changed_paths]
             if self.config.verbose:
                 print(f"  - Persistent cache: {len(cached_results)} hits, {len(files_to_analyze)} to analyze")
+                if removed:
+                    print(f"  - Persistent cache: {len(removed)} stale entries pruned (deleted files)")
+                    for rel in removed[:10]:
+                        print(f"     • {rel}")
+                    if len(removed) > 10:
+                        print(f"     ... and {len(removed) - 10} more")
             return pcache, cached_results, files_to_analyze
         except Exception as exc:
             logger.debug("PersistentCache init failed, falling back: %s", exc)
@@ -119,16 +134,23 @@ class ProjectAnalyzer:
         files_to_analyze: List[Tuple[str, str]],
         fresh_results: List[Dict],
     ) -> None:
-        """Persist fresh analysis results to cache; no-op when pcache is None."""
-        if pcache is None or not fresh_results:
+        """Persist fresh analysis results to cache; no-op when pcache is None.
+
+        Note: we always attempt to save — even without fresh_results — so
+        that manifest pruning of deleted files (done in
+        _load_from_persistent_cache) is persisted. save() is a cheap no-op
+        when nothing is dirty.
+        """
+        if pcache is None:
             return
-        path_to_result = {r.get('file', ''): r for r in fresh_results if r}
-        for fp, _ in files_to_analyze:
-            if fp in path_to_result:
-                try:
-                    pcache.put_file_result(fp, path_to_result[fp])
-                except Exception as exc:
-                    logger.debug("put_file_result failed: %s", exc)
+        if fresh_results:
+            path_to_result = {r.get('file', ''): r for r in fresh_results if r}
+            for fp, _ in files_to_analyze:
+                if fp in path_to_result:
+                    try:
+                        pcache.put_file_result(fp, path_to_result[fp])
+                    except Exception as exc:
+                        logger.debug("put_file_result failed: %s", exc)
         try:
             pcache.save()
         except Exception as exc:
@@ -183,6 +205,10 @@ class ProjectAnalyzer:
         """
         files = []
         ext_set = set(ALL_EXTENSIONS)  # O(1) lookup
+        # Filename lookup uses a case-insensitive set. We lowercase once
+        # here so the hot loop only does a single lower() per file.
+        filename_set_lower = frozenset(n.lower() for n in ALL_FILENAMES)
+        filename_prefixes_lower = tuple(p.lower() for p in LANGUAGE_FILENAME_PREFIXES)
         init_names = frozenset({'__init__.py', 'index.js', 'index.ts', 'mod.rs', 'lib.rs'})
         seen = set()  # guard against duplicate paths (e.g. .h in both c and cpp lists)
         project_str = str(project_path)
@@ -195,8 +221,16 @@ class ProjectAnalyzer:
             ]
 
             for filename in filenames:
+                filename_lower = filename.lower()
                 suffix = os.path.splitext(filename)[1].lower()
-                if suffix not in ext_set:
+                # Accept by extension, well-known filename
+                # (Dockerfile, Makefile, Jenkinsfile, ...), or known
+                # prefix (Dockerfile.dev, Dockerfile.prod, Makefile.am).
+                if (
+                    suffix not in ext_set
+                    and filename_lower not in filename_set_lower
+                    and not filename_lower.startswith(filename_prefixes_lower)
+                ):
                     continue
 
                 file_str = os.path.join(dirpath, filename)
