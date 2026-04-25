@@ -1,5 +1,21 @@
 ## [Unreleased]
 
+## [0.5.144] - 2026-04-25
+
+### Docs
+- Update README.md
+- Update context.md
+
+### Other
+- Update batch_1/analysis.toon.yaml
+- Update code2llm/analysis.toon.yaml
+- Update code2llm_part2/analysis.toon.yaml
+- Update project/batch_1/analysis.toon.yaml
+- Update project/code2llm/analysis.toon.yaml
+- Update project/root/analysis.toon.yaml
+- Update project2.sh
+- Update root/analysis.toon.yaml
+
 ## [0.5.143] - 2026-04-21
 
 ### Docs

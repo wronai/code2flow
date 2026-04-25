@@ -25,7 +25,7 @@ $PIP install goal --upgrade --quiet
 $PIP install code2logic --upgrade --quiet
 $PIP install code2llm --upgrade --quiet
 #$VENV/bin/code2llm ./ -f toon,evolution,code2logic,project-yaml -o ./project --no-chunk
-$VENV/bin/code2llm ./ -f all -o ./project --no-chunk
+$VENV/bin/code2llm ./ -f all -o ./project --no-chunk --exclude '*.md'
 #$VENV/bin/code2llm report --format all       # → all views
 rm -f project/analysis.json
 rm -f project/analysis.yaml
